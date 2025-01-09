@@ -446,6 +446,7 @@ class _LargeComposeIcon extends StatelessWidget {
 }
 
 typedef _CardSelectedCallback = void Function(int);
+final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
 // ItemList creates the list of cards and the search bar.
 class _ItemList extends StatelessWidget {
@@ -462,41 +463,73 @@ class _ItemList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       backgroundColor: const Color.fromARGB(0, 0, 0, 0),
       floatingActionButton: Breakpoints.mediumAndUp.isActive(context) ? null : const _SmallComposeIcon(),
+      drawer: Drawer(
+        // 抽屉的内容
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text('Menu'),
+            ),
+            ListTile(
+              title: const Text('Item 1'),
+              onTap: () {},
+            ),
+            ListTile(
+              title: const Text('Item 2'),
+              onTap: () {},
+            ),
+          ],
+        ),
+      ),
       body: Column(
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              decoration: InputDecoration(
-                prefixIcon: const Padding(
-                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                  child: Icon(Icons.search),
-                ),
-                suffixIcon: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                  child: CircleAvatar(
-                    radius: 18,
-                    child: Image.asset(
-                      'images/plum.png',
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.menu), // 或者使用任何其他图标
+                onPressed: () {
+                  scaffoldKey.currentState?.openDrawer(); // 打开抽屉
+                },
+              ),
+              Expanded(
+                child: TextField(
+                  decoration: InputDecoration(
+                    prefixIcon: const Padding(
+                      padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                      child: Icon(Icons.search),
                     ),
+                    suffixIcon: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                      child: CircleAvatar(
+                        radius: 18,
+                        child: Image.asset(
+                          'images/plum.png',
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    contentPadding: const EdgeInsets.all(25),
+                    hintStyle: const TextStyle(color: Color.fromARGB(255, 135, 129, 138)),
+                    hintText: 'Search replies',
+                    fillColor: Colors.white,
                   ),
                 ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                contentPadding: const EdgeInsets.all(25),
-                hintStyle: const TextStyle(color: Color.fromARGB(255, 135, 129, 138)),
-                hintText: 'Search replies',
-                fillColor: Colors.white,
               ),
-            ),
+            ],
           ),
           Expanded(
             child: ListView.builder(
