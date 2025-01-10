@@ -13,9 +13,5 @@ class AppPages {
       participatesInRootNavigator: true,
       preventDuplicates: true,
     ),
-    GetPage(
-      name: RoutePath.kDetailView,
-      page: ExtractRouteArguments.new,
-    )
   ];
 }

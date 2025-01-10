@@ -5,4 +5,6 @@ class RoutePath {
 
   /// 详情页
   static const kDetailView = "/detailView";
+
+  static var kSettings = "/settings";
 }
