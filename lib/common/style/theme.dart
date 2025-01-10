@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 
 class MyTheme {
@@ -12,9 +11,6 @@ class MyTheme {
   }) : assert(colorScheme == null || primaryColor == null);
 
   get lightThemeData {
-    if (Platform.isWindows) {
-      fontFamily = 'PingFang';
-    }
     return ThemeData(
       useMaterial3: true,
       splashFactory: NoSplash.splashFactory,
@@ -30,25 +26,18 @@ class MyTheme {
         elevation: 0,
         centerTitle: true,
       ),
-      fontFamily: fontFamily,
     );
   }
 
   get darkThemeData {
-    if (Platform.isWindows) {
-      fontFamily = 'PingFang';
-    }
     return ThemeData(
       useMaterial3: true,
       colorSchemeSeed: primaryColor,
       splashFactory: NoSplash.splashFactory,
-      colorScheme: colorScheme?.copyWith(
-        error: const Color.fromARGB(255, 255, 99, 71),
-      ),
+      colorScheme: colorScheme,
       tabBarTheme: const TabBarTheme(dividerColor: Colors.transparent),
       appBarTheme: const AppBarTheme(scrolledUnderElevation: 0.0, surfaceTintColor: Colors.transparent),
       brightness: Brightness.dark,
-      fontFamily: fontFamily,
     );
   }
 }

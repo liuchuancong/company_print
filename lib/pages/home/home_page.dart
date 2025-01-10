@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:company_print/common/index.dart';
+import 'package:company_print/pages/sales/sales_page.dart';
+import 'package:company_print/pages/units/units_page.dart';
+import 'package:company_print/pages/dishes/dishes_page.dart';
+import 'package:company_print/pages/customer/customer_page.dart';
+import 'package:company_print/pages/vehicles/vehicles_page.dart';
+import 'package:company_print/pages/statistics/statistics_page.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 
 class HomePage extends StatefulWidget {
@@ -11,26 +18,21 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int selectedTab = 0;
   int transitionDuration = 100;
-
+  final List<Widget> bodys = const [
+    SalesPage(),
+    DishesPage(),
+    UnitsPage(),
+    CustomerPage(),
+    VehiclesPage(),
+    StatisticsPage(),
+  ];
   @override
   Widget build(BuildContext context) {
-    final List<Widget> children = <Widget>[
-      for (int i = 0; i < 10; i++)
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            color: const Color.fromARGB(255, 255, 201, 197),
-            height: 400,
-          ),
-        )
-    ];
     return AdaptiveScaffold(
+      appBar: AppBar(),
+      extendedNavigationRailWidth: 150,
+      navigationRailWidth: 50,
       transitionDuration: Duration(milliseconds: transitionDuration),
-      smallBreakpoint: const Breakpoint(endWidth: 700),
-      mediumBreakpoint: const Breakpoint(beginWidth: 700, endWidth: 1000),
-      mediumLargeBreakpoint: const Breakpoint(beginWidth: 1000, endWidth: 1200),
-      largeBreakpoint: const Breakpoint(beginWidth: 1200, endWidth: 1600),
-      extraLargeBreakpoint: const Breakpoint(beginWidth: 1600),
       useDrawer: false,
       selectedIndex: selectedTab,
       onSelectedIndexChange: (int index) {
@@ -38,41 +40,84 @@ class _HomePageState extends State<HomePage> {
           selectedTab = index;
         });
       },
-      destinations: const <NavigationDestination>[
+      destinations: <NavigationDestination>[
         NavigationDestination(
-          icon: Icon(Icons.inbox_outlined),
-          selectedIcon: Icon(Icons.inbox),
-          label: 'Inbox',
+          icon: const HugeIcon(
+            icon: HugeIcons.strokeRoundedAppleReminder,
+            color: Colors.black,
+          ),
+          selectedIcon: HugeIcon(
+            icon: HugeIcons.strokeRoundedAppleReminder,
+            color: Get.theme.primaryColor,
+          ),
+          label: '销售清单',
         ),
         NavigationDestination(
-          icon: Icon(Icons.article_outlined),
-          selectedIcon: Icon(Icons.article),
-          label: 'Articles',
+          icon: const HugeIcon(
+            icon: HugeIcons.strokeRoundedDashboardSquare02,
+            color: Colors.black,
+          ),
+          selectedIcon: HugeIcon(
+            icon: HugeIcons.strokeRoundedDashboardSquare02,
+            color: Get.theme.primaryColor,
+          ),
+          label: '菜品管理',
         ),
         NavigationDestination(
-          icon: Icon(Icons.chat_outlined),
-          selectedIcon: Icon(Icons.chat),
-          label: 'Chat',
+          icon: const HugeIcon(
+            icon: HugeIcons.strokeRoundedGitbook,
+            color: Colors.black,
+          ),
+          selectedIcon: HugeIcon(
+            icon: HugeIcons.strokeRoundedGitbook,
+            color: Get.theme.primaryColor,
+          ),
+          label: '单位管理',
         ),
         NavigationDestination(
-          icon: Icon(Icons.video_call_outlined),
-          selectedIcon: Icon(Icons.video_call),
-          label: 'Video',
+          icon: const HugeIcon(
+            icon: HugeIcons.strokeRoundedUserMultiple,
+            color: Colors.black,
+          ),
+          selectedIcon: HugeIcon(
+            icon: HugeIcons.strokeRoundedUserMultiple,
+            color: Get.theme.primaryColor,
+          ),
+          label: '客户管理',
         ),
         NavigationDestination(
-          icon: Icon(Icons.home_outlined),
-          selectedIcon: Icon(Icons.home),
-          label: 'Inbox',
+          icon: const HugeIcon(
+            icon: HugeIcons.strokeRoundedDeliveryTruck01,
+            color: Colors.black,
+          ),
+          selectedIcon: HugeIcon(
+            icon: HugeIcons.strokeRoundedDeliveryTruck01,
+            color: Get.theme.primaryColor,
+          ),
+          label: '车辆管理',
+        ),
+        NavigationDestination(
+          icon: const HugeIcon(
+            icon: HugeIcons.strokeRoundedSaveMoneyYen,
+            color: Colors.black,
+          ),
+          selectedIcon: HugeIcon(
+            icon: HugeIcons.strokeRoundedSaveMoneyYen,
+            color: Get.theme.primaryColor,
+          ),
+          label: '统计分析',
         ),
       ],
-      smallBody: (_) => ListView.builder(
-        itemCount: children.length,
-        itemBuilder: (_, int idx) => children[idx],
+      body: (_) => SafeArea(
+        child: Row(
+          children: [
+            Get.width < 600 ? Container() : const VerticalDivider(width: 1),
+            Expanded(
+              child: bodys[selectedTab],
+            ),
+          ],
+        ),
       ),
-      body: (_) => GridView.count(crossAxisCount: 2, children: children),
-      mediumLargeBody: (_) => GridView.count(crossAxisCount: 3, children: children),
-      largeBody: (_) => GridView.count(crossAxisCount: 4, children: children),
-      extraLargeBody: (_) => GridView.count(crossAxisCount: 5, children: children),
     );
   }
 // #enddocregion Example

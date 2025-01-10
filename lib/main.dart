@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:company_print/common/index.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 
 Future<void> initSystem() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,8 +46,12 @@ class _MyAppState extends State<MyApp> {
         child: GetMaterialApp(
           title: '账单记录',
           themeMode: SettingsService.themeModes[settings.themeModeName.value]!,
-          theme: lightTheme.copyWith(appBarTheme: const AppBarTheme(surfaceTintColor: Colors.transparent)),
-          darkTheme: darkTheme.copyWith(appBarTheme: const AppBarTheme(surfaceTintColor: Colors.transparent)),
+          theme: lightTheme
+              .copyWith(appBarTheme: const AppBarTheme(surfaceTintColor: Colors.transparent))
+              .useSystemChineseFont(Brightness.light),
+          darkTheme: darkTheme
+              .copyWith(appBarTheme: const AppBarTheme(surfaceTintColor: Colors.transparent))
+              .useSystemChineseFont(Brightness.dark),
           navigatorObservers: [FlutterSmartDialog.observer],
           initialRoute: RoutePath.kInitial,
           defaultTransition: Transition.native,
