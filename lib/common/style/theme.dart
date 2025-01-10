@@ -21,8 +21,15 @@ class MyTheme {
       colorSchemeSeed: primaryColor,
       colorScheme: colorScheme,
       brightness: Brightness.light,
-      tabBarTheme: const TabBarTheme(dividerColor: Colors.transparent),
-      appBarTheme: const AppBarTheme(scrolledUnderElevation: 0.0, surfaceTintColor: Colors.transparent),
+      tabBarTheme: const TabBarTheme(
+        dividerColor: Colors.transparent,
+      ),
+      appBarTheme: const AppBarTheme(
+        scrolledUnderElevation: 0.0,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+      ),
       fontFamily: fontFamily,
     );
   }

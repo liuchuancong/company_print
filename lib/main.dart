@@ -5,6 +5,7 @@ import 'package:company_print/common/index.dart';
 Future<void> initSystem() async {
   WidgetsFlutterBinding.ensureInitialized();
   PrefUtil.prefs = await SharedPreferences.getInstance();
+  await ScreenUtil.ensureScreenSize(); // 确保屏幕大小被正确设置
   initService();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -37,16 +38,40 @@ class _MyAppState extends State<MyApp> {
       var themeColor = HexColor(settings.themeColorSwitch.value);
       ThemeData lightTheme = MyTheme(primaryColor: themeColor).lightThemeData;
       ThemeData darkTheme = MyTheme(primaryColor: themeColor).darkThemeData;
-      return GetMaterialApp(
-        title: '纯粹直播',
-        themeMode: SettingsService.themeModes[settings.themeModeName.value]!,
-        theme: lightTheme.copyWith(appBarTheme: const AppBarTheme(surfaceTintColor: Colors.transparent)),
-        darkTheme: darkTheme.copyWith(appBarTheme: const AppBarTheme(surfaceTintColor: Colors.transparent)),
-        navigatorObservers: [FlutterSmartDialog.observer],
-        builder: FlutterSmartDialog.init(),
-        initialRoute: RoutePath.kInitial,
-        defaultTransition: Transition.native,
-        getPages: AppPages.routes,
+      return ScreenUtilInit(
+        designSize: const Size(360, 690),
+        minTextAdapt: true,
+        splitScreenMode: true,
+        child: GetMaterialApp(
+          title: '账单记录',
+          themeMode: SettingsService.themeModes[settings.themeModeName.value]!,
+          theme: lightTheme.copyWith(appBarTheme: const AppBarTheme(surfaceTintColor: Colors.transparent)),
+          darkTheme: darkTheme.copyWith(appBarTheme: const AppBarTheme(surfaceTintColor: Colors.transparent)),
+          navigatorObservers: [FlutterSmartDialog.observer],
+          initialRoute: RoutePath.kInitial,
+          defaultTransition: Transition.native,
+          getPages: AppPages.routes,
+          debugShowCheckedModeBanner: false,
+          builder: FlutterSmartDialog.init(
+            loadingBuilder: (msg) => Center(
+              child: SizedBox(
+                width: 64.w,
+                height: 64.w,
+                child: CircularProgressIndicator(
+                  strokeWidth: 8.w,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            //字体大小不跟随系统变化
+            builder: (context, child) => MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                textScaler: const TextScaler.linear(1.0),
+              ),
+              child: child!,
+            ),
+          ),
+        ),
       );
     });
   }
