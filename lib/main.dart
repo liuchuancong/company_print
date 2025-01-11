@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:company_print/common/index.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 Future<void> initSystem() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,13 +58,18 @@ class _MyAppState extends State<MyApp> {
           defaultTransition: Transition.native,
           getPages: AppPages.routes,
           debugShowCheckedModeBanner: false,
+          supportedLocales: const [
+            Locale('zh', ''),
+          ],
+          locale: const Locale('zh', ''),
+          localizationsDelegates: const [GlobalMaterialLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
           builder: FlutterSmartDialog.init(
             loadingBuilder: (msg) => Center(
               child: SizedBox(
-                width: 64.w,
-                height: 64.w,
+                width: 5.w,
+                height: 5.w,
                 child: CircularProgressIndicator(
-                  strokeWidth: 8.w,
+                  strokeWidth: 0.2.w,
                   color: Colors.white,
                 ),
               ),
@@ -71,7 +77,7 @@ class _MyAppState extends State<MyApp> {
             //字体大小不跟随系统变化
             builder: (context, child) => MediaQuery(
               data: MediaQuery.of(context).copyWith(
-                textScaler: const TextScaler.linear(1.0),
+                textScaler: const TextScaler.linear(1.2),
               ),
               child: child!,
             ),

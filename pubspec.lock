@@ -214,6 +214,22 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.0.1"
+  data_table_2:
+    dependency: "direct main"
+    description:
+      name: data_table_2
+      sha256: "5a540a7b64809eb46b3809c67fc6faa29ca217864341294df66b1f0eb040c20e"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.5.18"
+  date_format:
+    dependency: "direct main"
+    description:
+      name: date_format
+      sha256: a48254e60bdb7f1d5a15cac7f86e37491808056c0a99dbdc850841def4754ddc
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.0.9"
   dbus:
     dependency: transitive
     description:
@@ -323,6 +339,11 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "4.0.0"
+  flutter_localizations:
+    dependency: "direct main"
+    description: flutter
+    source: sdk
+    version: "0.0.0"
   flutter_screenutil:
     dependency: "direct main"
     description:
@@ -413,6 +434,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.0.7"
+  intl:
+    dependency: transitive
+    description:
+      name: intl
+      sha256: d6f56758b7d3014a48af9701c085700aac781a92a87a62b1333b46d8879661cf
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.19.0"
   io:
     dependency: transitive
     description:
@@ -717,6 +746,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.0.1"
+  search_choices:
+    dependency: "direct main"
+    description:
+      name: search_choices
+      sha256: "44b0e00b45b72e69ee4e1350e2794134151d2a34ac668f2a7b6049b142d9b642"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.3.1"
   share_plus:
     dependency: "direct main"
     description:

@@ -12,11 +12,40 @@ class AppDatabase extends _$AppDatabase {
   int get schemaVersion => 1;
 
 // 在 AppDatabase 类中添加这个方法
-  Future<List<DishUnit>> getPaginatedDishUnits(int offset, int limit) async {
-    return await (select(dishUnits)..limit(limit, offset: offset)).get();
+  Future<List<DishUnit>> getPaginatedDishUnits(
+    int offset,
+    int limit, {
+    String orderByField = 'createdAt', // 默认按照创建时间排序
+    bool ascending = false, // 默认倒序
+  }) async {
+    final query = select(dishUnits)..limit(limit, offset: offset);
+
+    // 定义一个映射来将字符串字段名转换为表中的列
+    final columnMap = <String, dynamic>{
+      'id': dishUnits.id,
+      'name': dishUnits.name,
+      'abbreviation': dishUnits.abbreviation,
+      'description': dishUnits.description,
+      'createdAt': dishUnits.createdAt,
+    };
+
+    // 检查是否提供了有效的排序字段
+    if (columnMap.containsKey(orderByField)) {
+      final column = columnMap[orderByField]!;
+      final orderMode = ascending ? OrderingMode.asc : OrderingMode.desc;
+      query.orderBy([
+        (t) => OrderingTerm(expression: column, mode: orderMode),
+      ]);
+    } else {
+      // 如果没有提供有效字段，则默认按照创建时间排序，且默认为倒序
+      query.orderBy([
+        (t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc),
+      ]);
+    }
+
+    return await query.get();
   }
 
-// 如果需要总记录数（例如用于分页控件）
   Future<int> getTotalDishUnitsCount() async {
     final count = countAll();
     final countQuery = selectOnly(dishUnits)..addColumns([count]);

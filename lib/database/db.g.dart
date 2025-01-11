@@ -30,11 +30,8 @@ class $DishUnitsTable extends DishUnits
       const VerificationMeta('abbreviation');
   @override
   late final GeneratedColumn<String> abbreviation = GeneratedColumn<String>(
-      'abbreviation', aliasedName, false,
-      additionalChecks:
-          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 100),
-      type: DriftSqlType.string,
-      requiredDuringInsert: true);
+      'abbreviation', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _descriptionMeta =
       const VerificationMeta('description');
   @override
@@ -76,8 +73,6 @@ class $DishUnitsTable extends DishUnits
           _abbreviationMeta,
           abbreviation.isAcceptableOrUnknown(
               data['abbreviation']!, _abbreviationMeta));
-    } else if (isInserting) {
-      context.missing(_abbreviationMeta);
     }
     if (data.containsKey('description')) {
       context.handle(
@@ -103,7 +98,7 @@ class $DishUnitsTable extends DishUnits
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       abbreviation: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}abbreviation'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}abbreviation']),
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
       createdAt: attachedDatabase.typeMapping
@@ -120,13 +115,13 @@ class $DishUnitsTable extends DishUnits
 class DishUnit extends DataClass implements Insertable<DishUnit> {
   final int id;
   final String name;
-  final String abbreviation;
+  final String? abbreviation;
   final String? description;
   final DateTime createdAt;
   const DishUnit(
       {required this.id,
       required this.name,
-      required this.abbreviation,
+      this.abbreviation,
       this.description,
       required this.createdAt});
   @override
@@ -134,7 +129,9 @@ class DishUnit extends DataClass implements Insertable<DishUnit> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
-    map['abbreviation'] = Variable<String>(abbreviation);
+    if (!nullToAbsent || abbreviation != null) {
+      map['abbreviation'] = Variable<String>(abbreviation);
+    }
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
@@ -146,7 +143,9 @@ class DishUnit extends DataClass implements Insertable<DishUnit> {
     return DishUnitsCompanion(
       id: Value(id),
       name: Value(name),
-      abbreviation: Value(abbreviation),
+      abbreviation: abbreviation == null && nullToAbsent
+          ? const Value.absent()
+          : Value(abbreviation),
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
@@ -160,7 +159,7 @@ class DishUnit extends DataClass implements Insertable<DishUnit> {
     return DishUnit(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
-      abbreviation: serializer.fromJson<String>(json['abbreviation']),
+      abbreviation: serializer.fromJson<String?>(json['abbreviation']),
       description: serializer.fromJson<String?>(json['description']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
@@ -171,7 +170,7 @@ class DishUnit extends DataClass implements Insertable<DishUnit> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
-      'abbreviation': serializer.toJson<String>(abbreviation),
+      'abbreviation': serializer.toJson<String?>(abbreviation),
       'description': serializer.toJson<String?>(description),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
@@ -180,13 +179,14 @@ class DishUnit extends DataClass implements Insertable<DishUnit> {
   DishUnit copyWith(
           {int? id,
           String? name,
-          String? abbreviation,
+          Value<String?> abbreviation = const Value.absent(),
           Value<String?> description = const Value.absent(),
           DateTime? createdAt}) =>
       DishUnit(
         id: id ?? this.id,
         name: name ?? this.name,
-        abbreviation: abbreviation ?? this.abbreviation,
+        abbreviation:
+            abbreviation.present ? abbreviation.value : this.abbreviation,
         description: description.present ? description.value : this.description,
         createdAt: createdAt ?? this.createdAt,
       );
@@ -232,7 +232,7 @@ class DishUnit extends DataClass implements Insertable<DishUnit> {
 class DishUnitsCompanion extends UpdateCompanion<DishUnit> {
   final Value<int> id;
   final Value<String> name;
-  final Value<String> abbreviation;
+  final Value<String?> abbreviation;
   final Value<String?> description;
   final Value<DateTime> createdAt;
   const DishUnitsCompanion({
@@ -245,11 +245,10 @@ class DishUnitsCompanion extends UpdateCompanion<DishUnit> {
   DishUnitsCompanion.insert({
     this.id = const Value.absent(),
     required String name,
-    required String abbreviation,
+    this.abbreviation = const Value.absent(),
     this.description = const Value.absent(),
     this.createdAt = const Value.absent(),
-  })  : name = Value(name),
-        abbreviation = Value(abbreviation);
+  }) : name = Value(name);
   static Insertable<DishUnit> custom({
     Expression<int>? id,
     Expression<String>? name,
@@ -269,7 +268,7 @@ class DishUnitsCompanion extends UpdateCompanion<DishUnit> {
   DishUnitsCompanion copyWith(
       {Value<int>? id,
       Value<String>? name,
-      Value<String>? abbreviation,
+      Value<String?>? abbreviation,
       Value<String?>? description,
       Value<DateTime>? createdAt}) {
     return DishUnitsCompanion(
@@ -329,14 +328,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 typedef $$DishUnitsTableCreateCompanionBuilder = DishUnitsCompanion Function({
   Value<int> id,
   required String name,
-  required String abbreviation,
+  Value<String?> abbreviation,
   Value<String?> description,
   Value<DateTime> createdAt,
 });
 typedef $$DishUnitsTableUpdateCompanionBuilder = DishUnitsCompanion Function({
   Value<int> id,
   Value<String> name,
-  Value<String> abbreviation,
+  Value<String?> abbreviation,
   Value<String?> description,
   Value<DateTime> createdAt,
 });
@@ -442,7 +441,7 @@ class $$DishUnitsTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> name = const Value.absent(),
-            Value<String> abbreviation = const Value.absent(),
+            Value<String?> abbreviation = const Value.absent(),
             Value<String?> description = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
           }) =>
@@ -456,7 +455,7 @@ class $$DishUnitsTableTableManager extends RootTableManager<
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             required String name,
-            required String abbreviation,
+            Value<String?> abbreviation = const Value.absent(),
             Value<String?> description = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
           }) =>
