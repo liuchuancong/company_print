@@ -7,7 +7,7 @@ class DishesCategory extends Table {
   TextColumn get name => text().withLength(min: 1, max: 100)();
 
   // 使用 integer() 方法定义整数类型的列，并设置外键约束和级联删除
-  IntColumn get categoryId => integer().references(DishesCategory, #id, onDelete: KeyAction.cascade)();
+  IntColumn get parentId => integer().references(DishesCategory, #id, onDelete: KeyAction.cascade).nullable()();
 
   // 使用 text() 方法定义文本类型的列，并允许为空
   TextColumn get description => text().named('无描述')();

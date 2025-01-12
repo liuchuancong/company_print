@@ -337,13 +337,13 @@ class $DishesCategoryTable extends DishesCategory
           GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 100),
       type: DriftSqlType.string,
       requiredDuringInsert: true);
-  static const VerificationMeta _categoryIdMeta =
-      const VerificationMeta('categoryId');
+  static const VerificationMeta _parentIdMeta =
+      const VerificationMeta('parentId');
   @override
-  late final GeneratedColumn<int> categoryId = GeneratedColumn<int>(
-      'category_id', aliasedName, false,
+  late final GeneratedColumn<int> parentId = GeneratedColumn<int>(
+      'parent_id', aliasedName, true,
       type: DriftSqlType.int,
-      requiredDuringInsert: true,
+      requiredDuringInsert: false,
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'REFERENCES dishes_category (id) ON DELETE CASCADE'));
   static const VerificationMeta _descriptionMeta =
@@ -362,7 +362,7 @@ class $DishesCategoryTable extends DishesCategory
       defaultValue: currentDateAndTime);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, name, categoryId, description, createdAt];
+      [id, name, parentId, description, createdAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -382,13 +382,9 @@ class $DishesCategoryTable extends DishesCategory
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
-    if (data.containsKey('category_id')) {
-      context.handle(
-          _categoryIdMeta,
-          categoryId.isAcceptableOrUnknown(
-              data['category_id']!, _categoryIdMeta));
-    } else if (isInserting) {
-      context.missing(_categoryIdMeta);
+    if (data.containsKey('parent_id')) {
+      context.handle(_parentIdMeta,
+          parentId.isAcceptableOrUnknown(data['parent_id']!, _parentIdMeta));
     }
     if (data.containsKey('无描述')) {
       context.handle(_descriptionMeta,
@@ -413,8 +409,8 @@ class $DishesCategoryTable extends DishesCategory
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
-      categoryId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}category_id'])!,
+      parentId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}parent_id']),
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}无描述'])!,
       createdAt: attachedDatabase.typeMapping
@@ -432,13 +428,13 @@ class DishesCategoryData extends DataClass
     implements Insertable<DishesCategoryData> {
   final int id;
   final String name;
-  final int categoryId;
+  final int? parentId;
   final String description;
   final DateTime createdAt;
   const DishesCategoryData(
       {required this.id,
       required this.name,
-      required this.categoryId,
+      this.parentId,
       required this.description,
       required this.createdAt});
   @override
@@ -446,7 +442,9 @@ class DishesCategoryData extends DataClass
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
-    map['category_id'] = Variable<int>(categoryId);
+    if (!nullToAbsent || parentId != null) {
+      map['parent_id'] = Variable<int>(parentId);
+    }
     map['无描述'] = Variable<String>(description);
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
@@ -456,7 +454,9 @@ class DishesCategoryData extends DataClass
     return DishesCategoryCompanion(
       id: Value(id),
       name: Value(name),
-      categoryId: Value(categoryId),
+      parentId: parentId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(parentId),
       description: Value(description),
       createdAt: Value(createdAt),
     );
@@ -468,7 +468,7 @@ class DishesCategoryData extends DataClass
     return DishesCategoryData(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
-      categoryId: serializer.fromJson<int>(json['categoryId']),
+      parentId: serializer.fromJson<int?>(json['parentId']),
       description: serializer.fromJson<String>(json['description']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
@@ -479,7 +479,7 @@ class DishesCategoryData extends DataClass
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
-      'categoryId': serializer.toJson<int>(categoryId),
+      'parentId': serializer.toJson<int?>(parentId),
       'description': serializer.toJson<String>(description),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
@@ -488,13 +488,13 @@ class DishesCategoryData extends DataClass
   DishesCategoryData copyWith(
           {int? id,
           String? name,
-          int? categoryId,
+          Value<int?> parentId = const Value.absent(),
           String? description,
           DateTime? createdAt}) =>
       DishesCategoryData(
         id: id ?? this.id,
         name: name ?? this.name,
-        categoryId: categoryId ?? this.categoryId,
+        parentId: parentId.present ? parentId.value : this.parentId,
         description: description ?? this.description,
         createdAt: createdAt ?? this.createdAt,
       );
@@ -502,8 +502,7 @@ class DishesCategoryData extends DataClass
     return DishesCategoryData(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
-      categoryId:
-          data.categoryId.present ? data.categoryId.value : this.categoryId,
+      parentId: data.parentId.present ? data.parentId.value : this.parentId,
       description:
           data.description.present ? data.description.value : this.description,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -515,7 +514,7 @@ class DishesCategoryData extends DataClass
     return (StringBuffer('DishesCategoryData(')
           ..write('id: $id, ')
           ..write('name: $name, ')
-          ..write('categoryId: $categoryId, ')
+          ..write('parentId: $parentId, ')
           ..write('description: $description, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
@@ -523,14 +522,14 @@ class DishesCategoryData extends DataClass
   }
 
   @override
-  int get hashCode => Object.hash(id, name, categoryId, description, createdAt);
+  int get hashCode => Object.hash(id, name, parentId, description, createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is DishesCategoryData &&
           other.id == this.id &&
           other.name == this.name &&
-          other.categoryId == this.categoryId &&
+          other.parentId == this.parentId &&
           other.description == this.description &&
           other.createdAt == this.createdAt);
 }
@@ -538,36 +537,35 @@ class DishesCategoryData extends DataClass
 class DishesCategoryCompanion extends UpdateCompanion<DishesCategoryData> {
   final Value<int> id;
   final Value<String> name;
-  final Value<int> categoryId;
+  final Value<int?> parentId;
   final Value<String> description;
   final Value<DateTime> createdAt;
   const DishesCategoryCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
-    this.categoryId = const Value.absent(),
+    this.parentId = const Value.absent(),
     this.description = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
   DishesCategoryCompanion.insert({
     this.id = const Value.absent(),
     required String name,
-    required int categoryId,
+    this.parentId = const Value.absent(),
     required String description,
     this.createdAt = const Value.absent(),
   })  : name = Value(name),
-        categoryId = Value(categoryId),
         description = Value(description);
   static Insertable<DishesCategoryData> custom({
     Expression<int>? id,
     Expression<String>? name,
-    Expression<int>? categoryId,
+    Expression<int>? parentId,
     Expression<String>? description,
     Expression<DateTime>? createdAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
-      if (categoryId != null) 'category_id': categoryId,
+      if (parentId != null) 'parent_id': parentId,
       if (description != null) '无描述': description,
       if (createdAt != null) 'created_at': createdAt,
     });
@@ -576,13 +574,13 @@ class DishesCategoryCompanion extends UpdateCompanion<DishesCategoryData> {
   DishesCategoryCompanion copyWith(
       {Value<int>? id,
       Value<String>? name,
-      Value<int>? categoryId,
+      Value<int?>? parentId,
       Value<String>? description,
       Value<DateTime>? createdAt}) {
     return DishesCategoryCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
-      categoryId: categoryId ?? this.categoryId,
+      parentId: parentId ?? this.parentId,
       description: description ?? this.description,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -597,8 +595,8 @@ class DishesCategoryCompanion extends UpdateCompanion<DishesCategoryData> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
-    if (categoryId.present) {
-      map['category_id'] = Variable<int>(categoryId.value);
+    if (parentId.present) {
+      map['parent_id'] = Variable<int>(parentId.value);
     }
     if (description.present) {
       map['无描述'] = Variable<String>(description.value);
@@ -614,7 +612,7 @@ class DishesCategoryCompanion extends UpdateCompanion<DishesCategoryData> {
     return (StringBuffer('DishesCategoryCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
-          ..write('categoryId: $categoryId, ')
+          ..write('parentId: $parentId, ')
           ..write('description: $description, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
@@ -814,7 +812,7 @@ typedef $$DishesCategoryTableCreateCompanionBuilder = DishesCategoryCompanion
     Function({
   Value<int> id,
   required String name,
-  required int categoryId,
+  Value<int?> parentId,
   required String description,
   Value<DateTime> createdAt,
 });
@@ -822,7 +820,7 @@ typedef $$DishesCategoryTableUpdateCompanionBuilder = DishesCategoryCompanion
     Function({
   Value<int> id,
   Value<String> name,
-  Value<int> categoryId,
+  Value<int?> parentId,
   Value<String> description,
   Value<DateTime> createdAt,
 });
@@ -832,14 +830,15 @@ final class $$DishesCategoryTableReferences extends BaseReferences<
   $$DishesCategoryTableReferences(
       super.$_db, super.$_table, super.$_typedResult);
 
-  static $DishesCategoryTable _categoryIdTable(_$AppDatabase db) =>
+  static $DishesCategoryTable _parentIdTable(_$AppDatabase db) =>
       db.dishesCategory.createAlias($_aliasNameGenerator(
-          db.dishesCategory.categoryId, db.dishesCategory.id));
+          db.dishesCategory.parentId, db.dishesCategory.id));
 
-  $$DishesCategoryTableProcessedTableManager get categoryId {
+  $$DishesCategoryTableProcessedTableManager? get parentId {
+    if ($_item.parentId == null) return null;
     final manager = $$DishesCategoryTableTableManager($_db, $_db.dishesCategory)
-        .filter((f) => f.id($_item.categoryId));
-    final item = $_typedResult.readTableOrNull(_categoryIdTable($_db));
+        .filter((f) => f.id($_item.parentId!));
+    final item = $_typedResult.readTableOrNull(_parentIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
         manager.$state.copyWith(prefetchedData: [item]));
@@ -867,10 +866,10 @@ class $$DishesCategoryTableFilterComposer
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
 
-  $$DishesCategoryTableFilterComposer get categoryId {
+  $$DishesCategoryTableFilterComposer get parentId {
     final $$DishesCategoryTableFilterComposer composer = $composerBuilder(
         composer: this,
-        getCurrentColumn: (t) => t.categoryId,
+        getCurrentColumn: (t) => t.parentId,
         referencedTable: $db.dishesCategory,
         getReferencedColumn: (t) => t.id,
         builder: (joinBuilder,
@@ -909,10 +908,10 @@ class $$DishesCategoryTableOrderingComposer
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
-  $$DishesCategoryTableOrderingComposer get categoryId {
+  $$DishesCategoryTableOrderingComposer get parentId {
     final $$DishesCategoryTableOrderingComposer composer = $composerBuilder(
         composer: this,
-        getCurrentColumn: (t) => t.categoryId,
+        getCurrentColumn: (t) => t.parentId,
         referencedTable: $db.dishesCategory,
         getReferencedColumn: (t) => t.id,
         builder: (joinBuilder,
@@ -951,10 +950,10 @@ class $$DishesCategoryTableAnnotationComposer
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  $$DishesCategoryTableAnnotationComposer get categoryId {
+  $$DishesCategoryTableAnnotationComposer get parentId {
     final $$DishesCategoryTableAnnotationComposer composer = $composerBuilder(
         composer: this,
-        getCurrentColumn: (t) => t.categoryId,
+        getCurrentColumn: (t) => t.parentId,
         referencedTable: $db.dishesCategory,
         getReferencedColumn: (t) => t.id,
         builder: (joinBuilder,
@@ -983,7 +982,7 @@ class $$DishesCategoryTableTableManager extends RootTableManager<
     $$DishesCategoryTableUpdateCompanionBuilder,
     (DishesCategoryData, $$DishesCategoryTableReferences),
     DishesCategoryData,
-    PrefetchHooks Function({bool categoryId})> {
+    PrefetchHooks Function({bool parentId})> {
   $$DishesCategoryTableTableManager(
       _$AppDatabase db, $DishesCategoryTable table)
       : super(TableManagerState(
@@ -998,28 +997,28 @@ class $$DishesCategoryTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> name = const Value.absent(),
-            Value<int> categoryId = const Value.absent(),
+            Value<int?> parentId = const Value.absent(),
             Value<String> description = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
           }) =>
               DishesCategoryCompanion(
             id: id,
             name: name,
-            categoryId: categoryId,
+            parentId: parentId,
             description: description,
             createdAt: createdAt,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             required String name,
-            required int categoryId,
+            Value<int?> parentId = const Value.absent(),
             required String description,
             Value<DateTime> createdAt = const Value.absent(),
           }) =>
               DishesCategoryCompanion.insert(
             id: id,
             name: name,
-            categoryId: categoryId,
+            parentId: parentId,
             description: description,
             createdAt: createdAt,
           ),
@@ -1029,7 +1028,7 @@ class $$DishesCategoryTableTableManager extends RootTableManager<
                     $$DishesCategoryTableReferences(db, table, e)
                   ))
               .toList(),
-          prefetchHooksCallback: ({categoryId = false}) {
+          prefetchHooksCallback: ({parentId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
@@ -1046,14 +1045,14 @@ class $$DishesCategoryTableTableManager extends RootTableManager<
                       dynamic,
                       dynamic,
                       dynamic>>(state) {
-                if (categoryId) {
+                if (parentId) {
                   state = state.withJoin(
                     currentTable: table,
-                    currentColumn: table.categoryId,
+                    currentColumn: table.parentId,
                     referencedTable:
-                        $$DishesCategoryTableReferences._categoryIdTable(db),
+                        $$DishesCategoryTableReferences._parentIdTable(db),
                     referencedColumn:
-                        $$DishesCategoryTableReferences._categoryIdTable(db).id,
+                        $$DishesCategoryTableReferences._parentIdTable(db).id,
                   ) as T;
                 }
 
@@ -1078,7 +1077,7 @@ typedef $$DishesCategoryTableProcessedTableManager = ProcessedTableManager<
     $$DishesCategoryTableUpdateCompanionBuilder,
     (DishesCategoryData, $$DishesCategoryTableReferences),
     DishesCategoryData,
-    PrefetchHooks Function({bool categoryId})>;
+    PrefetchHooks Function({bool parentId})>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;

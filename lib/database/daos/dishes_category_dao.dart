@@ -23,22 +23,22 @@ class DishesCategoryDao extends DatabaseAccessor<AppDatabase> with _$DishesCateg
   }
 
   /// 创建新的分类
-  Future<int> createCategory(String name, int parentId, String? description) async {
+  Future<int> createCategory(String name, int? parentId, String? description) async {
     final entry = DishesCategoryCompanion(
       name: Value(name),
-      categoryId: Value(parentId),
+      parentId: Value(parentId),
       description: Value(description ?? ''),
     );
     return await into(dishesCategory).insert(entry);
   }
 
-  /// 根据 ID 获取单个分类
-  Future<DishesCategoryData?> getCategoryById(int id) async {
-    return await (select(dishesCategory)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
-  }
-
   /// 更新分类信息
-  Future updateCategory(DishesCategoryCompanion entry, int id) async {
+  Future updateCategory(String name, int parentId, String? description, int id) async {
+    final entry = DishesCategoryCompanion(
+      name: Value(name),
+      parentId: Value(parentId),
+      description: Value(description ?? ''),
+    );
     return await (update(dishesCategory)..where((tbl) => tbl.id.equals(id))).write(entry);
   }
 
@@ -49,6 +49,6 @@ class DishesCategoryDao extends DatabaseAccessor<AppDatabase> with _$DishesCateg
 
   /// 获取指定父级下的所有子分类
   Future<List<DishesCategoryData>> getChildCategories(int parentId) async {
-    return await (select(dishesCategory)..where((tbl) => tbl.categoryId.equals(parentId))).get();
+    return await (select(dishesCategory)..where((tbl) => tbl.parentId.equals(parentId))).get();
   }
 }
