@@ -105,11 +105,12 @@ class UnitsController extends GetxController {
           dishUnit: dishUnit,
           onConfirm: (updatedDishUnit) {
             updateDishUnit(DishUnit(
-                id: dishUnit.id,
-                name: updatedDishUnit.name,
-                abbreviation: updatedDishUnit.abbreviation,
-                description: updatedDishUnit.description,
-                createdAt: dishUnit.createdAt));
+              id: dishUnit.id,
+              name: updatedDishUnit.name,
+              abbreviation: updatedDishUnit.abbreviation,
+              description: updatedDishUnit.description,
+              createdAt: dishUnit.createdAt,
+            ));
           },
         );
       },

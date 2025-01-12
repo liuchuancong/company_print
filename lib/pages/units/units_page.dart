@@ -235,6 +235,7 @@ class EditOrCreateDishUnitDialogState extends State<EditOrCreateDishUnitDialog> 
                   hint: "请输入单位",
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.next,
+                  validator: (value) => value!.trim().isEmpty ? '请输入单位' : null,
                   maxLength: 20,
                 ),
                 AppStyle.vGap4,
