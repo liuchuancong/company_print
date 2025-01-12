@@ -38,7 +38,7 @@ class UnitsController extends GetxController {
 
   Future<void> loadTotalData() async {
     isLoading(true);
-    final totalCount = await _database.getTotalDishUnitsCount();
+    final totalCount = await _database.dishUnitsDao.getTotalDishUnitsCount();
     totalDishUnits(totalCount);
     isLoading(false);
   }
@@ -46,7 +46,7 @@ class UnitsController extends GetxController {
   Future<void> loadData(int pageIndex) async {
     isLoading(true);
     final offset = currentPage.value * rowsPerPage.value;
-    final units = await _database.getPaginatedDishUnits(
+    final units = await _database.dishUnitsDao.getPaginatedDishUnits(
       offset,
       rowsPerPage.value,
       orderByField: getSortName(),
@@ -72,17 +72,17 @@ class UnitsController extends GetxController {
 
   // 添加新菜品单位的方法
   Future<void> addNewDishUnit(String name, String abbreviation, String? description) async {
-    await _database.createDishUnit(name, abbreviation, description);
+    await _database.dishUnitsDao.createDishUnit(name, abbreviation, description);
     dataSource?.refreshDatasource();
   }
 
   Future<void> updateDishUnit(DishUnit dishUnit) async {
-    await _database.updateDishUnit(dishUnit.toCompanion(true), dishUnit.id);
+    await _database.dishUnitsDao.updateDishUnit(dishUnit.toCompanion(true), dishUnit.id);
     dataSource?.refreshDatasource();
   }
 
   Future<void> deleteDishUnit(DishUnit dishUnit) async {
-    await _database.deleteDishUnit(dishUnit.id);
+    await _database.dishUnitsDao.deleteDishUnit(dishUnit.id);
     dataSource?.refreshDatasource();
   }
 

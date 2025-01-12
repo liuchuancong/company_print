@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart';
-// 定义表结构
 
 class DishUnits extends Table {
   IntColumn get id => integer().autoIncrement()();
