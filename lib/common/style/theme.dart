@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:material_text_fields/theme/material_text_field_theme.dart';
 
 class MyTheme {
   Color? primaryColor;
@@ -26,6 +27,40 @@ class MyTheme {
         elevation: 0,
         centerTitle: true,
       ),
+      inputDecorationTheme: InputDecorationTheme(
+        // 设置边框样式为 OutlineInputBorder
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(color: Colors.grey.shade400),
+        ),
+        // 焦点状态下的边框样式
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(color: Colors.blue.shade700, width: 2.0),
+        ),
+        // 错误状态下的边框样式
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(color: Colors.red.shade700, width: 2.0),
+        ),
+        // 错误焦点状态下的边框样式
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(color: Colors.red.shade700, width: 2.0),
+        ),
+        // 填充颜色
+        filled: true,
+        fillColor: Colors.white,
+        // 标签文本样式
+        labelStyle: const TextStyle(color: Colors.black, fontSize: 16.0),
+        // 提示文本样式
+        hintStyle: TextStyle(color: Colors.grey.shade700, fontSize: 16.0),
+        // 错误文本样式
+        errorStyle: TextStyle(
+          color: Colors.red.shade700,
+        ),
+        // 内边距
+      ),
     );
   }
 
@@ -38,6 +73,40 @@ class MyTheme {
       tabBarTheme: const TabBarTheme(dividerColor: Colors.transparent),
       appBarTheme: const AppBarTheme(scrolledUnderElevation: 0.0, surfaceTintColor: Colors.transparent),
       brightness: Brightness.dark,
+      inputDecorationTheme: InputDecorationTheme(
+        // 设置边框样式为 OutlineInputBorder
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(color: Colors.grey.shade400),
+        ),
+        // 焦点状态下的边框样式
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(color: Colors.blue.shade700, width: 2.0),
+        ),
+        // 错误状态下的边框样式
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(color: Colors.red.shade700, width: 2.0),
+        ),
+        // 错误焦点状态下的边框样式
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(color: Colors.red.shade700, width: 2.0),
+        ),
+        // 填充颜色
+        filled: true,
+        fillColor: Colors.white,
+        // 标签文本样式
+        labelStyle: const TextStyle(color: Colors.black, fontSize: 16.0),
+        // 提示文本样式
+        hintStyle: TextStyle(color: Colors.grey.shade700, fontSize: 16.0),
+        // 错误文本样式
+        errorStyle: TextStyle(
+          color: Colors.red.shade700,
+        ),
+        // 内边距
+      ),
     );
   }
 }

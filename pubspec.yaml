@@ -57,6 +57,8 @@ dependencies:
   search_choices: ^2.3.1
   data_table_2: ^2.5.18
   date_format: ^2.0.9
+  input_quantity: ^2.5.1
+  material_text_fields: ^1.0.6
   flutter_localizations:
     sdk: flutter
 dev_dependencies:

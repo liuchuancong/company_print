@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:date_format/date_format.dart';
+import 'package:company_print/utils/utils.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/pages/units/units_page.dart';
@@ -72,5 +74,61 @@ class UnitsController extends GetxController {
   Future<void> addNewDishUnit(String name, String abbreviation, String? description) async {
     await _database.createDishUnit(name, abbreviation, description);
     dataSource?.refreshDatasource();
+  }
+
+  Future<void> updateDishUnit(DishUnit dishUnit) async {
+    await _database.updateDishUnit(dishUnit.toCompanion(true), dishUnit.id);
+    dataSource?.refreshDatasource();
+  }
+
+  Future<void> deleteDishUnit(DishUnit dishUnit) async {
+    await _database.deleteDishUnit(dishUnit.id);
+    dataSource?.refreshDatasource();
+  }
+
+  void showCreateDishUnitDialog() {
+    SmartDialog.show(
+      builder: (context) {
+        return EditOrCreateDishUnitDialog(
+          onConfirm: (newDishUnit) {
+            addNewDishUnit(newDishUnit.name, newDishUnit.abbreviation ?? '', newDishUnit.description ?? '');
+          },
+        );
+      },
+    );
+  }
+
+  void showEditDishUnitDialog(DishUnit dishUnit) {
+    SmartDialog.show(
+      builder: (context) {
+        return EditOrCreateDishUnitDialog(
+          dishUnit: dishUnit,
+          onConfirm: (updatedDishUnit) {
+            updateDishUnit(DishUnit(
+                id: dishUnit.id,
+                name: updatedDishUnit.name,
+                abbreviation: updatedDishUnit.abbreviation,
+                description: updatedDishUnit.description,
+                createdAt: dishUnit.createdAt));
+          },
+        );
+      },
+    );
+  }
+
+  void showPreviewDishUnitDialog(DishUnit dishUnit) {
+    Utils.showMapAlertDialog({
+      '名称': dishUnit.name,
+      '简称': dishUnit.abbreviation ?? '',
+      '描述': dishUnit.description ?? '',
+      '创建时间': formatDate(dishUnit.createdAt, [yyyy, '-', mm, '-', dd, ' ', HH, ':', nn, ':', ss]),
+    });
+  }
+
+  void showDeleteDishUnitDialog(DishUnit dishUnit) async {
+    var result = await Utils.showAlertDialog("确定要删除吗？", title: "删除");
+    if (result == true) {
+      deleteDishUnit(dishUnit);
+    }
   }
 }
