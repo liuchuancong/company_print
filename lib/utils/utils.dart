@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:company_print/common/index.dart';
 
 class Utils {
-  static Future<bool> showAlertDialog(
+  static Future<bool?> showAlertDialog(
     String content, {
     String title = '',
     String confirm = '',
@@ -37,7 +38,7 @@ class Utils {
         ],
       ),
     );
-    return result ?? false;
+    return result;
   }
 
   static Future<bool> showMapAlertDialog(
@@ -83,5 +84,25 @@ class Utils {
       ),
     );
     return result ?? false;
+  }
+}
+
+class TwoDigitDecimalFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    final String newText = newValue.text;
+
+    if (newText == '' || double.tryParse(newText) != null) {
+      return newValue;
+    }
+
+    final int selectionIndexFromTheRight = newValue.text.length - newValue.selection.end;
+
+    final RegExp regExp = RegExp(r'^\d*\.?\d{0,2}');
+    final String newString = regExp.stringMatch(newValue.text) ?? '';
+    return TextEditingValue(
+      text: newString,
+      selection: TextSelection.collapsed(offset: newString.length - selectionIndexFromTheRight),
+    );
   }
 }

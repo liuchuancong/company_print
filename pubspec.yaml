@@ -60,6 +60,7 @@ dependencies:
   input_quantity: ^2.5.1
   material_text_fields: ^1.0.6
   animated_tree_view: ^2.3.0
+  cascade_widget: ^1.0.5
   flutter_localizations:
     sdk: flutter
 dev_dependencies:

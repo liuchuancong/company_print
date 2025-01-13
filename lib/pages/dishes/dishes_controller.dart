@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:company_print/common/index.dart';
 import 'package:animated_tree_view/animated_tree_view.dart';
@@ -21,6 +22,7 @@ class DishesController extends GetxController {
     final result = await database.dishesCategoryDao.getAllCategories();
     categories.assignAll(result);
     nodes.assignAll(generateTreeNodes(buildTree(result)));
+    log(result.toString());
     await Future.delayed(const Duration(milliseconds: 20));
     isLoading(false);
   }

@@ -1,5 +1,7 @@
 import 'package:company_print/common/index.dart';
 import 'package:company_print/pages/home/home_page.dart';
+import 'package:company_print/pages/customer_order_items/customer_order_items_page.dart';
+import 'package:company_print/pages/customer_order_items/customer_order_items_binding.dart';
 
 // auth
 
@@ -12,6 +14,11 @@ class AppPages {
       page: HomePage.new,
       participatesInRootNavigator: true,
       preventDuplicates: true,
+    ),
+    GetPage(
+      name: RoutePath.kCustomerOrderItemsPage,
+      page: CustomerOrderItemsPage.new,
+      bindings: [CustomerOrderItemBinding()],
     ),
   ];
 }

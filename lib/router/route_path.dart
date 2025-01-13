@@ -7,4 +7,6 @@ class RoutePath {
   static const kDetailView = "/detailView";
 
   static var kSettings = "/settings";
+
+  static var kCustomerOrderItemsPage = "/customerOrderItemsPage";
 }

@@ -118,6 +118,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "8.9.3"
+  cascade_widget:
+    dependency: "direct main"
+    description:
+      name: cascade_widget
+      sha256: fdc3555c167f9ad2bd4db2281a862266151af79c48cba3b2e1124fca5dd114dc
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.0.5"
   characters:
     dependency: transitive
     description:

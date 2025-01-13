@@ -50,7 +50,13 @@ class MyTheme {
         // 填充颜色
         filled: true,
         fillColor: Colors.white,
+        floatingLabelBehavior: FloatingLabelBehavior.never, // 强制标签始终浮动
+        floatingLabelStyle: const TextStyle(
+          color: Colors.black,
+          fontSize: 16.0,
+        ),
         // 标签文本样式
+        floatingLabelAlignment: FloatingLabelAlignment.start,
         labelStyle: const TextStyle(color: Colors.black, fontSize: 16.0),
         // 提示文本样式
         hintStyle: TextStyle(color: Colors.grey.shade700, fontSize: 16.0),
@@ -58,6 +64,7 @@ class MyTheme {
         errorStyle: TextStyle(
           color: Colors.red.shade700,
         ),
+
         // 内边距
       ),
     );
@@ -103,6 +110,12 @@ class MyTheme {
         // 错误文本样式
         errorStyle: TextStyle(
           color: Colors.red.shade700,
+        ),
+        floatingLabelAlignment: FloatingLabelAlignment.start,
+        floatingLabelBehavior: FloatingLabelBehavior.never, // 强制标签始终浮动
+        floatingLabelStyle: const TextStyle(
+          color: Colors.black,
+          fontSize: 16.0,
         ),
         // 内边距
       ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:date_format/date_format.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/common/style/app_style.dart';
@@ -13,7 +12,7 @@ class CustomersPage extends StatefulWidget {
   State<CustomersPage> createState() => _CustomersPageState();
 }
 
-class _CustomersPageState extends State<CustomersPage> {
+class _CustomersPageState extends State<CustomersPage> with AutomaticKeepAliveClientMixin<CustomersPage> {
   @override
   void initState() {
     super.initState();
@@ -28,6 +27,7 @@ class _CustomersPageState extends State<CustomersPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final controller = Get.find<CustomersController>();
     return Scaffold(
       body: Column(
@@ -62,7 +62,7 @@ class _CustomersPageState extends State<CustomersPage> {
                 onRowsPerPageChanged: controller.handleRowsPerPageChanged,
                 sortColumnIndex: controller.sortColumnIndex.value,
                 sortAscending: controller.sortAscending.value,
-                minWidth: 600,
+                minWidth: 500,
                 isVerticalScrollBarVisible: true,
                 isHorizontalScrollBarVisible: true,
                 columns: [
@@ -85,7 +85,7 @@ class _CustomersPageState extends State<CustomersPage> {
                   ),
                   const DataColumn2(
                     label: Text('操作'),
-                    fixedWidth: 180,
+                    fixedWidth: 200,
                     headingRowAlignment: MainAxisAlignment.center,
                   ),
                 ],
@@ -110,6 +110,9 @@ class _CustomersPageState extends State<CustomersPage> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class EditOrCreateCustomerDialog extends StatefulWidget {
@@ -281,6 +284,13 @@ class CustomersDataSource extends AsyncDataTableSource {
                       tooltip: '删除',
                       onPressed: () {
                         controller.deleteCustomer(custom.id);
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.list_alt),
+                      tooltip: '编辑常用商品',
+                      onPressed: () {
+                        Get.toNamed(RoutePath.kCustomerOrderItemsPage, arguments: [custom.id]);
                       },
                     ),
                   ],
