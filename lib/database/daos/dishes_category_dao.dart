@@ -33,7 +33,7 @@ class DishesCategoryDao extends DatabaseAccessor<AppDatabase> with _$DishesCateg
   }
 
   /// 更新分类信息
-  Future updateCategory(String name, int parentId, String? description, int id) async {
+  Future updateCategory(String name, int? parentId, String? description, int id) async {
     final entry = DishesCategoryCompanion(
       name: Value(name),
       parentId: Value(parentId),
