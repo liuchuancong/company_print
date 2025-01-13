@@ -22,7 +22,7 @@ class _HomePageState extends State<HomePage> {
     SalesPage(),
     DishesPage(),
     UnitsPage(),
-    CustomerPage(),
+    CustomersPage(),
     VehiclesPage(),
     StatisticsPage(),
   ];

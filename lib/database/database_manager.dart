@@ -7,7 +7,7 @@ import 'package:path_provider/path_provider.dart';
 
 class DatabaseManager {
   AppDatabase appDatabase = AppDatabase();
-
+  static const databaseVersion = 2;
   DatabaseManager._();
 
   static final DatabaseManager _instance = DatabaseManager._();

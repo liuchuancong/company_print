@@ -620,20 +620,366 @@ class DishesCategoryCompanion extends UpdateCompanion<DishesCategoryData> {
   }
 }
 
+class $CustomersTable extends Customers
+    with TableInfo<$CustomersTable, Customer> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CustomersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, true,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 10),
+      type: DriftSqlType.string,
+      requiredDuringInsert: false);
+  static const VerificationMeta _phoneMeta = const VerificationMeta('phone');
+  @override
+  late final GeneratedColumn<String> phone = GeneratedColumn<String>(
+      'phone', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _addressMeta =
+      const VerificationMeta('address');
+  @override
+  late final GeneratedColumn<String> address = GeneratedColumn<String>(
+      'address', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _additionalInfoMeta =
+      const VerificationMeta('additionalInfo');
+  @override
+  late final GeneratedColumn<String> additionalInfo = GeneratedColumn<String>(
+      'additional_info', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, name, phone, address, additionalInfo, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'customers';
+  @override
+  VerificationContext validateIntegrity(Insertable<Customer> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    }
+    if (data.containsKey('phone')) {
+      context.handle(
+          _phoneMeta, phone.isAcceptableOrUnknown(data['phone']!, _phoneMeta));
+    }
+    if (data.containsKey('address')) {
+      context.handle(_addressMeta,
+          address.isAcceptableOrUnknown(data['address']!, _addressMeta));
+    }
+    if (data.containsKey('additional_info')) {
+      context.handle(
+          _additionalInfoMeta,
+          additionalInfo.isAcceptableOrUnknown(
+              data['additional_info']!, _additionalInfoMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Customer map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Customer(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name']),
+      phone: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}phone']),
+      address: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}address']),
+      additionalInfo: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}additional_info']),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+    );
+  }
+
+  @override
+  $CustomersTable createAlias(String alias) {
+    return $CustomersTable(attachedDatabase, alias);
+  }
+}
+
+class Customer extends DataClass implements Insertable<Customer> {
+  final int id;
+  final String? name;
+  final String? phone;
+  final String? address;
+  final String? additionalInfo;
+  final DateTime createdAt;
+  const Customer(
+      {required this.id,
+      this.name,
+      this.phone,
+      this.address,
+      this.additionalInfo,
+      required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    if (!nullToAbsent || name != null) {
+      map['name'] = Variable<String>(name);
+    }
+    if (!nullToAbsent || phone != null) {
+      map['phone'] = Variable<String>(phone);
+    }
+    if (!nullToAbsent || address != null) {
+      map['address'] = Variable<String>(address);
+    }
+    if (!nullToAbsent || additionalInfo != null) {
+      map['additional_info'] = Variable<String>(additionalInfo);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  CustomersCompanion toCompanion(bool nullToAbsent) {
+    return CustomersCompanion(
+      id: Value(id),
+      name: name == null && nullToAbsent ? const Value.absent() : Value(name),
+      phone:
+          phone == null && nullToAbsent ? const Value.absent() : Value(phone),
+      address: address == null && nullToAbsent
+          ? const Value.absent()
+          : Value(address),
+      additionalInfo: additionalInfo == null && nullToAbsent
+          ? const Value.absent()
+          : Value(additionalInfo),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory Customer.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Customer(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String?>(json['name']),
+      phone: serializer.fromJson<String?>(json['phone']),
+      address: serializer.fromJson<String?>(json['address']),
+      additionalInfo: serializer.fromJson<String?>(json['additionalInfo']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String?>(name),
+      'phone': serializer.toJson<String?>(phone),
+      'address': serializer.toJson<String?>(address),
+      'additionalInfo': serializer.toJson<String?>(additionalInfo),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  Customer copyWith(
+          {int? id,
+          Value<String?> name = const Value.absent(),
+          Value<String?> phone = const Value.absent(),
+          Value<String?> address = const Value.absent(),
+          Value<String?> additionalInfo = const Value.absent(),
+          DateTime? createdAt}) =>
+      Customer(
+        id: id ?? this.id,
+        name: name.present ? name.value : this.name,
+        phone: phone.present ? phone.value : this.phone,
+        address: address.present ? address.value : this.address,
+        additionalInfo:
+            additionalInfo.present ? additionalInfo.value : this.additionalInfo,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  Customer copyWithCompanion(CustomersCompanion data) {
+    return Customer(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      phone: data.phone.present ? data.phone.value : this.phone,
+      address: data.address.present ? data.address.value : this.address,
+      additionalInfo: data.additionalInfo.present
+          ? data.additionalInfo.value
+          : this.additionalInfo,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Customer(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('phone: $phone, ')
+          ..write('address: $address, ')
+          ..write('additionalInfo: $additionalInfo, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, name, phone, address, additionalInfo, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Customer &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.phone == this.phone &&
+          other.address == this.address &&
+          other.additionalInfo == this.additionalInfo &&
+          other.createdAt == this.createdAt);
+}
+
+class CustomersCompanion extends UpdateCompanion<Customer> {
+  final Value<int> id;
+  final Value<String?> name;
+  final Value<String?> phone;
+  final Value<String?> address;
+  final Value<String?> additionalInfo;
+  final Value<DateTime> createdAt;
+  const CustomersCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.phone = const Value.absent(),
+    this.address = const Value.absent(),
+    this.additionalInfo = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  CustomersCompanion.insert({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.phone = const Value.absent(),
+    this.address = const Value.absent(),
+    this.additionalInfo = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  static Insertable<Customer> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<String>? phone,
+    Expression<String>? address,
+    Expression<String>? additionalInfo,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (phone != null) 'phone': phone,
+      if (address != null) 'address': address,
+      if (additionalInfo != null) 'additional_info': additionalInfo,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  CustomersCompanion copyWith(
+      {Value<int>? id,
+      Value<String?>? name,
+      Value<String?>? phone,
+      Value<String?>? address,
+      Value<String?>? additionalInfo,
+      Value<DateTime>? createdAt}) {
+    return CustomersCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      phone: phone ?? this.phone,
+      address: address ?? this.address,
+      additionalInfo: additionalInfo ?? this.additionalInfo,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (phone.present) {
+      map['phone'] = Variable<String>(phone.value);
+    }
+    if (address.present) {
+      map['address'] = Variable<String>(address.value);
+    }
+    if (additionalInfo.present) {
+      map['additional_info'] = Variable<String>(additionalInfo.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CustomersCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('phone: $phone, ')
+          ..write('address: $address, ')
+          ..write('additionalInfo: $additionalInfo, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $DishUnitsTable dishUnits = $DishUnitsTable(this);
   late final $DishesCategoryTable dishesCategory = $DishesCategoryTable(this);
+  late final $CustomersTable customers = $CustomersTable(this);
   late final DishUnitsDao dishUnitsDao = DishUnitsDao(this as AppDatabase);
   late final DishesCategoryDao dishesCategoryDao =
       DishesCategoryDao(this as AppDatabase);
+  late final CustomerDao customerDao = CustomerDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [dishUnits, dishesCategory];
+      [dishUnits, dishesCategory, customers];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules(
         [
@@ -1078,6 +1424,182 @@ typedef $$DishesCategoryTableProcessedTableManager = ProcessedTableManager<
     (DishesCategoryData, $$DishesCategoryTableReferences),
     DishesCategoryData,
     PrefetchHooks Function({bool parentId})>;
+typedef $$CustomersTableCreateCompanionBuilder = CustomersCompanion Function({
+  Value<int> id,
+  Value<String?> name,
+  Value<String?> phone,
+  Value<String?> address,
+  Value<String?> additionalInfo,
+  Value<DateTime> createdAt,
+});
+typedef $$CustomersTableUpdateCompanionBuilder = CustomersCompanion Function({
+  Value<int> id,
+  Value<String?> name,
+  Value<String?> phone,
+  Value<String?> address,
+  Value<String?> additionalInfo,
+  Value<DateTime> createdAt,
+});
+
+class $$CustomersTableFilterComposer
+    extends Composer<_$AppDatabase, $CustomersTable> {
+  $$CustomersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get phone => $composableBuilder(
+      column: $table.phone, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get address => $composableBuilder(
+      column: $table.address, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get additionalInfo => $composableBuilder(
+      column: $table.additionalInfo,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$CustomersTableOrderingComposer
+    extends Composer<_$AppDatabase, $CustomersTable> {
+  $$CustomersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get phone => $composableBuilder(
+      column: $table.phone, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get address => $composableBuilder(
+      column: $table.address, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get additionalInfo => $composableBuilder(
+      column: $table.additionalInfo,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$CustomersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CustomersTable> {
+  $$CustomersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get phone =>
+      $composableBuilder(column: $table.phone, builder: (column) => column);
+
+  GeneratedColumn<String> get address =>
+      $composableBuilder(column: $table.address, builder: (column) => column);
+
+  GeneratedColumn<String> get additionalInfo => $composableBuilder(
+      column: $table.additionalInfo, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$CustomersTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $CustomersTable,
+    Customer,
+    $$CustomersTableFilterComposer,
+    $$CustomersTableOrderingComposer,
+    $$CustomersTableAnnotationComposer,
+    $$CustomersTableCreateCompanionBuilder,
+    $$CustomersTableUpdateCompanionBuilder,
+    (Customer, BaseReferences<_$AppDatabase, $CustomersTable, Customer>),
+    Customer,
+    PrefetchHooks Function()> {
+  $$CustomersTableTableManager(_$AppDatabase db, $CustomersTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CustomersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CustomersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CustomersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String?> name = const Value.absent(),
+            Value<String?> phone = const Value.absent(),
+            Value<String?> address = const Value.absent(),
+            Value<String?> additionalInfo = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+          }) =>
+              CustomersCompanion(
+            id: id,
+            name: name,
+            phone: phone,
+            address: address,
+            additionalInfo: additionalInfo,
+            createdAt: createdAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String?> name = const Value.absent(),
+            Value<String?> phone = const Value.absent(),
+            Value<String?> address = const Value.absent(),
+            Value<String?> additionalInfo = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+          }) =>
+              CustomersCompanion.insert(
+            id: id,
+            name: name,
+            phone: phone,
+            address: address,
+            additionalInfo: additionalInfo,
+            createdAt: createdAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$CustomersTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $CustomersTable,
+    Customer,
+    $$CustomersTableFilterComposer,
+    $$CustomersTableOrderingComposer,
+    $$CustomersTableAnnotationComposer,
+    $$CustomersTableCreateCompanionBuilder,
+    $$CustomersTableUpdateCompanionBuilder,
+    (Customer, BaseReferences<_$AppDatabase, $CustomersTable, Customer>),
+    Customer,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -1086,4 +1608,6 @@ class $AppDatabaseManager {
       $$DishUnitsTableTableManager(_db, _db.dishUnits);
   $$DishesCategoryTableTableManager get dishesCategory =>
       $$DishesCategoryTableTableManager(_db, _db.dishesCategory);
+  $$CustomersTableTableManager get customers =>
+      $$CustomersTableTableManager(_db, _db.customers);
 }

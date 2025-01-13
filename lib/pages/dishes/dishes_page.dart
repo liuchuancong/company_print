@@ -255,6 +255,11 @@ class EditOrCreateCategoryDialogState extends State<EditOrCreateCategoryDialog> 
                               child: ListTile(
                                 title: Text(node.data!.data.name, style: const TextStyle(fontSize: 18.0)),
                                 subtitle: Text(node.data!.data.description, style: const TextStyle(fontSize: 16.0)),
+                                onTap: () {
+                                  _parentIdController.text = node.data!.data.name.toString();
+                                  parentId = node.data!.data.id;
+                                  SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
+                                },
                                 trailing: ElevatedButton(
                                   onPressed: () {
                                     _parentIdController.text = node.data!.data.name.toString();
