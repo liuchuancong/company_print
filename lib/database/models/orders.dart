@@ -3,7 +3,7 @@ import 'package:drift/drift.dart';
 class Orders extends Table {
   IntColumn get id => integer().autoIncrement()(); // 订单ID
 
-  TextColumn get orderName => text().withLength(min: 1).nullable()(); // 订单名称，允许为空
+  TextColumn get orderName => text().nullable()(); // 订单名称，允许为空
   TextColumn get description => text().nullable()(); // 描述，允许为空
   TextColumn get remark => text().nullable()(); // 备注，允许为空
   // 顾客信息

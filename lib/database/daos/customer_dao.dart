@@ -14,6 +14,13 @@ class CustomerDao extends DatabaseAccessor<AppDatabase> with _$CustomerDaoMixin 
     return await select(customers).get();
   }
 
+  Future<List<String>> getDistinctOrderNames() async {
+    // 构建查询并执行，确保返回的结果集中每个订单名称只出现一次
+    final query = selectOnly(customers, distinct: true)..addColumns([customers.name]);
+    final result = await query.get();
+    return result.map((row) => row.read(customers.name)).whereType<String>().toList();
+  }
+
   Future<List<Customer>> getPaginatedCustomers(
     int offset,
     int limit, {

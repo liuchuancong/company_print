@@ -1571,13 +1571,9 @@ class $OrdersTable extends Orders with TableInfo<$OrdersTable, Order> {
   static const VerificationMeta _orderNameMeta =
       const VerificationMeta('orderName');
   @override
-  late final GeneratedColumn<String> orderName =
-      GeneratedColumn<String>('order_name', aliasedName, true,
-          additionalChecks: GeneratedColumn.checkTextLength(
-            minTextLength: 1,
-          ),
-          type: DriftSqlType.string,
-          requiredDuringInsert: false);
+  late final GeneratedColumn<String> orderName = GeneratedColumn<String>(
+      'order_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _descriptionMeta =
       const VerificationMeta('description');
   @override
@@ -3021,6 +3017,317 @@ class OrderItemsCompanion extends UpdateCompanion<OrderItem> {
   }
 }
 
+class $VehiclesTable extends Vehicles with TableInfo<$VehiclesTable, Vehicle> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $VehiclesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _driverNameMeta =
+      const VerificationMeta('driverName');
+  @override
+  late final GeneratedColumn<String> driverName = GeneratedColumn<String>(
+      'driver_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _plateNumberMeta =
+      const VerificationMeta('plateNumber');
+  @override
+  late final GeneratedColumn<String> plateNumber = GeneratedColumn<String>(
+      'plate_number', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _driverPhoneMeta =
+      const VerificationMeta('driverPhone');
+  @override
+  late final GeneratedColumn<String> driverPhone = GeneratedColumn<String>(
+      'driver_phone', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, driverName, plateNumber, driverPhone, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'vehicles';
+  @override
+  VerificationContext validateIntegrity(Insertable<Vehicle> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('driver_name')) {
+      context.handle(
+          _driverNameMeta,
+          driverName.isAcceptableOrUnknown(
+              data['driver_name']!, _driverNameMeta));
+    }
+    if (data.containsKey('plate_number')) {
+      context.handle(
+          _plateNumberMeta,
+          plateNumber.isAcceptableOrUnknown(
+              data['plate_number']!, _plateNumberMeta));
+    }
+    if (data.containsKey('driver_phone')) {
+      context.handle(
+          _driverPhoneMeta,
+          driverPhone.isAcceptableOrUnknown(
+              data['driver_phone']!, _driverPhoneMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Vehicle map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Vehicle(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      driverName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}driver_name']),
+      plateNumber: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}plate_number']),
+      driverPhone: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}driver_phone']),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+    );
+  }
+
+  @override
+  $VehiclesTable createAlias(String alias) {
+    return $VehiclesTable(attachedDatabase, alias);
+  }
+}
+
+class Vehicle extends DataClass implements Insertable<Vehicle> {
+  final int id;
+  final String? driverName;
+  final String? plateNumber;
+  final String? driverPhone;
+  final DateTime createdAt;
+  const Vehicle(
+      {required this.id,
+      this.driverName,
+      this.plateNumber,
+      this.driverPhone,
+      required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    if (!nullToAbsent || driverName != null) {
+      map['driver_name'] = Variable<String>(driverName);
+    }
+    if (!nullToAbsent || plateNumber != null) {
+      map['plate_number'] = Variable<String>(plateNumber);
+    }
+    if (!nullToAbsent || driverPhone != null) {
+      map['driver_phone'] = Variable<String>(driverPhone);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  VehiclesCompanion toCompanion(bool nullToAbsent) {
+    return VehiclesCompanion(
+      id: Value(id),
+      driverName: driverName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(driverName),
+      plateNumber: plateNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(plateNumber),
+      driverPhone: driverPhone == null && nullToAbsent
+          ? const Value.absent()
+          : Value(driverPhone),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory Vehicle.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Vehicle(
+      id: serializer.fromJson<int>(json['id']),
+      driverName: serializer.fromJson<String?>(json['driverName']),
+      plateNumber: serializer.fromJson<String?>(json['plateNumber']),
+      driverPhone: serializer.fromJson<String?>(json['driverPhone']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'driverName': serializer.toJson<String?>(driverName),
+      'plateNumber': serializer.toJson<String?>(plateNumber),
+      'driverPhone': serializer.toJson<String?>(driverPhone),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  Vehicle copyWith(
+          {int? id,
+          Value<String?> driverName = const Value.absent(),
+          Value<String?> plateNumber = const Value.absent(),
+          Value<String?> driverPhone = const Value.absent(),
+          DateTime? createdAt}) =>
+      Vehicle(
+        id: id ?? this.id,
+        driverName: driverName.present ? driverName.value : this.driverName,
+        plateNumber: plateNumber.present ? plateNumber.value : this.plateNumber,
+        driverPhone: driverPhone.present ? driverPhone.value : this.driverPhone,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  Vehicle copyWithCompanion(VehiclesCompanion data) {
+    return Vehicle(
+      id: data.id.present ? data.id.value : this.id,
+      driverName:
+          data.driverName.present ? data.driverName.value : this.driverName,
+      plateNumber:
+          data.plateNumber.present ? data.plateNumber.value : this.plateNumber,
+      driverPhone:
+          data.driverPhone.present ? data.driverPhone.value : this.driverPhone,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Vehicle(')
+          ..write('id: $id, ')
+          ..write('driverName: $driverName, ')
+          ..write('plateNumber: $plateNumber, ')
+          ..write('driverPhone: $driverPhone, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, driverName, plateNumber, driverPhone, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Vehicle &&
+          other.id == this.id &&
+          other.driverName == this.driverName &&
+          other.plateNumber == this.plateNumber &&
+          other.driverPhone == this.driverPhone &&
+          other.createdAt == this.createdAt);
+}
+
+class VehiclesCompanion extends UpdateCompanion<Vehicle> {
+  final Value<int> id;
+  final Value<String?> driverName;
+  final Value<String?> plateNumber;
+  final Value<String?> driverPhone;
+  final Value<DateTime> createdAt;
+  const VehiclesCompanion({
+    this.id = const Value.absent(),
+    this.driverName = const Value.absent(),
+    this.plateNumber = const Value.absent(),
+    this.driverPhone = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  VehiclesCompanion.insert({
+    this.id = const Value.absent(),
+    this.driverName = const Value.absent(),
+    this.plateNumber = const Value.absent(),
+    this.driverPhone = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  static Insertable<Vehicle> custom({
+    Expression<int>? id,
+    Expression<String>? driverName,
+    Expression<String>? plateNumber,
+    Expression<String>? driverPhone,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (driverName != null) 'driver_name': driverName,
+      if (plateNumber != null) 'plate_number': plateNumber,
+      if (driverPhone != null) 'driver_phone': driverPhone,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  VehiclesCompanion copyWith(
+      {Value<int>? id,
+      Value<String?>? driverName,
+      Value<String?>? plateNumber,
+      Value<String?>? driverPhone,
+      Value<DateTime>? createdAt}) {
+    return VehiclesCompanion(
+      id: id ?? this.id,
+      driverName: driverName ?? this.driverName,
+      plateNumber: plateNumber ?? this.plateNumber,
+      driverPhone: driverPhone ?? this.driverPhone,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (driverName.present) {
+      map['driver_name'] = Variable<String>(driverName.value);
+    }
+    if (plateNumber.present) {
+      map['plate_number'] = Variable<String>(plateNumber.value);
+    }
+    if (driverPhone.present) {
+      map['driver_phone'] = Variable<String>(driverPhone.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VehiclesCompanion(')
+          ..write('id: $id, ')
+          ..write('driverName: $driverName, ')
+          ..write('plateNumber: $plateNumber, ')
+          ..write('driverPhone: $driverPhone, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3031,6 +3338,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $CustomerOrderItemsTable(this);
   late final $OrdersTable orders = $OrdersTable(this);
   late final $OrderItemsTable orderItems = $OrderItemsTable(this);
+  late final $VehiclesTable vehicles = $VehiclesTable(this);
   late final DishUnitsDao dishUnitsDao = DishUnitsDao(this as AppDatabase);
   late final DishesCategoryDao dishesCategoryDao =
       DishesCategoryDao(this as AppDatabase);
@@ -3039,6 +3347,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       CustomerOrderItemsDao(this as AppDatabase);
   late final OrderItemsDao orderItemsDao = OrderItemsDao(this as AppDatabase);
   late final OrdersDao ordersDao = OrdersDao(this as AppDatabase);
+  late final VehicleDao vehicleDao = VehicleDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3049,7 +3358,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         customers,
         customerOrderItems,
         orders,
-        orderItems
+        orderItems,
+        vehicles
       ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules(
@@ -4952,6 +5262,165 @@ typedef $$OrderItemsTableProcessedTableManager = ProcessedTableManager<
     (OrderItem, $$OrderItemsTableReferences),
     OrderItem,
     PrefetchHooks Function({bool orderId})>;
+typedef $$VehiclesTableCreateCompanionBuilder = VehiclesCompanion Function({
+  Value<int> id,
+  Value<String?> driverName,
+  Value<String?> plateNumber,
+  Value<String?> driverPhone,
+  Value<DateTime> createdAt,
+});
+typedef $$VehiclesTableUpdateCompanionBuilder = VehiclesCompanion Function({
+  Value<int> id,
+  Value<String?> driverName,
+  Value<String?> plateNumber,
+  Value<String?> driverPhone,
+  Value<DateTime> createdAt,
+});
+
+class $$VehiclesTableFilterComposer
+    extends Composer<_$AppDatabase, $VehiclesTable> {
+  $$VehiclesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get driverName => $composableBuilder(
+      column: $table.driverName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get plateNumber => $composableBuilder(
+      column: $table.plateNumber, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get driverPhone => $composableBuilder(
+      column: $table.driverPhone, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$VehiclesTableOrderingComposer
+    extends Composer<_$AppDatabase, $VehiclesTable> {
+  $$VehiclesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get driverName => $composableBuilder(
+      column: $table.driverName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get plateNumber => $composableBuilder(
+      column: $table.plateNumber, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get driverPhone => $composableBuilder(
+      column: $table.driverPhone, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$VehiclesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $VehiclesTable> {
+  $$VehiclesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get driverName => $composableBuilder(
+      column: $table.driverName, builder: (column) => column);
+
+  GeneratedColumn<String> get plateNumber => $composableBuilder(
+      column: $table.plateNumber, builder: (column) => column);
+
+  GeneratedColumn<String> get driverPhone => $composableBuilder(
+      column: $table.driverPhone, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$VehiclesTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $VehiclesTable,
+    Vehicle,
+    $$VehiclesTableFilterComposer,
+    $$VehiclesTableOrderingComposer,
+    $$VehiclesTableAnnotationComposer,
+    $$VehiclesTableCreateCompanionBuilder,
+    $$VehiclesTableUpdateCompanionBuilder,
+    (Vehicle, BaseReferences<_$AppDatabase, $VehiclesTable, Vehicle>),
+    Vehicle,
+    PrefetchHooks Function()> {
+  $$VehiclesTableTableManager(_$AppDatabase db, $VehiclesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$VehiclesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$VehiclesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$VehiclesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String?> driverName = const Value.absent(),
+            Value<String?> plateNumber = const Value.absent(),
+            Value<String?> driverPhone = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+          }) =>
+              VehiclesCompanion(
+            id: id,
+            driverName: driverName,
+            plateNumber: plateNumber,
+            driverPhone: driverPhone,
+            createdAt: createdAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String?> driverName = const Value.absent(),
+            Value<String?> plateNumber = const Value.absent(),
+            Value<String?> driverPhone = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+          }) =>
+              VehiclesCompanion.insert(
+            id: id,
+            driverName: driverName,
+            plateNumber: plateNumber,
+            driverPhone: driverPhone,
+            createdAt: createdAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$VehiclesTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $VehiclesTable,
+    Vehicle,
+    $$VehiclesTableFilterComposer,
+    $$VehiclesTableOrderingComposer,
+    $$VehiclesTableAnnotationComposer,
+    $$VehiclesTableCreateCompanionBuilder,
+    $$VehiclesTableUpdateCompanionBuilder,
+    (Vehicle, BaseReferences<_$AppDatabase, $VehiclesTable, Vehicle>),
+    Vehicle,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4968,4 +5437,6 @@ class $AppDatabaseManager {
       $$OrdersTableTableManager(_db, _db.orders);
   $$OrderItemsTableTableManager get orderItems =>
       $$OrderItemsTableTableManager(_db, _db.orderItems);
+  $$VehiclesTableTableManager get vehicles =>
+      $$VehiclesTableTableManager(_db, _db.vehicles);
 }

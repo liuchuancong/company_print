@@ -28,6 +28,20 @@ class OrdersDao extends DatabaseAccessor<AppDatabase> with _$OrdersDaoMixin {
     return await (select(orders)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
   }
 
+  Future<List<Order>> getOrdersForTimeRange(DateTime startTime, DateTime endTime) async {
+    final query = select(orders)
+      ..where((tbl) => tbl.createdAt.isBiggerOrEqualValue(startTime) & tbl.createdAt.isSmallerThanValue(endTime));
+
+    return await query.get();
+  }
+
+  Future<List<String>> getDistinctOrderNames() async {
+    // 构建查询并执行，确保返回的结果集中每个订单名称只出现一次
+    final query = selectOnly(orders, distinct: true)..addColumns([orders.orderName]);
+    final result = await query.get();
+    return result.map((row) => row.read(orders.orderName)).whereType<String>().toList();
+  }
+
   /// 创建新的订单
   Future<int> createOrder({
     required String orderName,

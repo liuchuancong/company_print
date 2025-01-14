@@ -283,7 +283,7 @@ class CustomersDataSource extends AsyncDataTableSource {
                       icon: const Icon(Icons.delete),
                       tooltip: '删除',
                       onPressed: () {
-                        controller.deleteCustomer(custom.id);
+                        controller.showDeleteCustomerDialog(custom.id);
                       },
                     ),
                     IconButton(

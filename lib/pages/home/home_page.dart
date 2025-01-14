@@ -94,7 +94,7 @@ class _HomePageState extends State<HomePage> {
             icon: HugeIcons.strokeRoundedDeliveryTruck01,
             color: Get.theme.primaryColor,
           ),
-          label: '车辆管理',
+          label: '司机车辆',
         ),
         NavigationDestination(
           icon: const HugeIcon(

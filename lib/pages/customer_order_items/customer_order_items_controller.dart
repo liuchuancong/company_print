@@ -268,6 +268,13 @@ class CustomerOrderItemsController extends GetxController {
     dataSource?.refreshDatasource();
   }
 
+  void showDeleteCustomerOrderDialog(int id) async {
+    var result = await Utils.showAlertDialog("确定要删除吗？", title: "删除");
+    if (result == true) {
+      deleteCustomerOrderItem(id);
+    }
+  }
+
   Future<void> deleteCustomerOrderItem(int id) async {
     await database.customerOrderItemsDao.deleteCustomerOrderItem(id);
     dataSource?.refreshDatasource();
