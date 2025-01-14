@@ -62,6 +62,7 @@ dependencies:
   animated_tree_view: ^2.3.0
   cascade_widget: ^1.0.5
   scrollable_tab_view: ^1.0.12
+  calendar_date_picker2: ^1.1.8
   flutter_localizations:
     sdk: flutter
 dev_dependencies:

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:logger/logger.dart';
 import 'package:path/path.dart' as p;
 import 'package:company_print/database/db.dart';
 import 'package:path_provider/path_provider.dart';
@@ -24,7 +25,7 @@ LazyDatabase openConnection() {
     final file = File(p.join(folderDir, 'app_database.db'));
     // 确保数据库文件所在的目录存在
     await dbFolder.create(recursive: true);
-    print('Opening db $file');
+    Logger().i('Opening db $file');
     return NativeDatabase(file);
   });
 }

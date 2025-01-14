@@ -2,11 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/pages/sales/sales_controller.dart';
 
-class SalesPage extends StatelessWidget {
+class SalesPage extends StatefulWidget {
   const SalesPage({super.key});
+
+  @override
+  State<SalesPage> createState() => _SalesPageState();
+}
+
+class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixin {
+  late SalesController controller;
+  @override
+  void initState() {
+    super.initState();
+    Get.put(SalesController());
+    controller = Get.find<SalesController>();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final logic = Get.put(SalesController());
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sales'),
@@ -16,4 +30,7 @@ class SalesPage extends StatelessWidget {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
