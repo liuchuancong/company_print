@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:searchfield/searchfield.dart';
 import 'package:company_print/common/index.dart';
+import 'package:company_print/pages/sales/order_grid_view.dart';
 import 'package:company_print/pages/sales/sales_controller.dart';
 
 class SalesPage extends StatefulWidget {
@@ -27,7 +28,9 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
     return SafeArea(
       child: Scaffold(
         floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {},
+          onPressed: () {
+            controller.showAddOrEditOrderDialog();
+          },
           label: const Icon(HugeIcons.strokeRoundedAddCircle, size: 40),
         ),
         body: Column(
@@ -88,12 +91,13 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
                       size: 30,
                     ),
                     onPressed: () {
-                      // 处理搜索图标点击事件
+                      controller.showDateTimerPicker();
                     },
                   ),
                 ],
               ),
             ),
+            Expanded(child: OrderGridView(controller: controller))
           ],
         ),
       ),

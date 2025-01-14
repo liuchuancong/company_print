@@ -28,10 +28,18 @@ class OrdersDao extends DatabaseAccessor<AppDatabase> with _$OrdersDaoMixin {
     return await (select(orders)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
   }
 
-  Future<List<Order>> getOrdersForTimeRange(DateTime startTime, DateTime endTime) async {
-    final query = select(orders)
+  Future<List<Order>> getOrdersForTimeRange(DateTime startTime, DateTime endTime,
+      {int page = 1, int pageSize = 10, String searchQuery = ''}) async {
+    final offset = (page - 1) * pageSize;
+
+    var query = select(orders)
       ..where((tbl) => tbl.createdAt.isBiggerOrEqualValue(startTime) & tbl.createdAt.isSmallerThanValue(endTime));
 
+    // 如果 searchQuery 不为空，则添加 customerName 的过滤条件
+    if (searchQuery.isNotEmpty) {
+      query = query..where((tbl) => tbl.customerName.like('%$searchQuery%'));
+    }
+    // query = query..limit(pageSize, offset: offset);
     return await query.get();
   }
 
@@ -44,10 +52,10 @@ class OrdersDao extends DatabaseAccessor<AppDatabase> with _$OrdersDaoMixin {
 
   /// 创建新的订单
   Future<int> createOrder({
-    required String orderName,
+    required String customerName,
+    String? orderName,
     String? description,
     String? remark,
-    String? customerName,
     String? customerPhone,
     String? customerAddress,
     String? driverName,
@@ -63,7 +71,7 @@ class OrdersDao extends DatabaseAccessor<AppDatabase> with _$OrdersDaoMixin {
       orderName: Value(orderName),
       description: Value(description ?? ''),
       remark: Value(remark ?? ''),
-      customerName: Value(customerName ?? ''),
+      customerName: Value(customerName),
       customerPhone: Value(customerPhone ?? ''),
       customerAddress: Value(customerAddress ?? ''),
       driverName: Value(driverName ?? ''),
@@ -95,6 +103,7 @@ class OrdersDao extends DatabaseAccessor<AppDatabase> with _$OrdersDaoMixin {
     double advancePayment = 0.0,
     double shippingFee = 0.0,
     bool isPaid = false,
+    DateTime? createdAt,
   }) async {
     final entry = OrdersCompanion(
       orderName: Value(orderName),
@@ -111,6 +120,7 @@ class OrdersDao extends DatabaseAccessor<AppDatabase> with _$OrdersDaoMixin {
       advancePayment: Value(advancePayment),
       shippingFee: Value(shippingFee),
       isPaid: Value(isPaid),
+      createdAt: Value(createdAt ?? DateTime.now()),
     );
     return await (update(orders)..where((tbl) => tbl.id.equals(id))).write(entry);
   }

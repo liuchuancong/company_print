@@ -486,7 +486,7 @@ class MutipleOrderItemDialogDialogState extends State<MutipleOrderItemDialog> {
       itemShortName: _itemShortNameController.text.isNotEmpty ? _itemShortNameController.text : '',
       purchaseUnit: _purchaseUnitController.text.isNotEmpty ? _purchaseUnitController.text : '',
       actualUnit: _actualUnitController.text.isNotEmpty ? _actualUnitController.text : '',
-      purchaseQuantity: double.tryParse(_purchaseQuantityController.text) ?? 0.0,
+      purchaseQuantity: double.tryParse(_purchaseQuantityController.text) ?? 0,
       actualQuantity: double.tryParse(_actualQuantityController.text) ?? 0,
       presetPrice: double.tryParse(_presetPriceController.text) ?? 0,
       actualPrice: double.tryParse(_actualPriceController.text) ?? 0,

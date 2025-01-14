@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:company_print/common/index.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -14,6 +15,7 @@ Future<void> initSystem() async {
     systemNavigationBarColor: Colors.transparent,
     systemNavigationBarContrastEnforced: false,
   ));
+  initRefresh();
 }
 
 void initService() {
@@ -86,4 +88,27 @@ class _MyAppState extends State<MyApp> {
       );
     });
   }
+}
+
+initRefresh() {
+  EasyRefresh.defaultHeaderBuilder = () => const ClassicHeader(
+        armedText: '松开加载',
+        dragText: '上拉刷新',
+        readyText: '加载中...',
+        processingText: '正在刷新...',
+        noMoreText: '没有更多数据了',
+        failedText: '加载失败',
+        messageText: '上次加载时间 %T',
+        processedText: '加载成功',
+      );
+  EasyRefresh.defaultFooterBuilder = () => const ClassicFooter(
+        armedText: '松开加载',
+        dragText: '下拉刷新',
+        readyText: '加载中...',
+        processingText: '正在刷新...',
+        noMoreText: '没有更多数据了',
+        failedText: '加载失败',
+        messageText: '上次加载时间 %T',
+        processedText: '加载成功',
+      );
 }

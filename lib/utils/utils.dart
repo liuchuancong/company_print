@@ -85,6 +85,109 @@ class Utils {
     );
     return result ?? false;
   }
+
+  static DateTime getStartOfDay(DateTime date) {
+    return DateTime(date.year, date.month, date.day, 0, 0, 0, 0);
+  }
+
+  static DateTime getEndOfDay(DateTime date) {
+    return DateTime(date.year, date.month, date.day, 23, 59, 59, 999);
+  }
+
+  static Future<T?> showOptionDialog<T>(
+    List<T> contents,
+    T value, {
+    String title = '',
+  }) async {
+    var result = await Get.dialog(
+      SimpleDialog(
+        title: Text(title),
+        children: contents
+            .map(
+              (e) => RadioListTile<T>(
+                title: Text(e.toString()),
+                value: e,
+                groupValue: value,
+                onChanged: (e) {
+                  Navigator.of(Get.context!).pop(e);
+                },
+              ),
+            )
+            .toList(),
+      ),
+    );
+    return result;
+  }
+
+  static void showRightDialog({
+    required String title,
+    Function()? onDismiss,
+    required Widget child,
+    double width = 320,
+    bool useSystem = false,
+  }) {
+    SmartDialog.show(
+      alignment: Alignment.topRight,
+      animationBuilder: (controller, child, animationParam) {
+        //从右到左
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(1, 0),
+            end: Offset.zero,
+          ).animate(controller.view),
+          child: child,
+        );
+      },
+      useSystem: useSystem,
+      maskColor: Colors.transparent,
+      animationTime: const Duration(milliseconds: 200),
+      builder: (context) => Container(
+        width: width + MediaQuery.of(context).padding.right,
+        padding: EdgeInsets.only(right: MediaQuery.of(context).padding.right),
+        decoration: BoxDecoration(
+          color: Get.theme.cardColor,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(4),
+            bottomLeft: Radius.circular(4),
+          ),
+        ),
+        child: SafeArea(
+          left: false,
+          right: false,
+          child: MediaQuery(
+            data: const MediaQueryData(padding: EdgeInsets.zero),
+            child: Column(
+              children: [
+                ListTile(
+                  visualDensity: VisualDensity.compact,
+                  contentPadding: EdgeInsets.zero,
+                  leading: IconButton(
+                    onPressed: () {
+                      SmartDialog.dismiss(status: SmartStatus.allCustom).then(
+                        (value) => onDismiss?.call(),
+                      );
+                    },
+                    icon: const Icon(Icons.arrow_back),
+                  ),
+                  title: Text(
+                    title,
+                    style: Get.textTheme.titleMedium,
+                  ),
+                ),
+                Divider(
+                  height: 1,
+                  color: Colors.grey.withValues(alpha: .1),
+                ),
+                Expanded(
+                  child: child,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class TwoDigitDecimalFormatter extends TextInputFormatter {
