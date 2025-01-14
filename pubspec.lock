@@ -126,6 +126,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.1.8"
+  carousel_slider:
+    dependency: "direct main"
+    description:
+      name: carousel_slider
+      sha256: "7b006ec356205054af5beaef62e2221160ea36b90fb70a35e4deacd49d0349ae"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "5.0.0"
   cascade_widget:
     dependency: "direct main"
     description:
@@ -818,14 +826,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.0.1"
-  scrollable_tab_view:
-    dependency: "direct main"
-    description:
-      name: scrollable_tab_view
-      sha256: cd1370e530ae4287a3055942e7adae714d4f38052ff5166201a3f25fc42f2912
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.0.12"
   search_choices:
     dependency: "direct main"
     description:
@@ -834,6 +834,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.3.1"
+  searchfield:
+    dependency: "direct main"
+    description:
+      name: searchfield
+      sha256: "4feb30fb730010cce3bd53c065cc9acc2cd1833a4ab8263ba9575293f09a1e3f"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.2.2"
   share_plus:
     dependency: "direct main"
     description:

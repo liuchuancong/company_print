@@ -223,11 +223,11 @@ class CustomerOrderItemsController extends GetxController {
     String itemName,
     String? itemShortName,
     String? purchaseUnit,
-    double purchaseQuantity,
+    double? purchaseQuantity,
     String? actualUnit,
-    double actualQuantity,
-    double presetPrice,
-    double actualPrice,
+    double? actualQuantity,
+    double? presetPrice,
+    double? actualPrice,
   ) async {
     await database.customerOrderItemsDao.insertCustomerOrderItem(
       customerId,
@@ -248,11 +248,11 @@ class CustomerOrderItemsController extends GetxController {
     String itemName,
     String? itemShortName,
     String? purchaseUnit,
-    double purchaseQuantity,
+    double? purchaseQuantity,
     String? actualUnit,
-    double actualQuantity,
-    double presetPrice,
-    double actualPrice,
+    double? actualQuantity,
+    double? presetPrice,
+    double? actualPrice,
   ) async {
     await database.customerOrderItemsDao.updateCustomerOrderItem(
       id,

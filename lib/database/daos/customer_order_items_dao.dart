@@ -16,11 +16,11 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
     String itemName,
     String? itemShortName,
     String? purchaseUnit,
-    double purchaseQuantity,
+    double? purchaseQuantity,
     String? actualUnit,
-    double actualQuantity,
-    double presetPrice,
-    double actualPrice,
+    double? actualQuantity,
+    double? presetPrice,
+    double? actualPrice,
   ) async {
     final entry = CustomerOrderItemsCompanion(
       itemName: Value(itemName),
@@ -103,11 +103,11 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
       String itemName,
       String? itemShortName,
       String? purchaseUnit,
-      double purchaseQuantity,
+      double? purchaseQuantity,
       String? actualUnit,
-      double actualQuantity,
-      double presetPrice,
-      double actualPrice) async {
+      double? actualQuantity,
+      double? presetPrice,
+      double? actualPrice) async {
     final entry = CustomerOrderItemsCompanion(
       itemName: Value(itemName),
       customerId: Value(id),

@@ -1007,55 +1007,39 @@ class $CustomerOrderItemsTable extends CustomerOrderItems
   static const VerificationMeta _purchaseUnitMeta =
       const VerificationMeta('purchaseUnit');
   @override
-  late final GeneratedColumn<String> purchaseUnit =
-      GeneratedColumn<String>('purchase_unit', aliasedName, true,
-          additionalChecks: GeneratedColumn.checkTextLength(
-            minTextLength: 1,
-          ),
-          type: DriftSqlType.string,
-          requiredDuringInsert: false);
+  late final GeneratedColumn<String> purchaseUnit = GeneratedColumn<String>(
+      'purchase_unit', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _actualUnitMeta =
       const VerificationMeta('actualUnit');
   @override
-  late final GeneratedColumn<String> actualUnit =
-      GeneratedColumn<String>('actual_unit', aliasedName, true,
-          additionalChecks: GeneratedColumn.checkTextLength(
-            minTextLength: 1,
-          ),
-          type: DriftSqlType.string,
-          requiredDuringInsert: false);
+  late final GeneratedColumn<String> actualUnit = GeneratedColumn<String>(
+      'actual_unit', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _purchaseQuantityMeta =
       const VerificationMeta('purchaseQuantity');
   @override
   late final GeneratedColumn<double> purchaseQuantity = GeneratedColumn<double>(
-      'purchase_quantity', aliasedName, false,
-      type: DriftSqlType.double,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(1.0));
+      'purchase_quantity', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _actualQuantityMeta =
       const VerificationMeta('actualQuantity');
   @override
   late final GeneratedColumn<double> actualQuantity = GeneratedColumn<double>(
-      'actual_quantity', aliasedName, false,
-      type: DriftSqlType.double,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(1.0));
+      'actual_quantity', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _presetPriceMeta =
       const VerificationMeta('presetPrice');
   @override
   late final GeneratedColumn<double> presetPrice = GeneratedColumn<double>(
-      'preset_price', aliasedName, false,
-      type: DriftSqlType.double,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(0.0));
+      'preset_price', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _actualPriceMeta =
       const VerificationMeta('actualPrice');
   @override
   late final GeneratedColumn<double> actualPrice = GeneratedColumn<double>(
-      'actual_price', aliasedName, false,
-      type: DriftSqlType.double,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(0.0));
+      'actual_price', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -1173,13 +1157,13 @@ class $CustomerOrderItemsTable extends CustomerOrderItems
       actualUnit: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}actual_unit']),
       purchaseQuantity: attachedDatabase.typeMapping.read(
-          DriftSqlType.double, data['${effectivePrefix}purchase_quantity'])!,
-      actualQuantity: attachedDatabase.typeMapping.read(
-          DriftSqlType.double, data['${effectivePrefix}actual_quantity'])!,
+          DriftSqlType.double, data['${effectivePrefix}purchase_quantity']),
+      actualQuantity: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}actual_quantity']),
       presetPrice: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}preset_price'])!,
+          .read(DriftSqlType.double, data['${effectivePrefix}preset_price']),
       actualPrice: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}actual_price'])!,
+          .read(DriftSqlType.double, data['${effectivePrefix}actual_price']),
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
     );
@@ -1199,10 +1183,10 @@ class CustomerOrderItem extends DataClass
   final String? itemShortName;
   final String? purchaseUnit;
   final String? actualUnit;
-  final double purchaseQuantity;
-  final double actualQuantity;
-  final double presetPrice;
-  final double actualPrice;
+  final double? purchaseQuantity;
+  final double? actualQuantity;
+  final double? presetPrice;
+  final double? actualPrice;
   final DateTime createdAt;
   const CustomerOrderItem(
       {required this.id,
@@ -1211,10 +1195,10 @@ class CustomerOrderItem extends DataClass
       this.itemShortName,
       this.purchaseUnit,
       this.actualUnit,
-      required this.purchaseQuantity,
-      required this.actualQuantity,
-      required this.presetPrice,
-      required this.actualPrice,
+      this.purchaseQuantity,
+      this.actualQuantity,
+      this.presetPrice,
+      this.actualPrice,
       required this.createdAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1231,10 +1215,18 @@ class CustomerOrderItem extends DataClass
     if (!nullToAbsent || actualUnit != null) {
       map['actual_unit'] = Variable<String>(actualUnit);
     }
-    map['purchase_quantity'] = Variable<double>(purchaseQuantity);
-    map['actual_quantity'] = Variable<double>(actualQuantity);
-    map['preset_price'] = Variable<double>(presetPrice);
-    map['actual_price'] = Variable<double>(actualPrice);
+    if (!nullToAbsent || purchaseQuantity != null) {
+      map['purchase_quantity'] = Variable<double>(purchaseQuantity);
+    }
+    if (!nullToAbsent || actualQuantity != null) {
+      map['actual_quantity'] = Variable<double>(actualQuantity);
+    }
+    if (!nullToAbsent || presetPrice != null) {
+      map['preset_price'] = Variable<double>(presetPrice);
+    }
+    if (!nullToAbsent || actualPrice != null) {
+      map['actual_price'] = Variable<double>(actualPrice);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -1253,10 +1245,18 @@ class CustomerOrderItem extends DataClass
       actualUnit: actualUnit == null && nullToAbsent
           ? const Value.absent()
           : Value(actualUnit),
-      purchaseQuantity: Value(purchaseQuantity),
-      actualQuantity: Value(actualQuantity),
-      presetPrice: Value(presetPrice),
-      actualPrice: Value(actualPrice),
+      purchaseQuantity: purchaseQuantity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(purchaseQuantity),
+      actualQuantity: actualQuantity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(actualQuantity),
+      presetPrice: presetPrice == null && nullToAbsent
+          ? const Value.absent()
+          : Value(presetPrice),
+      actualPrice: actualPrice == null && nullToAbsent
+          ? const Value.absent()
+          : Value(actualPrice),
       createdAt: Value(createdAt),
     );
   }
@@ -1271,10 +1271,10 @@ class CustomerOrderItem extends DataClass
       itemShortName: serializer.fromJson<String?>(json['itemShortName']),
       purchaseUnit: serializer.fromJson<String?>(json['purchaseUnit']),
       actualUnit: serializer.fromJson<String?>(json['actualUnit']),
-      purchaseQuantity: serializer.fromJson<double>(json['purchaseQuantity']),
-      actualQuantity: serializer.fromJson<double>(json['actualQuantity']),
-      presetPrice: serializer.fromJson<double>(json['presetPrice']),
-      actualPrice: serializer.fromJson<double>(json['actualPrice']),
+      purchaseQuantity: serializer.fromJson<double?>(json['purchaseQuantity']),
+      actualQuantity: serializer.fromJson<double?>(json['actualQuantity']),
+      presetPrice: serializer.fromJson<double?>(json['presetPrice']),
+      actualPrice: serializer.fromJson<double?>(json['actualPrice']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -1288,10 +1288,10 @@ class CustomerOrderItem extends DataClass
       'itemShortName': serializer.toJson<String?>(itemShortName),
       'purchaseUnit': serializer.toJson<String?>(purchaseUnit),
       'actualUnit': serializer.toJson<String?>(actualUnit),
-      'purchaseQuantity': serializer.toJson<double>(purchaseQuantity),
-      'actualQuantity': serializer.toJson<double>(actualQuantity),
-      'presetPrice': serializer.toJson<double>(presetPrice),
-      'actualPrice': serializer.toJson<double>(actualPrice),
+      'purchaseQuantity': serializer.toJson<double?>(purchaseQuantity),
+      'actualQuantity': serializer.toJson<double?>(actualQuantity),
+      'presetPrice': serializer.toJson<double?>(presetPrice),
+      'actualPrice': serializer.toJson<double?>(actualPrice),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -1303,10 +1303,10 @@ class CustomerOrderItem extends DataClass
           Value<String?> itemShortName = const Value.absent(),
           Value<String?> purchaseUnit = const Value.absent(),
           Value<String?> actualUnit = const Value.absent(),
-          double? purchaseQuantity,
-          double? actualQuantity,
-          double? presetPrice,
-          double? actualPrice,
+          Value<double?> purchaseQuantity = const Value.absent(),
+          Value<double?> actualQuantity = const Value.absent(),
+          Value<double?> presetPrice = const Value.absent(),
+          Value<double?> actualPrice = const Value.absent(),
           DateTime? createdAt}) =>
       CustomerOrderItem(
         id: id ?? this.id,
@@ -1317,10 +1317,13 @@ class CustomerOrderItem extends DataClass
         purchaseUnit:
             purchaseUnit.present ? purchaseUnit.value : this.purchaseUnit,
         actualUnit: actualUnit.present ? actualUnit.value : this.actualUnit,
-        purchaseQuantity: purchaseQuantity ?? this.purchaseQuantity,
-        actualQuantity: actualQuantity ?? this.actualQuantity,
-        presetPrice: presetPrice ?? this.presetPrice,
-        actualPrice: actualPrice ?? this.actualPrice,
+        purchaseQuantity: purchaseQuantity.present
+            ? purchaseQuantity.value
+            : this.purchaseQuantity,
+        actualQuantity:
+            actualQuantity.present ? actualQuantity.value : this.actualQuantity,
+        presetPrice: presetPrice.present ? presetPrice.value : this.presetPrice,
+        actualPrice: actualPrice.present ? actualPrice.value : this.actualPrice,
         createdAt: createdAt ?? this.createdAt,
       );
   CustomerOrderItem copyWithCompanion(CustomerOrderItemsCompanion data) {
@@ -1406,10 +1409,10 @@ class CustomerOrderItemsCompanion extends UpdateCompanion<CustomerOrderItem> {
   final Value<String?> itemShortName;
   final Value<String?> purchaseUnit;
   final Value<String?> actualUnit;
-  final Value<double> purchaseQuantity;
-  final Value<double> actualQuantity;
-  final Value<double> presetPrice;
-  final Value<double> actualPrice;
+  final Value<double?> purchaseQuantity;
+  final Value<double?> actualQuantity;
+  final Value<double?> presetPrice;
+  final Value<double?> actualPrice;
   final Value<DateTime> createdAt;
   const CustomerOrderItemsCompanion({
     this.id = const Value.absent(),
@@ -1473,10 +1476,10 @@ class CustomerOrderItemsCompanion extends UpdateCompanion<CustomerOrderItem> {
       Value<String?>? itemShortName,
       Value<String?>? purchaseUnit,
       Value<String?>? actualUnit,
-      Value<double>? purchaseQuantity,
-      Value<double>? actualQuantity,
-      Value<double>? presetPrice,
-      Value<double>? actualPrice,
+      Value<double?>? purchaseQuantity,
+      Value<double?>? actualQuantity,
+      Value<double?>? presetPrice,
+      Value<double?>? actualPrice,
       Value<DateTime>? createdAt}) {
     return CustomerOrderItemsCompanion(
       id: id ?? this.id,
@@ -1622,38 +1625,30 @@ class $OrdersTable extends Orders with TableInfo<$OrdersTable, Order> {
   late final GeneratedColumn<String> vehiclePlateNumber =
       GeneratedColumn<String>('vehicle_plate_number', aliasedName, true,
           type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _totalPriceMeta =
-      const VerificationMeta('totalPrice');
-  @override
-  late final GeneratedColumn<double> totalPrice = GeneratedColumn<double>(
-      'total_price', aliasedName, false,
-      type: DriftSqlType.double,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(0.0));
-  static const VerificationMeta _itemCountMeta =
-      const VerificationMeta('itemCount');
-  @override
-  late final GeneratedColumn<int> itemCount = GeneratedColumn<int>(
-      'item_count', aliasedName, false,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(0));
   static const VerificationMeta _advancePaymentMeta =
       const VerificationMeta('advancePayment');
   @override
   late final GeneratedColumn<double> advancePayment = GeneratedColumn<double>(
-      'advance_payment', aliasedName, false,
-      type: DriftSqlType.double,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(0.0));
+      'advance_payment', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _totalPriceMeta =
+      const VerificationMeta('totalPrice');
+  @override
+  late final GeneratedColumn<double> totalPrice = GeneratedColumn<double>(
+      'total_price', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _itemCountMeta =
+      const VerificationMeta('itemCount');
+  @override
+  late final GeneratedColumn<double> itemCount = GeneratedColumn<double>(
+      'item_count', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _shippingFeeMeta =
       const VerificationMeta('shippingFee');
   @override
   late final GeneratedColumn<double> shippingFee = GeneratedColumn<double>(
-      'shipping_fee', aliasedName, false,
-      type: DriftSqlType.double,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(0.0));
+      'shipping_fee', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _isPaidMeta = const VerificationMeta('isPaid');
   @override
   late final GeneratedColumn<bool> isPaid = GeneratedColumn<bool>(
@@ -1683,9 +1678,9 @@ class $OrdersTable extends Orders with TableInfo<$OrdersTable, Order> {
         driverName,
         driverPhone,
         vehiclePlateNumber,
+        advancePayment,
         totalPrice,
         itemCount,
-        advancePayment,
         shippingFee,
         isPaid,
         createdAt
@@ -1753,6 +1748,12 @@ class $OrdersTable extends Orders with TableInfo<$OrdersTable, Order> {
           vehiclePlateNumber.isAcceptableOrUnknown(
               data['vehicle_plate_number']!, _vehiclePlateNumberMeta));
     }
+    if (data.containsKey('advance_payment')) {
+      context.handle(
+          _advancePaymentMeta,
+          advancePayment.isAcceptableOrUnknown(
+              data['advance_payment']!, _advancePaymentMeta));
+    }
     if (data.containsKey('total_price')) {
       context.handle(
           _totalPriceMeta,
@@ -1762,12 +1763,6 @@ class $OrdersTable extends Orders with TableInfo<$OrdersTable, Order> {
     if (data.containsKey('item_count')) {
       context.handle(_itemCountMeta,
           itemCount.isAcceptableOrUnknown(data['item_count']!, _itemCountMeta));
-    }
-    if (data.containsKey('advance_payment')) {
-      context.handle(
-          _advancePaymentMeta,
-          advancePayment.isAcceptableOrUnknown(
-              data['advance_payment']!, _advancePaymentMeta));
     }
     if (data.containsKey('shipping_fee')) {
       context.handle(
@@ -1812,14 +1807,14 @@ class $OrdersTable extends Orders with TableInfo<$OrdersTable, Order> {
           .read(DriftSqlType.string, data['${effectivePrefix}driver_phone']),
       vehiclePlateNumber: attachedDatabase.typeMapping.read(
           DriftSqlType.string, data['${effectivePrefix}vehicle_plate_number']),
+      advancePayment: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}advance_payment']),
       totalPrice: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}total_price'])!,
+          .read(DriftSqlType.double, data['${effectivePrefix}total_price']),
       itemCount: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}item_count'])!,
-      advancePayment: attachedDatabase.typeMapping.read(
-          DriftSqlType.double, data['${effectivePrefix}advance_payment'])!,
+          .read(DriftSqlType.double, data['${effectivePrefix}item_count']),
       shippingFee: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}shipping_fee'])!,
+          .read(DriftSqlType.double, data['${effectivePrefix}shipping_fee']),
       isPaid: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_paid'])!,
       createdAt: attachedDatabase.typeMapping
@@ -1844,10 +1839,10 @@ class Order extends DataClass implements Insertable<Order> {
   final String? driverName;
   final String? driverPhone;
   final String? vehiclePlateNumber;
-  final double totalPrice;
-  final int itemCount;
-  final double advancePayment;
-  final double shippingFee;
+  final double? advancePayment;
+  final double? totalPrice;
+  final double? itemCount;
+  final double? shippingFee;
   final bool isPaid;
   final DateTime createdAt;
   const Order(
@@ -1861,10 +1856,10 @@ class Order extends DataClass implements Insertable<Order> {
       this.driverName,
       this.driverPhone,
       this.vehiclePlateNumber,
-      required this.totalPrice,
-      required this.itemCount,
-      required this.advancePayment,
-      required this.shippingFee,
+      this.advancePayment,
+      this.totalPrice,
+      this.itemCount,
+      this.shippingFee,
       required this.isPaid,
       required this.createdAt});
   @override
@@ -1898,10 +1893,18 @@ class Order extends DataClass implements Insertable<Order> {
     if (!nullToAbsent || vehiclePlateNumber != null) {
       map['vehicle_plate_number'] = Variable<String>(vehiclePlateNumber);
     }
-    map['total_price'] = Variable<double>(totalPrice);
-    map['item_count'] = Variable<int>(itemCount);
-    map['advance_payment'] = Variable<double>(advancePayment);
-    map['shipping_fee'] = Variable<double>(shippingFee);
+    if (!nullToAbsent || advancePayment != null) {
+      map['advance_payment'] = Variable<double>(advancePayment);
+    }
+    if (!nullToAbsent || totalPrice != null) {
+      map['total_price'] = Variable<double>(totalPrice);
+    }
+    if (!nullToAbsent || itemCount != null) {
+      map['item_count'] = Variable<double>(itemCount);
+    }
+    if (!nullToAbsent || shippingFee != null) {
+      map['shipping_fee'] = Variable<double>(shippingFee);
+    }
     map['is_paid'] = Variable<bool>(isPaid);
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
@@ -1936,10 +1939,18 @@ class Order extends DataClass implements Insertable<Order> {
       vehiclePlateNumber: vehiclePlateNumber == null && nullToAbsent
           ? const Value.absent()
           : Value(vehiclePlateNumber),
-      totalPrice: Value(totalPrice),
-      itemCount: Value(itemCount),
-      advancePayment: Value(advancePayment),
-      shippingFee: Value(shippingFee),
+      advancePayment: advancePayment == null && nullToAbsent
+          ? const Value.absent()
+          : Value(advancePayment),
+      totalPrice: totalPrice == null && nullToAbsent
+          ? const Value.absent()
+          : Value(totalPrice),
+      itemCount: itemCount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(itemCount),
+      shippingFee: shippingFee == null && nullToAbsent
+          ? const Value.absent()
+          : Value(shippingFee),
       isPaid: Value(isPaid),
       createdAt: Value(createdAt),
     );
@@ -1960,10 +1971,10 @@ class Order extends DataClass implements Insertable<Order> {
       driverPhone: serializer.fromJson<String?>(json['driverPhone']),
       vehiclePlateNumber:
           serializer.fromJson<String?>(json['vehiclePlateNumber']),
-      totalPrice: serializer.fromJson<double>(json['totalPrice']),
-      itemCount: serializer.fromJson<int>(json['itemCount']),
-      advancePayment: serializer.fromJson<double>(json['advancePayment']),
-      shippingFee: serializer.fromJson<double>(json['shippingFee']),
+      advancePayment: serializer.fromJson<double?>(json['advancePayment']),
+      totalPrice: serializer.fromJson<double?>(json['totalPrice']),
+      itemCount: serializer.fromJson<double?>(json['itemCount']),
+      shippingFee: serializer.fromJson<double?>(json['shippingFee']),
       isPaid: serializer.fromJson<bool>(json['isPaid']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
@@ -1982,10 +1993,10 @@ class Order extends DataClass implements Insertable<Order> {
       'driverName': serializer.toJson<String?>(driverName),
       'driverPhone': serializer.toJson<String?>(driverPhone),
       'vehiclePlateNumber': serializer.toJson<String?>(vehiclePlateNumber),
-      'totalPrice': serializer.toJson<double>(totalPrice),
-      'itemCount': serializer.toJson<int>(itemCount),
-      'advancePayment': serializer.toJson<double>(advancePayment),
-      'shippingFee': serializer.toJson<double>(shippingFee),
+      'advancePayment': serializer.toJson<double?>(advancePayment),
+      'totalPrice': serializer.toJson<double?>(totalPrice),
+      'itemCount': serializer.toJson<double?>(itemCount),
+      'shippingFee': serializer.toJson<double?>(shippingFee),
       'isPaid': serializer.toJson<bool>(isPaid),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
@@ -2002,10 +2013,10 @@ class Order extends DataClass implements Insertable<Order> {
           Value<String?> driverName = const Value.absent(),
           Value<String?> driverPhone = const Value.absent(),
           Value<String?> vehiclePlateNumber = const Value.absent(),
-          double? totalPrice,
-          int? itemCount,
-          double? advancePayment,
-          double? shippingFee,
+          Value<double?> advancePayment = const Value.absent(),
+          Value<double?> totalPrice = const Value.absent(),
+          Value<double?> itemCount = const Value.absent(),
+          Value<double?> shippingFee = const Value.absent(),
           bool? isPaid,
           DateTime? createdAt}) =>
       Order(
@@ -2025,10 +2036,11 @@ class Order extends DataClass implements Insertable<Order> {
         vehiclePlateNumber: vehiclePlateNumber.present
             ? vehiclePlateNumber.value
             : this.vehiclePlateNumber,
-        totalPrice: totalPrice ?? this.totalPrice,
-        itemCount: itemCount ?? this.itemCount,
-        advancePayment: advancePayment ?? this.advancePayment,
-        shippingFee: shippingFee ?? this.shippingFee,
+        advancePayment:
+            advancePayment.present ? advancePayment.value : this.advancePayment,
+        totalPrice: totalPrice.present ? totalPrice.value : this.totalPrice,
+        itemCount: itemCount.present ? itemCount.value : this.itemCount,
+        shippingFee: shippingFee.present ? shippingFee.value : this.shippingFee,
         isPaid: isPaid ?? this.isPaid,
         createdAt: createdAt ?? this.createdAt,
       );
@@ -2055,12 +2067,12 @@ class Order extends DataClass implements Insertable<Order> {
       vehiclePlateNumber: data.vehiclePlateNumber.present
           ? data.vehiclePlateNumber.value
           : this.vehiclePlateNumber,
-      totalPrice:
-          data.totalPrice.present ? data.totalPrice.value : this.totalPrice,
-      itemCount: data.itemCount.present ? data.itemCount.value : this.itemCount,
       advancePayment: data.advancePayment.present
           ? data.advancePayment.value
           : this.advancePayment,
+      totalPrice:
+          data.totalPrice.present ? data.totalPrice.value : this.totalPrice,
+      itemCount: data.itemCount.present ? data.itemCount.value : this.itemCount,
       shippingFee:
           data.shippingFee.present ? data.shippingFee.value : this.shippingFee,
       isPaid: data.isPaid.present ? data.isPaid.value : this.isPaid,
@@ -2081,9 +2093,9 @@ class Order extends DataClass implements Insertable<Order> {
           ..write('driverName: $driverName, ')
           ..write('driverPhone: $driverPhone, ')
           ..write('vehiclePlateNumber: $vehiclePlateNumber, ')
+          ..write('advancePayment: $advancePayment, ')
           ..write('totalPrice: $totalPrice, ')
           ..write('itemCount: $itemCount, ')
-          ..write('advancePayment: $advancePayment, ')
           ..write('shippingFee: $shippingFee, ')
           ..write('isPaid: $isPaid, ')
           ..write('createdAt: $createdAt')
@@ -2103,9 +2115,9 @@ class Order extends DataClass implements Insertable<Order> {
       driverName,
       driverPhone,
       vehiclePlateNumber,
+      advancePayment,
       totalPrice,
       itemCount,
-      advancePayment,
       shippingFee,
       isPaid,
       createdAt);
@@ -2123,9 +2135,9 @@ class Order extends DataClass implements Insertable<Order> {
           other.driverName == this.driverName &&
           other.driverPhone == this.driverPhone &&
           other.vehiclePlateNumber == this.vehiclePlateNumber &&
+          other.advancePayment == this.advancePayment &&
           other.totalPrice == this.totalPrice &&
           other.itemCount == this.itemCount &&
-          other.advancePayment == this.advancePayment &&
           other.shippingFee == this.shippingFee &&
           other.isPaid == this.isPaid &&
           other.createdAt == this.createdAt);
@@ -2142,10 +2154,10 @@ class OrdersCompanion extends UpdateCompanion<Order> {
   final Value<String?> driverName;
   final Value<String?> driverPhone;
   final Value<String?> vehiclePlateNumber;
-  final Value<double> totalPrice;
-  final Value<int> itemCount;
-  final Value<double> advancePayment;
-  final Value<double> shippingFee;
+  final Value<double?> advancePayment;
+  final Value<double?> totalPrice;
+  final Value<double?> itemCount;
+  final Value<double?> shippingFee;
   final Value<bool> isPaid;
   final Value<DateTime> createdAt;
   const OrdersCompanion({
@@ -2159,9 +2171,9 @@ class OrdersCompanion extends UpdateCompanion<Order> {
     this.driverName = const Value.absent(),
     this.driverPhone = const Value.absent(),
     this.vehiclePlateNumber = const Value.absent(),
+    this.advancePayment = const Value.absent(),
     this.totalPrice = const Value.absent(),
     this.itemCount = const Value.absent(),
-    this.advancePayment = const Value.absent(),
     this.shippingFee = const Value.absent(),
     this.isPaid = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -2177,9 +2189,9 @@ class OrdersCompanion extends UpdateCompanion<Order> {
     this.driverName = const Value.absent(),
     this.driverPhone = const Value.absent(),
     this.vehiclePlateNumber = const Value.absent(),
+    this.advancePayment = const Value.absent(),
     this.totalPrice = const Value.absent(),
     this.itemCount = const Value.absent(),
-    this.advancePayment = const Value.absent(),
     this.shippingFee = const Value.absent(),
     this.isPaid = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -2195,9 +2207,9 @@ class OrdersCompanion extends UpdateCompanion<Order> {
     Expression<String>? driverName,
     Expression<String>? driverPhone,
     Expression<String>? vehiclePlateNumber,
-    Expression<double>? totalPrice,
-    Expression<int>? itemCount,
     Expression<double>? advancePayment,
+    Expression<double>? totalPrice,
+    Expression<double>? itemCount,
     Expression<double>? shippingFee,
     Expression<bool>? isPaid,
     Expression<DateTime>? createdAt,
@@ -2214,9 +2226,9 @@ class OrdersCompanion extends UpdateCompanion<Order> {
       if (driverPhone != null) 'driver_phone': driverPhone,
       if (vehiclePlateNumber != null)
         'vehicle_plate_number': vehiclePlateNumber,
+      if (advancePayment != null) 'advance_payment': advancePayment,
       if (totalPrice != null) 'total_price': totalPrice,
       if (itemCount != null) 'item_count': itemCount,
-      if (advancePayment != null) 'advance_payment': advancePayment,
       if (shippingFee != null) 'shipping_fee': shippingFee,
       if (isPaid != null) 'is_paid': isPaid,
       if (createdAt != null) 'created_at': createdAt,
@@ -2234,10 +2246,10 @@ class OrdersCompanion extends UpdateCompanion<Order> {
       Value<String?>? driverName,
       Value<String?>? driverPhone,
       Value<String?>? vehiclePlateNumber,
-      Value<double>? totalPrice,
-      Value<int>? itemCount,
-      Value<double>? advancePayment,
-      Value<double>? shippingFee,
+      Value<double?>? advancePayment,
+      Value<double?>? totalPrice,
+      Value<double?>? itemCount,
+      Value<double?>? shippingFee,
       Value<bool>? isPaid,
       Value<DateTime>? createdAt}) {
     return OrdersCompanion(
@@ -2251,9 +2263,9 @@ class OrdersCompanion extends UpdateCompanion<Order> {
       driverName: driverName ?? this.driverName,
       driverPhone: driverPhone ?? this.driverPhone,
       vehiclePlateNumber: vehiclePlateNumber ?? this.vehiclePlateNumber,
+      advancePayment: advancePayment ?? this.advancePayment,
       totalPrice: totalPrice ?? this.totalPrice,
       itemCount: itemCount ?? this.itemCount,
-      advancePayment: advancePayment ?? this.advancePayment,
       shippingFee: shippingFee ?? this.shippingFee,
       isPaid: isPaid ?? this.isPaid,
       createdAt: createdAt ?? this.createdAt,
@@ -2293,14 +2305,14 @@ class OrdersCompanion extends UpdateCompanion<Order> {
     if (vehiclePlateNumber.present) {
       map['vehicle_plate_number'] = Variable<String>(vehiclePlateNumber.value);
     }
+    if (advancePayment.present) {
+      map['advance_payment'] = Variable<double>(advancePayment.value);
+    }
     if (totalPrice.present) {
       map['total_price'] = Variable<double>(totalPrice.value);
     }
     if (itemCount.present) {
-      map['item_count'] = Variable<int>(itemCount.value);
-    }
-    if (advancePayment.present) {
-      map['advance_payment'] = Variable<double>(advancePayment.value);
+      map['item_count'] = Variable<double>(itemCount.value);
     }
     if (shippingFee.present) {
       map['shipping_fee'] = Variable<double>(shippingFee.value);
@@ -2327,9 +2339,9 @@ class OrdersCompanion extends UpdateCompanion<Order> {
           ..write('driverName: $driverName, ')
           ..write('driverPhone: $driverPhone, ')
           ..write('vehiclePlateNumber: $vehiclePlateNumber, ')
+          ..write('advancePayment: $advancePayment, ')
           ..write('totalPrice: $totalPrice, ')
           ..write('itemCount: $itemCount, ')
-          ..write('advancePayment: $advancePayment, ')
           ..write('shippingFee: $shippingFee, ')
           ..write('isPaid: $isPaid, ')
           ..write('createdAt: $createdAt')
@@ -2377,71 +2389,51 @@ class $OrderItemsTable extends OrderItems
   static const VerificationMeta _purchaseUnitMeta =
       const VerificationMeta('purchaseUnit');
   @override
-  late final GeneratedColumn<String> purchaseUnit =
-      GeneratedColumn<String>('purchase_unit', aliasedName, true,
-          additionalChecks: GeneratedColumn.checkTextLength(
-            minTextLength: 1,
-          ),
-          type: DriftSqlType.string,
-          requiredDuringInsert: false);
+  late final GeneratedColumn<String> purchaseUnit = GeneratedColumn<String>(
+      'purchase_unit', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _actualUnitMeta =
       const VerificationMeta('actualUnit');
   @override
-  late final GeneratedColumn<String> actualUnit =
-      GeneratedColumn<String>('actual_unit', aliasedName, true,
-          additionalChecks: GeneratedColumn.checkTextLength(
-            minTextLength: 1,
-          ),
-          type: DriftSqlType.string,
-          requiredDuringInsert: false);
+  late final GeneratedColumn<String> actualUnit = GeneratedColumn<String>(
+      'actual_unit', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _purchaseQuantityMeta =
       const VerificationMeta('purchaseQuantity');
   @override
   late final GeneratedColumn<double> purchaseQuantity = GeneratedColumn<double>(
-      'purchase_quantity', aliasedName, false,
-      type: DriftSqlType.double,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(1.0));
+      'purchase_quantity', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _actualQuantityMeta =
       const VerificationMeta('actualQuantity');
   @override
   late final GeneratedColumn<double> actualQuantity = GeneratedColumn<double>(
-      'actual_quantity', aliasedName, false,
-      type: DriftSqlType.double,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(1.0));
+      'actual_quantity', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _presetPriceMeta =
       const VerificationMeta('presetPrice');
   @override
   late final GeneratedColumn<double> presetPrice = GeneratedColumn<double>(
-      'preset_price', aliasedName, false,
-      type: DriftSqlType.double,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(0.0));
+      'preset_price', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _actualPriceMeta =
       const VerificationMeta('actualPrice');
   @override
   late final GeneratedColumn<double> actualPrice = GeneratedColumn<double>(
-      'actual_price', aliasedName, false,
-      type: DriftSqlType.double,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(0.0));
+      'actual_price', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _advancePaymentMeta =
       const VerificationMeta('advancePayment');
   @override
   late final GeneratedColumn<double> advancePayment = GeneratedColumn<double>(
-      'advance_payment', aliasedName, false,
-      type: DriftSqlType.double,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(0.0));
+      'advance_payment', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _totalPriceMeta =
       const VerificationMeta('totalPrice');
   @override
   late final GeneratedColumn<double> totalPrice = GeneratedColumn<double>(
-      'total_price', aliasedName, false,
-      type: DriftSqlType.double,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(0.0));
+      'total_price', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -2569,17 +2561,17 @@ class $OrderItemsTable extends OrderItems
       actualUnit: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}actual_unit']),
       purchaseQuantity: attachedDatabase.typeMapping.read(
-          DriftSqlType.double, data['${effectivePrefix}purchase_quantity'])!,
-      actualQuantity: attachedDatabase.typeMapping.read(
-          DriftSqlType.double, data['${effectivePrefix}actual_quantity'])!,
+          DriftSqlType.double, data['${effectivePrefix}purchase_quantity']),
+      actualQuantity: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}actual_quantity']),
       presetPrice: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}preset_price'])!,
+          .read(DriftSqlType.double, data['${effectivePrefix}preset_price']),
       actualPrice: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}actual_price'])!,
-      advancePayment: attachedDatabase.typeMapping.read(
-          DriftSqlType.double, data['${effectivePrefix}advance_payment'])!,
+          .read(DriftSqlType.double, data['${effectivePrefix}actual_price']),
+      advancePayment: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}advance_payment']),
       totalPrice: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}total_price'])!,
+          .read(DriftSqlType.double, data['${effectivePrefix}total_price']),
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
     );
@@ -2598,12 +2590,12 @@ class OrderItem extends DataClass implements Insertable<OrderItem> {
   final String? itemShortName;
   final String? purchaseUnit;
   final String? actualUnit;
-  final double purchaseQuantity;
-  final double actualQuantity;
-  final double presetPrice;
-  final double actualPrice;
-  final double advancePayment;
-  final double totalPrice;
+  final double? purchaseQuantity;
+  final double? actualQuantity;
+  final double? presetPrice;
+  final double? actualPrice;
+  final double? advancePayment;
+  final double? totalPrice;
   final DateTime createdAt;
   const OrderItem(
       {required this.id,
@@ -2612,12 +2604,12 @@ class OrderItem extends DataClass implements Insertable<OrderItem> {
       this.itemShortName,
       this.purchaseUnit,
       this.actualUnit,
-      required this.purchaseQuantity,
-      required this.actualQuantity,
-      required this.presetPrice,
-      required this.actualPrice,
-      required this.advancePayment,
-      required this.totalPrice,
+      this.purchaseQuantity,
+      this.actualQuantity,
+      this.presetPrice,
+      this.actualPrice,
+      this.advancePayment,
+      this.totalPrice,
       required this.createdAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2636,12 +2628,24 @@ class OrderItem extends DataClass implements Insertable<OrderItem> {
     if (!nullToAbsent || actualUnit != null) {
       map['actual_unit'] = Variable<String>(actualUnit);
     }
-    map['purchase_quantity'] = Variable<double>(purchaseQuantity);
-    map['actual_quantity'] = Variable<double>(actualQuantity);
-    map['preset_price'] = Variable<double>(presetPrice);
-    map['actual_price'] = Variable<double>(actualPrice);
-    map['advance_payment'] = Variable<double>(advancePayment);
-    map['total_price'] = Variable<double>(totalPrice);
+    if (!nullToAbsent || purchaseQuantity != null) {
+      map['purchase_quantity'] = Variable<double>(purchaseQuantity);
+    }
+    if (!nullToAbsent || actualQuantity != null) {
+      map['actual_quantity'] = Variable<double>(actualQuantity);
+    }
+    if (!nullToAbsent || presetPrice != null) {
+      map['preset_price'] = Variable<double>(presetPrice);
+    }
+    if (!nullToAbsent || actualPrice != null) {
+      map['actual_price'] = Variable<double>(actualPrice);
+    }
+    if (!nullToAbsent || advancePayment != null) {
+      map['advance_payment'] = Variable<double>(advancePayment);
+    }
+    if (!nullToAbsent || totalPrice != null) {
+      map['total_price'] = Variable<double>(totalPrice);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -2662,12 +2666,24 @@ class OrderItem extends DataClass implements Insertable<OrderItem> {
       actualUnit: actualUnit == null && nullToAbsent
           ? const Value.absent()
           : Value(actualUnit),
-      purchaseQuantity: Value(purchaseQuantity),
-      actualQuantity: Value(actualQuantity),
-      presetPrice: Value(presetPrice),
-      actualPrice: Value(actualPrice),
-      advancePayment: Value(advancePayment),
-      totalPrice: Value(totalPrice),
+      purchaseQuantity: purchaseQuantity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(purchaseQuantity),
+      actualQuantity: actualQuantity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(actualQuantity),
+      presetPrice: presetPrice == null && nullToAbsent
+          ? const Value.absent()
+          : Value(presetPrice),
+      actualPrice: actualPrice == null && nullToAbsent
+          ? const Value.absent()
+          : Value(actualPrice),
+      advancePayment: advancePayment == null && nullToAbsent
+          ? const Value.absent()
+          : Value(advancePayment),
+      totalPrice: totalPrice == null && nullToAbsent
+          ? const Value.absent()
+          : Value(totalPrice),
       createdAt: Value(createdAt),
     );
   }
@@ -2682,12 +2698,12 @@ class OrderItem extends DataClass implements Insertable<OrderItem> {
       itemShortName: serializer.fromJson<String?>(json['itemShortName']),
       purchaseUnit: serializer.fromJson<String?>(json['purchaseUnit']),
       actualUnit: serializer.fromJson<String?>(json['actualUnit']),
-      purchaseQuantity: serializer.fromJson<double>(json['purchaseQuantity']),
-      actualQuantity: serializer.fromJson<double>(json['actualQuantity']),
-      presetPrice: serializer.fromJson<double>(json['presetPrice']),
-      actualPrice: serializer.fromJson<double>(json['actualPrice']),
-      advancePayment: serializer.fromJson<double>(json['advancePayment']),
-      totalPrice: serializer.fromJson<double>(json['totalPrice']),
+      purchaseQuantity: serializer.fromJson<double?>(json['purchaseQuantity']),
+      actualQuantity: serializer.fromJson<double?>(json['actualQuantity']),
+      presetPrice: serializer.fromJson<double?>(json['presetPrice']),
+      actualPrice: serializer.fromJson<double?>(json['actualPrice']),
+      advancePayment: serializer.fromJson<double?>(json['advancePayment']),
+      totalPrice: serializer.fromJson<double?>(json['totalPrice']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -2701,12 +2717,12 @@ class OrderItem extends DataClass implements Insertable<OrderItem> {
       'itemShortName': serializer.toJson<String?>(itemShortName),
       'purchaseUnit': serializer.toJson<String?>(purchaseUnit),
       'actualUnit': serializer.toJson<String?>(actualUnit),
-      'purchaseQuantity': serializer.toJson<double>(purchaseQuantity),
-      'actualQuantity': serializer.toJson<double>(actualQuantity),
-      'presetPrice': serializer.toJson<double>(presetPrice),
-      'actualPrice': serializer.toJson<double>(actualPrice),
-      'advancePayment': serializer.toJson<double>(advancePayment),
-      'totalPrice': serializer.toJson<double>(totalPrice),
+      'purchaseQuantity': serializer.toJson<double?>(purchaseQuantity),
+      'actualQuantity': serializer.toJson<double?>(actualQuantity),
+      'presetPrice': serializer.toJson<double?>(presetPrice),
+      'actualPrice': serializer.toJson<double?>(actualPrice),
+      'advancePayment': serializer.toJson<double?>(advancePayment),
+      'totalPrice': serializer.toJson<double?>(totalPrice),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -2718,12 +2734,12 @@ class OrderItem extends DataClass implements Insertable<OrderItem> {
           Value<String?> itemShortName = const Value.absent(),
           Value<String?> purchaseUnit = const Value.absent(),
           Value<String?> actualUnit = const Value.absent(),
-          double? purchaseQuantity,
-          double? actualQuantity,
-          double? presetPrice,
-          double? actualPrice,
-          double? advancePayment,
-          double? totalPrice,
+          Value<double?> purchaseQuantity = const Value.absent(),
+          Value<double?> actualQuantity = const Value.absent(),
+          Value<double?> presetPrice = const Value.absent(),
+          Value<double?> actualPrice = const Value.absent(),
+          Value<double?> advancePayment = const Value.absent(),
+          Value<double?> totalPrice = const Value.absent(),
           DateTime? createdAt}) =>
       OrderItem(
         id: id ?? this.id,
@@ -2734,12 +2750,16 @@ class OrderItem extends DataClass implements Insertable<OrderItem> {
         purchaseUnit:
             purchaseUnit.present ? purchaseUnit.value : this.purchaseUnit,
         actualUnit: actualUnit.present ? actualUnit.value : this.actualUnit,
-        purchaseQuantity: purchaseQuantity ?? this.purchaseQuantity,
-        actualQuantity: actualQuantity ?? this.actualQuantity,
-        presetPrice: presetPrice ?? this.presetPrice,
-        actualPrice: actualPrice ?? this.actualPrice,
-        advancePayment: advancePayment ?? this.advancePayment,
-        totalPrice: totalPrice ?? this.totalPrice,
+        purchaseQuantity: purchaseQuantity.present
+            ? purchaseQuantity.value
+            : this.purchaseQuantity,
+        actualQuantity:
+            actualQuantity.present ? actualQuantity.value : this.actualQuantity,
+        presetPrice: presetPrice.present ? presetPrice.value : this.presetPrice,
+        actualPrice: actualPrice.present ? actualPrice.value : this.actualPrice,
+        advancePayment:
+            advancePayment.present ? advancePayment.value : this.advancePayment,
+        totalPrice: totalPrice.present ? totalPrice.value : this.totalPrice,
         createdAt: createdAt ?? this.createdAt,
       );
   OrderItem copyWithCompanion(OrderItemsCompanion data) {
@@ -2835,12 +2855,12 @@ class OrderItemsCompanion extends UpdateCompanion<OrderItem> {
   final Value<String?> itemShortName;
   final Value<String?> purchaseUnit;
   final Value<String?> actualUnit;
-  final Value<double> purchaseQuantity;
-  final Value<double> actualQuantity;
-  final Value<double> presetPrice;
-  final Value<double> actualPrice;
-  final Value<double> advancePayment;
-  final Value<double> totalPrice;
+  final Value<double?> purchaseQuantity;
+  final Value<double?> actualQuantity;
+  final Value<double?> presetPrice;
+  final Value<double?> actualPrice;
+  final Value<double?> advancePayment;
+  final Value<double?> totalPrice;
   final Value<DateTime> createdAt;
   const OrderItemsCompanion({
     this.id = const Value.absent(),
@@ -2911,12 +2931,12 @@ class OrderItemsCompanion extends UpdateCompanion<OrderItem> {
       Value<String?>? itemShortName,
       Value<String?>? purchaseUnit,
       Value<String?>? actualUnit,
-      Value<double>? purchaseQuantity,
-      Value<double>? actualQuantity,
-      Value<double>? presetPrice,
-      Value<double>? actualPrice,
-      Value<double>? advancePayment,
-      Value<double>? totalPrice,
+      Value<double?>? purchaseQuantity,
+      Value<double?>? actualQuantity,
+      Value<double?>? presetPrice,
+      Value<double?>? actualPrice,
+      Value<double?>? advancePayment,
+      Value<double?>? totalPrice,
       Value<DateTime>? createdAt}) {
     return OrderItemsCompanion(
       id: id ?? this.id,
@@ -3765,10 +3785,10 @@ typedef $$CustomerOrderItemsTableCreateCompanionBuilder
   Value<String?> itemShortName,
   Value<String?> purchaseUnit,
   Value<String?> actualUnit,
-  Value<double> purchaseQuantity,
-  Value<double> actualQuantity,
-  Value<double> presetPrice,
-  Value<double> actualPrice,
+  Value<double?> purchaseQuantity,
+  Value<double?> actualQuantity,
+  Value<double?> presetPrice,
+  Value<double?> actualPrice,
   Value<DateTime> createdAt,
 });
 typedef $$CustomerOrderItemsTableUpdateCompanionBuilder
@@ -3779,10 +3799,10 @@ typedef $$CustomerOrderItemsTableUpdateCompanionBuilder
   Value<String?> itemShortName,
   Value<String?> purchaseUnit,
   Value<String?> actualUnit,
-  Value<double> purchaseQuantity,
-  Value<double> actualQuantity,
-  Value<double> presetPrice,
-  Value<double> actualPrice,
+  Value<double?> purchaseQuantity,
+  Value<double?> actualQuantity,
+  Value<double?> presetPrice,
+  Value<double?> actualPrice,
   Value<DateTime> createdAt,
 });
 
@@ -4022,10 +4042,10 @@ class $$CustomerOrderItemsTableTableManager extends RootTableManager<
             Value<String?> itemShortName = const Value.absent(),
             Value<String?> purchaseUnit = const Value.absent(),
             Value<String?> actualUnit = const Value.absent(),
-            Value<double> purchaseQuantity = const Value.absent(),
-            Value<double> actualQuantity = const Value.absent(),
-            Value<double> presetPrice = const Value.absent(),
-            Value<double> actualPrice = const Value.absent(),
+            Value<double?> purchaseQuantity = const Value.absent(),
+            Value<double?> actualQuantity = const Value.absent(),
+            Value<double?> presetPrice = const Value.absent(),
+            Value<double?> actualPrice = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
           }) =>
               CustomerOrderItemsCompanion(
@@ -4048,10 +4068,10 @@ class $$CustomerOrderItemsTableTableManager extends RootTableManager<
             Value<String?> itemShortName = const Value.absent(),
             Value<String?> purchaseUnit = const Value.absent(),
             Value<String?> actualUnit = const Value.absent(),
-            Value<double> purchaseQuantity = const Value.absent(),
-            Value<double> actualQuantity = const Value.absent(),
-            Value<double> presetPrice = const Value.absent(),
-            Value<double> actualPrice = const Value.absent(),
+            Value<double?> purchaseQuantity = const Value.absent(),
+            Value<double?> actualQuantity = const Value.absent(),
+            Value<double?> presetPrice = const Value.absent(),
+            Value<double?> actualPrice = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
           }) =>
               CustomerOrderItemsCompanion.insert(
@@ -4135,10 +4155,10 @@ typedef $$OrdersTableCreateCompanionBuilder = OrdersCompanion Function({
   Value<String?> driverName,
   Value<String?> driverPhone,
   Value<String?> vehiclePlateNumber,
-  Value<double> totalPrice,
-  Value<int> itemCount,
-  Value<double> advancePayment,
-  Value<double> shippingFee,
+  Value<double?> advancePayment,
+  Value<double?> totalPrice,
+  Value<double?> itemCount,
+  Value<double?> shippingFee,
   Value<bool> isPaid,
   Value<DateTime> createdAt,
 });
@@ -4153,10 +4173,10 @@ typedef $$OrdersTableUpdateCompanionBuilder = OrdersCompanion Function({
   Value<String?> driverName,
   Value<String?> driverPhone,
   Value<String?> vehiclePlateNumber,
-  Value<double> totalPrice,
-  Value<int> itemCount,
-  Value<double> advancePayment,
-  Value<double> shippingFee,
+  Value<double?> advancePayment,
+  Value<double?> totalPrice,
+  Value<double?> itemCount,
+  Value<double?> shippingFee,
   Value<bool> isPaid,
   Value<DateTime> createdAt,
 });
@@ -4221,15 +4241,15 @@ class $$OrdersTableFilterComposer
       column: $table.vehiclePlateNumber,
       builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get totalPrice => $composableBuilder(
-      column: $table.totalPrice, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<int> get itemCount => $composableBuilder(
-      column: $table.itemCount, builder: (column) => ColumnFilters(column));
-
   ColumnFilters<double> get advancePayment => $composableBuilder(
       column: $table.advancePayment,
       builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get totalPrice => $composableBuilder(
+      column: $table.totalPrice, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get itemCount => $composableBuilder(
+      column: $table.itemCount, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<double> get shippingFee => $composableBuilder(
       column: $table.shippingFee, builder: (column) => ColumnFilters(column));
@@ -4305,15 +4325,15 @@ class $$OrdersTableOrderingComposer
       column: $table.vehiclePlateNumber,
       builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get totalPrice => $composableBuilder(
-      column: $table.totalPrice, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<int> get itemCount => $composableBuilder(
-      column: $table.itemCount, builder: (column) => ColumnOrderings(column));
-
   ColumnOrderings<double> get advancePayment => $composableBuilder(
       column: $table.advancePayment,
       builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get totalPrice => $composableBuilder(
+      column: $table.totalPrice, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get itemCount => $composableBuilder(
+      column: $table.itemCount, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<double> get shippingFee => $composableBuilder(
       column: $table.shippingFee, builder: (column) => ColumnOrderings(column));
@@ -4364,14 +4384,14 @@ class $$OrdersTableAnnotationComposer
   GeneratedColumn<String> get vehiclePlateNumber => $composableBuilder(
       column: $table.vehiclePlateNumber, builder: (column) => column);
 
+  GeneratedColumn<double> get advancePayment => $composableBuilder(
+      column: $table.advancePayment, builder: (column) => column);
+
   GeneratedColumn<double> get totalPrice => $composableBuilder(
       column: $table.totalPrice, builder: (column) => column);
 
-  GeneratedColumn<int> get itemCount =>
+  GeneratedColumn<double> get itemCount =>
       $composableBuilder(column: $table.itemCount, builder: (column) => column);
-
-  GeneratedColumn<double> get advancePayment => $composableBuilder(
-      column: $table.advancePayment, builder: (column) => column);
 
   GeneratedColumn<double> get shippingFee => $composableBuilder(
       column: $table.shippingFee, builder: (column) => column);
@@ -4437,10 +4457,10 @@ class $$OrdersTableTableManager extends RootTableManager<
             Value<String?> driverName = const Value.absent(),
             Value<String?> driverPhone = const Value.absent(),
             Value<String?> vehiclePlateNumber = const Value.absent(),
-            Value<double> totalPrice = const Value.absent(),
-            Value<int> itemCount = const Value.absent(),
-            Value<double> advancePayment = const Value.absent(),
-            Value<double> shippingFee = const Value.absent(),
+            Value<double?> advancePayment = const Value.absent(),
+            Value<double?> totalPrice = const Value.absent(),
+            Value<double?> itemCount = const Value.absent(),
+            Value<double?> shippingFee = const Value.absent(),
             Value<bool> isPaid = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
           }) =>
@@ -4455,9 +4475,9 @@ class $$OrdersTableTableManager extends RootTableManager<
             driverName: driverName,
             driverPhone: driverPhone,
             vehiclePlateNumber: vehiclePlateNumber,
+            advancePayment: advancePayment,
             totalPrice: totalPrice,
             itemCount: itemCount,
-            advancePayment: advancePayment,
             shippingFee: shippingFee,
             isPaid: isPaid,
             createdAt: createdAt,
@@ -4473,10 +4493,10 @@ class $$OrdersTableTableManager extends RootTableManager<
             Value<String?> driverName = const Value.absent(),
             Value<String?> driverPhone = const Value.absent(),
             Value<String?> vehiclePlateNumber = const Value.absent(),
-            Value<double> totalPrice = const Value.absent(),
-            Value<int> itemCount = const Value.absent(),
-            Value<double> advancePayment = const Value.absent(),
-            Value<double> shippingFee = const Value.absent(),
+            Value<double?> advancePayment = const Value.absent(),
+            Value<double?> totalPrice = const Value.absent(),
+            Value<double?> itemCount = const Value.absent(),
+            Value<double?> shippingFee = const Value.absent(),
             Value<bool> isPaid = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
           }) =>
@@ -4491,9 +4511,9 @@ class $$OrdersTableTableManager extends RootTableManager<
             driverName: driverName,
             driverPhone: driverPhone,
             vehiclePlateNumber: vehiclePlateNumber,
+            advancePayment: advancePayment,
             totalPrice: totalPrice,
             itemCount: itemCount,
-            advancePayment: advancePayment,
             shippingFee: shippingFee,
             isPaid: isPaid,
             createdAt: createdAt,
@@ -4547,12 +4567,12 @@ typedef $$OrderItemsTableCreateCompanionBuilder = OrderItemsCompanion Function({
   Value<String?> itemShortName,
   Value<String?> purchaseUnit,
   Value<String?> actualUnit,
-  Value<double> purchaseQuantity,
-  Value<double> actualQuantity,
-  Value<double> presetPrice,
-  Value<double> actualPrice,
-  Value<double> advancePayment,
-  Value<double> totalPrice,
+  Value<double?> purchaseQuantity,
+  Value<double?> actualQuantity,
+  Value<double?> presetPrice,
+  Value<double?> actualPrice,
+  Value<double?> advancePayment,
+  Value<double?> totalPrice,
   Value<DateTime> createdAt,
 });
 typedef $$OrderItemsTableUpdateCompanionBuilder = OrderItemsCompanion Function({
@@ -4562,12 +4582,12 @@ typedef $$OrderItemsTableUpdateCompanionBuilder = OrderItemsCompanion Function({
   Value<String?> itemShortName,
   Value<String?> purchaseUnit,
   Value<String?> actualUnit,
-  Value<double> purchaseQuantity,
-  Value<double> actualQuantity,
-  Value<double> presetPrice,
-  Value<double> actualPrice,
-  Value<double> advancePayment,
-  Value<double> totalPrice,
+  Value<double?> purchaseQuantity,
+  Value<double?> actualQuantity,
+  Value<double?> presetPrice,
+  Value<double?> actualPrice,
+  Value<double?> advancePayment,
+  Value<double?> totalPrice,
   Value<DateTime> createdAt,
 });
 
@@ -4823,12 +4843,12 @@ class $$OrderItemsTableTableManager extends RootTableManager<
             Value<String?> itemShortName = const Value.absent(),
             Value<String?> purchaseUnit = const Value.absent(),
             Value<String?> actualUnit = const Value.absent(),
-            Value<double> purchaseQuantity = const Value.absent(),
-            Value<double> actualQuantity = const Value.absent(),
-            Value<double> presetPrice = const Value.absent(),
-            Value<double> actualPrice = const Value.absent(),
-            Value<double> advancePayment = const Value.absent(),
-            Value<double> totalPrice = const Value.absent(),
+            Value<double?> purchaseQuantity = const Value.absent(),
+            Value<double?> actualQuantity = const Value.absent(),
+            Value<double?> presetPrice = const Value.absent(),
+            Value<double?> actualPrice = const Value.absent(),
+            Value<double?> advancePayment = const Value.absent(),
+            Value<double?> totalPrice = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
           }) =>
               OrderItemsCompanion(
@@ -4853,12 +4873,12 @@ class $$OrderItemsTableTableManager extends RootTableManager<
             Value<String?> itemShortName = const Value.absent(),
             Value<String?> purchaseUnit = const Value.absent(),
             Value<String?> actualUnit = const Value.absent(),
-            Value<double> purchaseQuantity = const Value.absent(),
-            Value<double> actualQuantity = const Value.absent(),
-            Value<double> presetPrice = const Value.absent(),
-            Value<double> actualPrice = const Value.absent(),
-            Value<double> advancePayment = const Value.absent(),
-            Value<double> totalPrice = const Value.absent(),
+            Value<double?> purchaseQuantity = const Value.absent(),
+            Value<double?> actualQuantity = const Value.absent(),
+            Value<double?> presetPrice = const Value.absent(),
+            Value<double?> actualPrice = const Value.absent(),
+            Value<double?> advancePayment = const Value.absent(),
+            Value<double?> totalPrice = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
           }) =>
               OrderItemsCompanion.insert(

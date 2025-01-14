@@ -21,12 +21,32 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sales'),
-      ),
-      body: const Center(
-        child: Text('Sales Page'),
+    return SafeArea(
+      child: Row(
+        children: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              // 处理返回按钮点击事件
+              Navigator.pop(context);
+            },
+          ),
+          const Expanded(
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: '搜索',
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              // 处理搜索图标点击事件
+            },
+          ),
+        ],
       ),
     );
   }

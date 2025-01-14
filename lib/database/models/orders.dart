@@ -16,10 +16,11 @@ class Orders extends Table {
   TextColumn get driverPhone => text().nullable()(); // 司机电话，允许为空
   TextColumn get vehiclePlateNumber => text().nullable()(); // 车牌号，允许为空
   // 总价
-  RealColumn get totalPrice => real().withDefault(const Constant(0.0))(); // 总价，默认值为0.0
-  IntColumn get itemCount => integer().withDefault(const Constant(0))(); // 件数，默认值为0
-  RealColumn get advancePayment => real().withDefault(const Constant(0.0))(); // 垫付，默认值为0.0
-  RealColumn get shippingFee => real().withDefault(const Constant(0.0))(); // 运费，默认值为0.0
+  RealColumn get advancePayment => real().nullable()(); // 垫付，默认值为0.0
+  RealColumn get totalPrice => real().nullable()(); // 总价，默认值为0.0
+  RealColumn get itemCount => real().nullable()();
+  RealColumn get shippingFee => real().nullable()(); // 运费，默认值为0.0
+
   BoolColumn get isPaid => boolean().withDefault(const Constant(false))(); // 是否已支付，默认值为false
 
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)(); // 创建时间字段，默认值为当前时间
