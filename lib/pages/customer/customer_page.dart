@@ -165,7 +165,7 @@ class EditOrCreateCustomerDialogState extends State<EditOrCreateCustomerDialog> 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(isNew ? '新增顾客' : '编辑顾客'),
+      title: Text(isNew ? '新增客户' : '编辑客户'),
       content: SizedBox(
         width: Get.width < 600 ? Get.width * 0.9 : MediaQuery.of(context).size.width * 0.6,
         child: SingleChildScrollView(
@@ -190,7 +190,7 @@ class EditOrCreateCustomerDialogState extends State<EditOrCreateCustomerDialog> 
                   hint: "请输入电话",
                   keyboardType: TextInputType.phone,
                   textInputAction: TextInputAction.next,
-                  maxLength: 11,
+                  maxLength: 20,
                 ),
                 AppStyle.vGap4,
                 MaterialTextField(

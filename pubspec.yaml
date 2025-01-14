@@ -61,6 +61,7 @@ dependencies:
   material_text_fields: ^1.0.6
   animated_tree_view: ^2.3.0
   cascade_widget: ^1.0.5
+  scrollable_tab_view: ^1.0.12
   flutter_localizations:
     sdk: flutter
 dev_dependencies:

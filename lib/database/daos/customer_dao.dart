@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:company_print/database/db.dart';
-import 'package:company_print/database/models/customer.dart'; // 假设这是你的顾客模型文件路径
+import 'package:company_print/database/models/customer.dart'; // 假设这是你的客户模型文件路径
 part 'customer_dao.g.dart';
 
 @DriftAccessor(tables: [Customers])
@@ -9,7 +9,7 @@ class CustomerDao extends DatabaseAccessor<AppDatabase> with _$CustomerDaoMixin 
 
   CustomerDao(this.db) : super(db);
 
-  /// 获取所有顾客列表
+  /// 获取所有客户列表
   Future<List<Customer>> getAllCustomers() async {
     return await select(customers).get();
   }
@@ -49,7 +49,7 @@ class CustomerDao extends DatabaseAccessor<AppDatabase> with _$CustomerDaoMixin 
     return await query.get();
   }
 
-  /// 获取顾客总数
+  /// 获取客户总数
   Future<int> getTotalCustomersCount() async {
     final count = countAll();
     final countQuery = selectOnly(customers)..addColumns([count]);
@@ -57,7 +57,7 @@ class CustomerDao extends DatabaseAccessor<AppDatabase> with _$CustomerDaoMixin 
     return result ?? 0;
   }
 
-  /// 创建新的顾客
+  /// 创建新的客户
   Future<int> createCustomer(String name, String? phone, String? address, String? additionalInfo) async {
     final entry = CustomersCompanion(
       name: Value(name),
@@ -68,7 +68,7 @@ class CustomerDao extends DatabaseAccessor<AppDatabase> with _$CustomerDaoMixin 
     return await into(customers).insert(entry);
   }
 
-  /// 更新顾客信息
+  /// 更新客户信息
   Future updateCustomer(int id, String name, String? phone, String? address, String? additionalInfo) async {
     final entry = CustomersCompanion(
       name: Value(name),
@@ -79,17 +79,17 @@ class CustomerDao extends DatabaseAccessor<AppDatabase> with _$CustomerDaoMixin 
     return await (update(customers)..where((tbl) => tbl.id.equals(id))).write(entry);
   }
 
-  /// 删除顾客
+  /// 删除客户
   Future deleteCustomer(int id) async {
     return await (delete(customers)..where((tbl) => tbl.id.equals(id))).go();
   }
 
-  /// 根据电话号码查找顾客
+  /// 根据电话号码查找客户
   Future<List<Customer>> getCustomersByPhone(String phone) async {
     return await (select(customers)..where((tbl) => tbl.phone.equals(phone))).get();
   }
 
-  /// 根据姓名查找顾客
+  /// 根据姓名查找客户
   Future<List<Customer>> getCustomersByName(String name) async {
     return await (select(customers)..where((tbl) => tbl.name.equals(name))).get();
   }

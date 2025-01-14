@@ -36,12 +36,12 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
     return await into(db.customerOrderItems).insert(entry);
   }
 
-  /// 获取特定顾客的所有订单项
+  /// 获取特定客户的所有订单项
   Future<List<CustomerOrderItem>> getAllOrderItemsByCustomerId(int customerId) async {
     return await (db.select(db.customerOrderItems)..where((tbl) => tbl.customerId.equals(customerId))).get();
   }
 
-  /// 分页获取特定顾客的订单项
+  /// 分页获取特定客户的订单项
   Future<List<CustomerOrderItem>> getPaginatedOrderItemsByCustomerId(
     int customerId,
     int offset,
@@ -127,7 +127,7 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
     return await (delete(db.customerOrderItems)..where((tbl) => tbl.id.equals(id))).go();
   }
 
-  /// 删除特定顾客的所有订单项
+  /// 删除特定客户的所有订单项
   Future deleteAllOrderItemsByCustomerId(int customerId) async {
     return (delete(db.customerOrderItems)..where((tbl) => tbl.customerId.equals(customerId))).go();
   }

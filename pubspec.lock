@@ -810,6 +810,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.0.1"
+  scrollable_tab_view:
+    dependency: "direct main"
+    description:
+      name: scrollable_tab_view
+      sha256: cd1370e530ae4287a3055942e7adae714d4f38052ff5166201a3f25fc42f2912
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.0.12"
   search_choices:
     dependency: "direct main"
     description:
