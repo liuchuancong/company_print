@@ -42,6 +42,37 @@ class SalesController extends BasePageController {
     Get.toNamed(RoutePath.kSaleDetails, arguments: [order.id]);
   }
 
+  void completeOrder(Order order) async {
+    var query = await database.ordersDao.getOrderById(order.id);
+    if (query != null) {
+      var result = await Utils.showAlertDialog(
+        query.isPaid ? '是否标记该订单为未结算？' : '是否标记该订单为已结算？',
+        title: '提示',
+      );
+      if (result == true) {
+        updateOrder(
+          order.id,
+          query.customerName!,
+          query.orderName,
+          query.description,
+          query.remark,
+          query.customerPhone,
+          query.customerAddress,
+          query.driverName,
+          query.driverPhone,
+          query.vehiclePlateNumber,
+          query.advancePayment,
+          query.totalPrice,
+          query.itemCount,
+          query.shippingFee,
+          query.isPaid ? false : true,
+          query.createdAt,
+        );
+        refreshData();
+      }
+    }
+  }
+
   void onDeleteOrder(Order order) async {
     var result = await Utils.showAlertDialog(
       '确定删除该订单吗？',

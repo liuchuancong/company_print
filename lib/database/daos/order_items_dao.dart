@@ -10,69 +10,141 @@ class OrderItemsDao extends DatabaseAccessor<AppDatabase> with _$OrderItemsDaoMi
 
   OrderItemsDao(this.db) : super(db);
 
-  /// 获取所有订单项列表
-  Future<List<OrderItem>> getAllOrderItems() async {
-    return await select(orderItems).get();
-  }
-
-  /// 获取指定订单的所有项
-  Future<List<OrderItem>> getOrderItemsByOrderId(int orderId) async {
-    return await (select(orderItems)..where((tbl) => tbl.orderId.equals(orderId))).get();
-  }
-
-  /// 创建新的订单项
-  Future<int> createOrderItem({
-    required int orderId,
-    String? itemName,
+  /// 插入新的订单项
+  Future<int> insertOrderItem(
+    int orderId,
+    String itemName,
     String? itemShortName,
     String? purchaseUnit,
     String? actualUnit,
-    double purchaseQuantity = 1.0,
-    double actualQuantity = 1.0,
-    double presetPrice = 0.0,
-    double actualPrice = 0.0,
-  }) async {
+    double purchaseQuantity,
+    double actualQuantity,
+    double presetPrice,
+    double actualPrice,
+    double advancePayment,
+    double totalPrice,
+  ) async {
     final entry = OrderItemsCompanion.insert(
       orderId: orderId,
-      itemName: Value(itemName ?? ''),
-      itemShortName: Value(itemShortName ?? ''),
-      purchaseUnit: Value(purchaseUnit ?? ''),
-      actualUnit: Value(actualUnit ?? ''),
+      itemName: Value(itemName),
+      itemShortName: Value(itemShortName),
+      purchaseUnit: Value(purchaseUnit),
       purchaseQuantity: Value(purchaseQuantity),
+      actualUnit: Value(actualUnit),
       actualQuantity: Value(actualQuantity),
       presetPrice: Value(presetPrice),
       actualPrice: Value(actualPrice),
+      advancePayment: Value(advancePayment),
+      totalPrice: Value(totalPrice),
     );
-    return await into(orderItems).insert(entry);
+    return await into(db.orderItems).insert(entry);
   }
 
-  /// 更新订单项信息
-  Future updateOrderItem({
-    required int id,
-    String? itemName,
+  /// 获取特定订单的所有订单项
+  Future<List<OrderItem>> getAllOrderItemsByOrderId(int orderId) async {
+    return await (select(db.orderItems)..where((tbl) => tbl.orderId.equals(orderId))).get();
+  }
+
+  /// 分页获取特定订单的订单项
+  Future<List<OrderItem>> getPaginatedOrderItemsByOrderId(
+    int orderId,
+    int offset,
+    int limit, {
+    String orderByField = 'createdAt', // 默认按照创建时间排序
+    bool ascending = false, // 默认倒序
+  }) async {
+    final query = select(db.orderItems)
+      ..where((tbl) => tbl.orderId.equals(orderId))
+      ..limit(limit, offset: offset);
+
+    // 定义一个映射来将字符串字段名转换为表中的列
+    final columnMap = <String, dynamic>{
+      'id': db.orderItems.id,
+      'orderId': db.orderItems.orderId,
+      'itemName': db.orderItems.itemName,
+      'itemShortName': db.orderItems.itemShortName,
+      'purchaseUnit': db.orderItems.purchaseUnit,
+      'purchaseQuantity': db.orderItems.purchaseQuantity,
+      'actualUnit': db.orderItems.actualUnit,
+      'actualQuantity': db.orderItems.actualQuantity,
+      'presetPrice': db.orderItems.presetPrice,
+      'actualPrice': db.orderItems.actualPrice,
+      'advancePayment': db.orderItems.advancePayment,
+      'totalPrice': db.orderItems.totalPrice,
+      'createdAt': db.orderItems.createdAt,
+    };
+
+    // 检查是否提供了有效的排序字段
+    if (columnMap.containsKey(orderByField)) {
+      final column = columnMap[orderByField]!;
+      final orderMode = ascending ? OrderingMode.asc : OrderingMode.desc;
+      query.orderBy([
+        (t) => OrderingTerm(expression: column, mode: orderMode),
+      ]);
+    } else {
+      query.orderBy([
+        (t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc),
+      ]);
+    }
+
+    return await query.get();
+  }
+
+  /// 获取特定订单的所有订单项总数
+  Future<int> getTotalOrderItemsCountByOrderId(int orderId) async {
+    final count = countAll();
+    final countQuery = selectOnly(db.orderItems)..addColumns([count]);
+    countQuery.where(db.orderItems.orderId.equals(orderId));
+    final result = await countQuery.map((row) => row.read<int>(count)).getSingleOrNull();
+    return result ?? 0;
+  }
+
+  /// 更新订单项
+  Future<void> updateOrderItem(
+    int id,
+    int orderId,
+    String itemName,
     String? itemShortName,
     String? purchaseUnit,
     String? actualUnit,
-    double purchaseQuantity = 1.0,
-    double actualQuantity = 1.0,
-    double presetPrice = 0.0,
-    double actualPrice = 0.0,
-  }) async {
+    double purchaseQuantity,
+    double actualQuantity,
+    double presetPrice,
+    double actualPrice,
+    double advancePayment,
+    double totalPrice,
+  ) async {
     final entry = OrderItemsCompanion(
-      itemName: Value(itemName ?? ''),
-      itemShortName: Value(itemShortName ?? ''),
-      purchaseUnit: Value(purchaseUnit ?? ''),
-      actualUnit: Value(actualUnit ?? ''),
+      orderId: Value(orderId),
+      itemName: Value(itemName),
+      itemShortName: Value(itemShortName),
+      purchaseUnit: Value(purchaseUnit),
       purchaseQuantity: Value(purchaseQuantity),
+      actualUnit: Value(actualUnit),
       actualQuantity: Value(actualQuantity),
       presetPrice: Value(presetPrice),
       actualPrice: Value(actualPrice),
+      advancePayment: Value(advancePayment),
+      totalPrice: Value(totalPrice),
     );
-    return await (update(orderItems)..where((tbl) => tbl.id.equals(id))).write(entry);
+    await (update(db.orderItems)..where((tbl) => tbl.id.equals(id))).write(entry);
   }
 
   /// 删除订单项
-  Future deleteOrderItem(int id) async {
-    return await (delete(orderItems)..where((tbl) => tbl.id.equals(id))).go();
+  Future<void> deleteOrderItem(int id) async {
+    await (delete(db.orderItems)..where((tbl) => tbl.id.equals(id))).go();
+  }
+
+  /// 删除特定订单的所有订单项
+  Future<void> deleteAllOrderItemsByOrderId(int orderId) async {
+    await (delete(db.orderItems)..where((tbl) => tbl.orderId.equals(orderId))).go();
+  }
+
+  /// 检查是否已经存在具有指定 itemName 和 orderId 的订单项
+  Future<bool> doesItemNameExistForOrder(String itemName, int orderId) async {
+    final query = select(db.orderItems)..where((tbl) => tbl.itemName.equals(itemName) & tbl.orderId.equals(orderId));
+
+    final result = await query.get();
+    return result.isNotEmpty;
   }
 }

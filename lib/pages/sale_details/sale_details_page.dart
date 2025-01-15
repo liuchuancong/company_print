@@ -73,9 +73,13 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                 onRowsPerPageChanged: controller.handleRowsPerPageChanged,
                 sortColumnIndex: controller.sortColumnIndex.value,
                 sortAscending: controller.sortAscending.value,
-                minWidth: 1500,
+                minWidth: 4000,
                 isVerticalScrollBarVisible: true,
                 isHorizontalScrollBarVisible: true,
+                fixedTopRows: 1,
+                fixedLeftColumns: 1,
+                fixedColumnsColor: Theme.of(context).focusColor,
+                fixedCornerColor: Theme.of(context).focusColor,
                 columns: [
                   const DataColumn2(
                     label: Text('操作'),
@@ -84,13 +88,19 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                   ),
                   DataColumn2(
                     label: const Text('商品名称'),
-                    fixedWidth: 80,
+                    fixedWidth: 200,
                     headingRowAlignment: MainAxisAlignment.center,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
-                    label: const Text('商品简介'),
-                    fixedWidth: 170,
+                    label: const Text('总价'),
+                    fixedWidth: 150,
+                    headingRowAlignment: MainAxisAlignment.center,
+                    onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
+                  ),
+                  DataColumn2(
+                    label: const Text('垫付'),
+                    fixedWidth: 150,
                     headingRowAlignment: MainAxisAlignment.center,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
@@ -155,8 +165,8 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
 }
 
 class EditOrderItemDialog extends StatefulWidget {
-  final CustomerOrderItem? orderItem; // 可选的 CustomerOrderItem，如果为 null 则表示新增
-  final Function(CustomerOrderItem newOrUpdatedOrderItem) onConfirm;
+  final OrderItem? orderItem; // 可选的 CustomerOrderItem，如果为 null 则表示新增
+  final Function(OrderItem newOrUpdatedOrderItem) onConfirm;
   final SaleDetailsController controller;
   const EditOrderItemDialog({
     super.key,
@@ -206,9 +216,9 @@ class EditOrderItemDialogState extends State<EditOrderItemDialog> {
       SmartDialog.showToast("商品名称不能为空");
     }
     if (_itemNameController.text.isNotEmpty) {
-      final newOrUpdatedOrderItem = CustomerOrderItem(
+      final newOrUpdatedOrderItem = OrderItem(
         id: isNew ? DateTime.now().millisecondsSinceEpoch : widget.orderItem!.id,
-        customerId: widget.orderItem?.customerId ?? 0, // 确保提供有效的 customer ID
+        orderId: widget.orderItem?.orderId ?? 0, // 确保提供有效的 customer ID
         itemName: _itemNameController.text,
         itemShortName: _itemShortNameController.text.isNotEmpty ? _itemShortNameController.text : '',
         purchaseUnit: _purchaseUnitController.text.isNotEmpty ? _purchaseUnitController.text : '',
@@ -393,7 +403,7 @@ class SaleDetailsDataSource extends AsyncDataTableSource {
     await controller.loadData(startIndex);
     return AsyncRowsResponse(
         controller.totalSaleDetails.value,
-        controller.customerOrderItems.map((orderItem) {
+        controller.orderItems.map((orderItem) {
           return DataRow(
             key: ValueKey<int>(orderItem.id),
             cells: [
@@ -424,8 +434,9 @@ class SaleDetailsDataSource extends AsyncDataTableSource {
                   ],
                 ),
               ),
-              DataCell(Text(orderItem.itemName)),
-              DataCell(Text(orderItem.itemShortName ?? '')),
+              DataCell(Text(orderItem.itemName!)),
+              DataCell(Text((orderItem.totalPrice ?? '0.0').toString())),
+              DataCell(Text((orderItem.advancePayment ?? '0.0').toString())),
               DataCell(Text(orderItem.purchaseQuantity.toString())),
               DataCell(Text(orderItem.presetPrice.toString())),
               DataCell(Text(orderItem.purchaseUnit.toString())),
@@ -439,7 +450,7 @@ class SaleDetailsDataSource extends AsyncDataTableSource {
 }
 
 class MutipleOrderItemDialog extends StatefulWidget {
-  final Function(CustomerOrderItem newOrUpdatedOrderItem, List<DropDownMenuModel> itemNames) onConfirm;
+  final Function(OrderItem newOrUpdatedOrderItem, List<DropDownMenuModel> itemNames) onConfirm;
   final SaleDetailsController controller;
   const MutipleOrderItemDialog({
     super.key,
@@ -479,9 +490,9 @@ class MutipleOrderItemDialogDialogState extends State<MutipleOrderItemDialog> {
       SmartDialog.showToast('请选择商品名称');
       return;
     }
-    final newOrUpdatedOrderItem = CustomerOrderItem(
+    final newOrUpdatedOrderItem = OrderItem(
       id: 0,
-      customerId: 0, // 确保提供有效的 customer ID
+      orderId: 0, // 确保提供有效的 customer ID
       itemName: '',
       itemShortName: _itemShortNameController.text.isNotEmpty ? _itemShortNameController.text : '',
       purchaseUnit: _purchaseUnitController.text.isNotEmpty ? _purchaseUnitController.text : '',

@@ -51,7 +51,7 @@ class BasePageController<T> extends BaseController {
   int currentPage = 1;
   int count = 0;
   int maxPage = 0;
-  int pageSize = 10;
+  int pageSize = 30;
   var canLoadMore = false.obs;
   var list = <T>[].obs;
 

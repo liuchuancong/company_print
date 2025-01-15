@@ -39,7 +39,9 @@ class OrdersDao extends DatabaseAccessor<AppDatabase> with _$OrdersDaoMixin {
     if (searchQuery.isNotEmpty) {
       query = query..where((tbl) => tbl.customerName.like('%$searchQuery%'));
     }
-    query = query..limit(pageSize, offset: offset);
+    query = query
+      ..orderBy([(tbl) => OrderingTerm.desc(tbl.createdAt)]) // 按照 createdAt 时间倒序排序
+      ..limit(pageSize, offset: offset);
     return await query.get();
   }
 

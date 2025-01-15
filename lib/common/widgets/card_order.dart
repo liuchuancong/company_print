@@ -3,18 +3,21 @@ import 'package:date_format/date_format.dart';
 import 'package:company_print/database/db.dart';
 
 class CardOrder extends StatelessWidget {
-  const CardOrder(
-      {super.key,
-      required this.order,
-      required this.index,
-      required this.onEdit,
-      required this.onDelete,
-      required this.onTap});
+  const CardOrder({
+    super.key,
+    required this.order,
+    required this.index,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onTap,
+    required this.complete,
+  });
   final Order order;
   final int index;
   final Function(Order) onEdit;
   final Function(Order) onDelete;
   final Function(Order) onTap;
+  final Function(Order) complete;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -39,10 +42,13 @@ class CardOrder extends StatelessWidget {
                 Positioned(
                   right: 4,
                   top: 8,
-                  child: CountChip(
-                    icon: Icons.monetization_on_outlined,
-                    count: order.isPaid ? '已结算' : '未结算',
-                    isPaid: order.isPaid,
+                  child: GestureDetector(
+                    onTap: () => complete(order),
+                    child: CountChip(
+                      icon: Icons.monetization_on_outlined,
+                      count: order.isPaid ? '已结算' : '未结算',
+                      isPaid: order.isPaid,
+                    ),
                   ),
                 ),
                 Container(

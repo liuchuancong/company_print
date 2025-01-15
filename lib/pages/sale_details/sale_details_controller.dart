@@ -13,10 +13,10 @@ class SaleDetailsController extends GetxController {
 
   final int orderId;
   final AppDatabase database = DatabaseManager.instance.appDatabase;
-  final List<CustomerOrderItem> customerOrderItems = <CustomerOrderItem>[].obs;
+  final List<OrderItem> orderItems = <OrderItem>[].obs;
   var isLoading = false.obs; // 加载状态标记
-  final AppDatabase _database = DatabaseManager.instance.appDatabase;
   var totalSaleDetails = 0.obs;
+
   var rowsPerPage = PaginatedDataTable.defaultRowsPerPage.obs;
   var currentPage = 0.obs;
   var sortAscending = false.obs;
@@ -35,7 +35,7 @@ class SaleDetailsController extends GetxController {
   }
 
   String getSortName() {
-    var sortNames = [
+    final sortNames = [
       'itemName',
       'itemShortName',
       'purchaseQuantity',
@@ -44,6 +44,7 @@ class SaleDetailsController extends GetxController {
       'actualQuantity',
       'actualPrice',
       'actualUnit',
+      // 如果有其他需要排序的字段，可以继续添加
     ];
     return sortNames[sortColumnIndex.value];
   }
@@ -52,14 +53,14 @@ class SaleDetailsController extends GetxController {
     isLoading(true);
     final offset = currentPage.value * rowsPerPage.value;
     try {
-      final results = await _database.customerOrderItemsDao.getPaginatedOrderItemsByCustomerId(
+      final results = await database.orderItemsDao.getPaginatedOrderItemsByOrderId(
         orderId,
         offset,
         rowsPerPage.value,
         orderByField: getSortName(),
         ascending: sortAscending.value,
       );
-      customerOrderItems.assignAll(results);
+      orderItems.assignAll(results);
     } catch (e) {
       log(e.toString(), name: 'loadData');
     }
@@ -69,7 +70,7 @@ class SaleDetailsController extends GetxController {
   Future<void> loadTotalData() async {
     isLoading(true);
     try {
-      final count = await _database.customerOrderItemsDao.getAllOrderItemsByCustomerId(orderId);
+      final count = await database.orderItemsDao.getAllOrderItemsByOrderId(orderId);
       totalSaleDetails.value = count.length;
     } catch (e) {
       log(e.toString(), name: 'loadTotalData');
@@ -97,9 +98,9 @@ class SaleDetailsController extends GetxController {
     }
   }
 
-  void showPreviewCustomerDialog(CustomerOrderItem customer) {
+  void showPreviewCustomerDialog(OrderItem customer) {
     Utils.showMapAlertDialog({
-      '商品名称': customer.itemName,
+      '商品名称': customer.itemName!,
       '商品简介': customer.itemShortName ?? '',
       '购买数量': customer.purchaseQuantity.toString(),
       '购买单价': customer.presetPrice.toString(),
@@ -116,15 +117,17 @@ class SaleDetailsController extends GetxController {
       builder: (context) {
         return EditOrderItemDialog(
           controller: this,
-          onConfirm: (newCustomerOrderItem) => addCustomerOrderItem(
-            newCustomerOrderItem.itemName,
-            newCustomerOrderItem.itemShortName,
-            newCustomerOrderItem.purchaseUnit,
-            newCustomerOrderItem.purchaseQuantity,
-            newCustomerOrderItem.actualUnit,
-            newCustomerOrderItem.actualQuantity,
-            newCustomerOrderItem.presetPrice,
-            newCustomerOrderItem.actualPrice,
+          onConfirm: (orderItem) => addCustomerOrderItem(
+            orderItem.itemName!,
+            orderItem.itemShortName,
+            orderItem.purchaseUnit,
+            orderItem.actualUnit,
+            orderItem.purchaseQuantity!,
+            orderItem.actualQuantity!,
+            orderItem.presetPrice!,
+            orderItem.actualPrice!,
+            orderItem.advancePayment!,
+            orderItem.totalPrice!,
           ),
         );
       },
@@ -136,17 +139,17 @@ class SaleDetailsController extends GetxController {
       builder: (context) {
         return MutipleOrderItemDialog(
             controller: this,
-            onConfirm: (newCustomerOrderItem, itemNames) {
-              handleMutipleOrderItem(itemNames, newCustomerOrderItem);
+            onConfirm: (orderItem, itemNames) {
+              handleMutipleOrderItem(itemNames, orderItem);
             });
       },
     );
   }
 
-  void handleMutipleOrderItem(List<DropDownMenuModel> itemNames, CustomerOrderItem newCustomerOrderItem) async {
+  void handleMutipleOrderItem(List<DropDownMenuModel> itemNames, OrderItem orderItem) async {
     List<bool> itemNameExits = [];
     for (var itemName in itemNames) {
-      var isExit = await database.customerOrderItemsDao.doesItemNameExistForCustomer(itemName.name, orderId);
+      var isExit = await database.orderItemsDao.doesItemNameExistForOrder(itemName.name, orderId);
       itemNameExits.add(isExit);
     }
     var count = itemNameExits.where((element) => element == true).length;
@@ -156,13 +159,15 @@ class SaleDetailsController extends GetxController {
         for (var itemName in itemNames) {
           addCustomerOrderItem(
             itemName.name,
-            newCustomerOrderItem.itemShortName,
-            newCustomerOrderItem.purchaseUnit,
-            newCustomerOrderItem.purchaseQuantity,
-            newCustomerOrderItem.actualUnit,
-            newCustomerOrderItem.actualQuantity,
-            newCustomerOrderItem.presetPrice,
-            newCustomerOrderItem.actualPrice,
+            orderItem.itemShortName,
+            orderItem.purchaseUnit,
+            orderItem.actualUnit,
+            orderItem.purchaseQuantity!,
+            orderItem.actualQuantity!,
+            orderItem.presetPrice!,
+            orderItem.actualPrice!,
+            orderItem.advancePayment!,
+            orderItem.totalPrice!,
           );
         }
       } else if (result == false) {
@@ -170,13 +175,15 @@ class SaleDetailsController extends GetxController {
           if (itemNameExits[i] == false) {
             addCustomerOrderItem(
               itemNames[i].name,
-              newCustomerOrderItem.itemShortName,
-              newCustomerOrderItem.purchaseUnit,
-              newCustomerOrderItem.purchaseQuantity,
-              newCustomerOrderItem.actualUnit,
-              newCustomerOrderItem.actualQuantity,
-              newCustomerOrderItem.presetPrice,
-              newCustomerOrderItem.actualPrice,
+              orderItem.itemShortName,
+              orderItem.purchaseUnit,
+              orderItem.actualUnit,
+              orderItem.purchaseQuantity!,
+              orderItem.actualQuantity!,
+              orderItem.presetPrice!,
+              orderItem.actualPrice!,
+              orderItem.advancePayment!,
+              orderItem.totalPrice!,
             );
           }
         }
@@ -185,34 +192,38 @@ class SaleDetailsController extends GetxController {
       for (var itemName in itemNames) {
         addCustomerOrderItem(
           itemName.name,
-          newCustomerOrderItem.itemShortName,
-          newCustomerOrderItem.purchaseUnit,
-          newCustomerOrderItem.purchaseQuantity,
-          newCustomerOrderItem.actualUnit,
-          newCustomerOrderItem.actualQuantity,
-          newCustomerOrderItem.presetPrice,
-          newCustomerOrderItem.actualPrice,
+          orderItem.itemShortName,
+          orderItem.purchaseUnit,
+          orderItem.actualUnit,
+          orderItem.purchaseQuantity!,
+          orderItem.actualQuantity!,
+          orderItem.presetPrice!,
+          orderItem.actualPrice!,
+          orderItem.advancePayment!,
+          orderItem.totalPrice!,
         );
       }
     }
   }
 
-  void showEditCustomerDialog(CustomerOrderItem customerOrderItem) {
+  void showEditCustomerDialog(OrderItem customerOrderItem) {
     SmartDialog.show(
       builder: (context) {
         return EditOrderItemDialog(
           controller: this,
           orderItem: customerOrderItem,
-          onConfirm: (updatedCustomerOrderItem) => updateCustomerOrderItem(
-            updatedCustomerOrderItem.id,
-            updatedCustomerOrderItem.itemName,
-            updatedCustomerOrderItem.itemShortName,
-            updatedCustomerOrderItem.purchaseUnit,
-            updatedCustomerOrderItem.purchaseQuantity,
-            updatedCustomerOrderItem.actualUnit,
-            updatedCustomerOrderItem.actualQuantity,
-            updatedCustomerOrderItem.presetPrice,
-            updatedCustomerOrderItem.actualPrice,
+          onConfirm: (orderItem) => updateCustomerOrderItem(
+            orderItem.id,
+            orderItem.itemName!,
+            orderItem.itemShortName,
+            orderItem.purchaseUnit,
+            orderItem.actualUnit,
+            orderItem.purchaseQuantity!,
+            orderItem.actualQuantity!,
+            orderItem.presetPrice!,
+            orderItem.actualPrice!,
+            orderItem.advancePayment!,
+            orderItem.totalPrice!,
           ),
         );
       },
@@ -223,22 +234,26 @@ class SaleDetailsController extends GetxController {
     String itemName,
     String? itemShortName,
     String? purchaseUnit,
-    double? purchaseQuantity,
     String? actualUnit,
-    double? actualQuantity,
-    double? presetPrice,
-    double? actualPrice,
+    double purchaseQuantity,
+    double actualQuantity,
+    double presetPrice,
+    double actualPrice,
+    double advancePayment,
+    double totalPrice,
   ) async {
-    await database.customerOrderItemsDao.insertCustomerOrderItem(
+    await database.orderItemsDao.insertOrderItem(
       orderId,
       itemName,
       itemShortName,
       purchaseUnit,
-      purchaseQuantity,
       actualUnit,
+      purchaseQuantity,
       actualQuantity,
       presetPrice,
       actualPrice,
+      advancePayment,
+      totalPrice,
     );
     dataSource?.refreshDatasource();
   }
@@ -248,22 +263,27 @@ class SaleDetailsController extends GetxController {
     String itemName,
     String? itemShortName,
     String? purchaseUnit,
-    double? purchaseQuantity,
     String? actualUnit,
-    double? actualQuantity,
-    double? presetPrice,
-    double? actualPrice,
+    double purchaseQuantity,
+    double actualQuantity,
+    double presetPrice,
+    double actualPrice,
+    double advancePayment,
+    double totalPrice,
   ) async {
-    await database.customerOrderItemsDao.updateCustomerOrderItem(
+    await database.orderItemsDao.updateOrderItem(
       id,
+      orderId,
       itemName,
       itemShortName,
       purchaseUnit,
-      purchaseQuantity,
       actualUnit,
+      purchaseQuantity,
       actualQuantity,
       presetPrice,
       actualPrice,
+      advancePayment,
+      totalPrice,
     );
     dataSource?.refreshDatasource();
   }
@@ -276,7 +296,7 @@ class SaleDetailsController extends GetxController {
   }
 
   Future<void> deleteCustomerOrderItem(int id) async {
-    await database.customerOrderItemsDao.deleteCustomerOrderItem(id);
+    await database.orderItemsDao.deleteOrderItem(id);
     dataSource?.refreshDatasource();
   }
 

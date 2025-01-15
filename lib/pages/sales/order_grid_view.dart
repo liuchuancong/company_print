@@ -43,6 +43,7 @@ class OrderGridViewState extends State<OrderGridView> {
                         onEdit: widget.controller.onEditOrder,
                         onDelete: widget.controller.onDeleteOrder,
                         onTap: widget.controller.onOrderTaped,
+                        complete: widget.controller.completeOrder,
                       ),
                     ),
                   ),
