@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:date_format/date_format.dart';
 import 'package:searchfield/searchfield.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/common/style/app_style.dart';
 import 'package:material_text_fields/material_text_fields.dart';
 import 'package:company_print/pages/sales/sales_controller.dart';
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+import 'package:company_print/common/widgets/section_listtile.dart';
 
-class AddOrEditOrderDialog extends StatefulWidget {
+class AddOrEditOrderPage extends StatefulWidget {
   final Order? order; // 如果是编辑，则此参数不为空
   final Function(Order updatedOrder) onConfirm;
   final SalesController controller;
-  const AddOrEditOrderDialog({super.key, this.order, required this.onConfirm, required this.controller});
+  const AddOrEditOrderPage({super.key, this.order, required this.onConfirm, required this.controller});
 
   @override
-  AddOrEditOrderDialogState createState() => AddOrEditOrderDialogState();
+  AddOrEditOrderPageState createState() => AddOrEditOrderPageState();
 }
 
-class AddOrEditOrderDialogState extends State<AddOrEditOrderDialog> {
+class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
   bool isNew = false;
   final TextEditingController _orderNameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -30,10 +33,13 @@ class AddOrEditOrderDialogState extends State<AddOrEditOrderDialog> {
   final TextEditingController _totalPriceController = TextEditingController(text: '0.0');
   final TextEditingController _itemCountController = TextEditingController(text: '0.0');
   final TextEditingController _shippingFeeController = TextEditingController(text: '0.0');
-
+  final TextEditingController _dateController = TextEditingController();
   SearchFieldListItem<Customer>? selectedCustomerValue;
   SearchFieldListItem<Vehicle>? selectedVehicleValue;
   bool _isPaid = false;
+  int customerId = 0;
+
+  List<DateTime> selectedDate = [];
 
   @override
   void initState() {
@@ -55,13 +61,78 @@ class AddOrEditOrderDialogState extends State<AddOrEditOrderDialog> {
       _itemCountController.text = order.itemCount.toString();
       _shippingFeeController.text = order.shippingFee.toString();
       _isPaid = order.isPaid;
+      setState(() {
+        selectedDate = [widget.order!.createdAt];
+        _dateController.text = formatDate(widget.order!.createdAt, [yyyy, '-', mm, '-', dd, ' ', HH, ':', nn, ':', ss]);
+      });
     }
     super.initState();
   }
 
+  void showDateTimerPicker() async {
+    var results = await Get.dialog<List<DateTime>>(
+        AlertDialog(
+          title: const Text('选择日期'),
+          content: Container(
+            width: Get.width < 600 ? Get.width * 0.9 : Get.width * 0.6,
+            constraints: const BoxConstraints(
+              maxHeight: 500,
+            ),
+            child: SingleChildScrollView(
+              child: CalendarDatePicker2(
+                config: CalendarDatePicker2Config(
+                  calendarType: CalendarDatePicker2Type.single,
+                  firstDate: DateTime(1990, 1, 1),
+                  lastDate: DateTime.now(),
+                  controlsTextStyle: const TextStyle(color: Colors.black, fontSize: 18),
+                  dayTextStyle: const TextStyle(color: Colors.black, fontSize: 18),
+                  monthTextStyle: const TextStyle(fontSize: 18),
+                  selectedDayTextStyle: const TextStyle(fontSize: 18, color: Colors.white),
+                  yearTextStyle: const TextStyle(fontSize: 18),
+                  selectedRangeHighlightColor: Theme.of(Get.context!).primaryColor,
+                  weekdayLabelTextStyle: const TextStyle(fontSize: 18),
+                  selectedMonthTextStyle: const TextStyle(fontSize: 18, color: Colors.black),
+                  selectedRangeDayTextStyle: const TextStyle(fontSize: 18, color: Colors.white),
+                  selectedYearTextStyle: const TextStyle(fontSize: 18, color: Colors.white),
+                ),
+                value: selectedDate,
+                onValueChanged: (dates) {
+                  setState(() {
+                    selectedDate = dates;
+                  });
+                },
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: (() {
+                setState(() {
+                  selectedDate = [widget.order!.createdAt];
+                });
+                Navigator.of(Get.context!).pop();
+              }),
+              child: const Text("重置"),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _dateController.text =
+                      formatDate(selectedDate[0], [yyyy, '-', mm, '-', dd, ' ', HH, ':', nn, ':', ss]);
+                });
+                Navigator.of(Get.context!).pop();
+              },
+              child: const Text("确定"),
+            ),
+          ],
+        ),
+        barrierDismissible: false);
+    if (results != null && results.isNotEmpty) {}
+  }
+
   void _submitForm() {
-    if (_customerNameController.text.isEmpty || _customerPhoneController.text.isEmpty) {
-      SmartDialog.showToast("客户姓名和电话不能为空");
+    if (_customerNameController.text.isEmpty) {
+      SmartDialog.showToast("客户姓名不能为空");
       return;
     }
 
@@ -81,211 +152,240 @@ class AddOrEditOrderDialogState extends State<AddOrEditOrderDialog> {
       itemCount: double.tryParse(_itemCountController.text) ?? 0,
       shippingFee: double.tryParse(_shippingFeeController.text) ?? 0,
       isPaid: _isPaid,
-      createdAt: isNew ? DateTime.now() : widget.order!.createdAt,
+      customerId: customerId,
+      createdAt: isNew ? DateTime.now() : selectedDate[0],
     );
 
     widget.onConfirm(updatedOrder);
-    SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
+    Get.back();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(isNew ? '新增订单' : '编辑订单'),
-      content: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        height: Get.height,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (isNew)
-                SearchField(
-                  dynamicHeight: true,
-                  maxSuggestionBoxHeight: 300,
-                  offset: const Offset(0, 55),
-                  suggestionState: Suggestion.expand,
-                  textInputAction: TextInputAction.next,
-                  selectedValue: selectedCustomerValue,
-                  suggestions: widget.controller.customers
-                      .map((node) =>
-                          SearchFieldListItem<Customer>(node.name ?? '', child: Text(node.name ?? ''), item: node))
-                      .toList(),
-                  hint: "请选择客户",
-                  onSuggestionTap: (SearchFieldListItem<Customer> x) {
-                    setState(() {
-                      selectedCustomerValue = x;
-                      _customerNameController.text = x.item!.name ?? '';
-                      _customerPhoneController.text = x.item!.phone ?? '';
-                      _customerAddressController.text = x.item!.address ?? '';
-                    });
-                  },
-                ),
-              if (isNew) AppStyle.vGap4,
-              if (isNew)
-                SearchField(
-                  dynamicHeight: true,
-                  maxSuggestionBoxHeight: 300,
-                  offset: const Offset(0, 55),
-                  suggestionState: Suggestion.expand,
-                  textInputAction: TextInputAction.next,
-                  selectedValue: selectedVehicleValue,
-                  suggestions: widget.controller.vehicles
-                      .map((node) => SearchFieldListItem<Vehicle>(node.driverName ?? '',
-                          child: Text(node.driverName ?? ''), item: node))
-                      .toList(),
-                  hint: "请选择司机",
-                  onSuggestionTap: (SearchFieldListItem<Vehicle> x) {
-                    setState(() {
-                      selectedVehicleValue = x;
-                      _driverNameController.text = x.item!.driverName ?? '';
-                      _driverPhoneController.text = x.item!.driverPhone ?? '';
-                      _vehiclePlateNumberController.text = x.item!.plateNumber ?? '';
-                    });
-                  },
-                ),
-              if (!isNew)
-                MaterialTextField(
-                  controller: _customerNameController,
-                  labelText: "客户姓名",
-                  hint: "请输入客户姓名",
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.next,
-                ),
-              if (!isNew) AppStyle.vGap4,
-              if (!isNew)
-                MaterialTextField(
-                  controller: _customerPhoneController,
-                  labelText: "客户电话",
-                  hint: "请输入客户电话",
-                  keyboardType: TextInputType.phone,
-                  textInputAction: TextInputAction.next,
-                ),
-              if (!isNew) AppStyle.vGap4,
-              if (!isNew)
-                MaterialTextField(
-                  controller: _customerAddressController,
-                  labelText: "客户地址",
-                  hint: "请输入客户地址",
-                  keyboardType: TextInputType.streetAddress,
-                  textInputAction: TextInputAction.next,
-                ),
-              AppStyle.vGap4,
-              MaterialTextField(
-                controller: _orderNameController,
-                labelText: "订单名称",
-                hint: "请输入订单名称",
-                keyboardType: TextInputType.text,
-                textInputAction: TextInputAction.next,
-              ),
-              AppStyle.vGap4,
-              MaterialTextField(
-                controller: _descriptionController,
-                labelText: "描述",
-                hint: "请输入描述",
-                keyboardType: TextInputType.multiline,
-                maxLines: null,
-                textInputAction: TextInputAction.next,
-              ),
-              AppStyle.vGap4,
-              MaterialTextField(
-                controller: _remarkController,
-                labelText: "备注",
-                hint: "请输入备注",
-                keyboardType: TextInputType.multiline,
-                maxLines: null,
-                textInputAction: TextInputAction.next,
-              ),
-              if (!isNew) AppStyle.vGap4,
-              if (!isNew)
-                MaterialTextField(
-                  controller: _driverNameController,
-                  labelText: "司机姓名",
-                  hint: "请输入司机姓名",
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.next,
-                ),
-              if (!isNew) AppStyle.vGap4,
-              if (!isNew)
-                MaterialTextField(
-                  controller: _driverPhoneController,
-                  labelText: "司机电话",
-                  hint: "请输入司机电话",
-                  keyboardType: TextInputType.phone,
-                  textInputAction: TextInputAction.next,
-                ),
-              if (!isNew) AppStyle.vGap4,
-              if (!isNew)
-                MaterialTextField(
-                  controller: _vehiclePlateNumberController,
-                  labelText: "车牌号",
-                  hint: "请输入车牌号",
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.next,
-                ),
-              if (!isNew) AppStyle.vGap4,
-              if (!isNew)
-                MaterialTextField(
-                  controller: _advancePaymentController,
-                  labelText: "垫付金额",
-                  hint: "请输入垫付金额",
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  textInputAction: TextInputAction.next,
-                ),
-              if (!isNew) AppStyle.vGap4,
-              if (!isNew)
-                MaterialTextField(
-                  controller: _totalPriceController,
-                  labelText: "总价",
-                  hint: "请输入总价",
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  textInputAction: TextInputAction.next,
-                ),
-              if (!isNew) AppStyle.vGap4,
-              if (!isNew)
-                MaterialTextField(
-                  controller: _itemCountController,
-                  labelText: "商品数量",
-                  hint: "请输入商品数量",
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  textInputAction: TextInputAction.next,
-                ),
-              if (!isNew) AppStyle.vGap4,
-              if (!isNew)
-                MaterialTextField(
-                  controller: _shippingFeeController,
-                  labelText: "运费",
-                  hint: "请输入运费",
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  textInputAction: TextInputAction.done,
-                ),
-              if (!isNew) AppStyle.vGap4,
-              if (!isNew)
-                CheckboxListTile(
-                  title: const Text('订单是否完成'),
-                  value: _isPaid,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      _isPaid = value ?? false;
-                    });
-                  },
-                ),
-            ],
-          ),
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(isNew ? '新增订单' : '编辑订单'),
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
-          },
-          child: const Text('取消'),
-        ),
-        TextButton(
-          onPressed: _submitForm,
-          child: Text(isNew ? '新增' : '保存'),
-        ),
-      ],
+      body: Column(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+              child: ListView(
+                children: [
+                  const SectionTitle(title: '客户信息'),
+                  if (isNew)
+                    SearchField(
+                      dynamicHeight: true,
+                      maxSuggestionBoxHeight: 300,
+                      offset: const Offset(0, 55),
+                      suggestionState: Suggestion.expand,
+                      textInputAction: TextInputAction.next,
+                      selectedValue: selectedCustomerValue,
+                      suggestions: widget.controller.customers
+                          .map((node) =>
+                              SearchFieldListItem<Customer>(node.name ?? '', child: Text(node.name ?? ''), item: node))
+                          .toList(),
+                      hint: "请选择客户",
+                      onSuggestionTap: (SearchFieldListItem<Customer> x) {
+                        setState(() {
+                          selectedCustomerValue = x;
+                          _customerNameController.text = x.item!.name ?? '';
+                          _customerPhoneController.text = x.item!.phone ?? '';
+                          _customerAddressController.text = x.item!.address ?? '';
+                          customerId = x.item!.id;
+                        });
+                      },
+                    ),
+                  if (!isNew)
+                    MaterialTextField(
+                      controller: _customerNameController,
+                      labelText: "客户姓名",
+                      hint: "请输入客户姓名",
+                      keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                    ),
+                  if (!isNew) AppStyle.vGap4,
+                  if (!isNew)
+                    MaterialTextField(
+                      controller: _customerPhoneController,
+                      labelText: "客户电话",
+                      hint: "请输入客户电话",
+                      keyboardType: TextInputType.phone,
+                      textInputAction: TextInputAction.next,
+                    ),
+                  if (!isNew) AppStyle.vGap4,
+                  if (!isNew)
+                    MaterialTextField(
+                      controller: _customerAddressController,
+                      labelText: "客户地址",
+                      hint: "请输入客户地址",
+                      keyboardType: TextInputType.streetAddress,
+                      textInputAction: TextInputAction.next,
+                    ),
+                  const SectionTitle(title: '订单信息'),
+                  if (!isNew) AppStyle.vGap4,
+                  if (!isNew)
+                    MaterialTextField(
+                      controller: _itemCountController,
+                      labelText: "商品数量",
+                      hint: "请输入商品数量",
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      textInputAction: TextInputAction.next,
+                    ),
+                  if (!isNew) AppStyle.vGap4,
+                  if (!isNew)
+                    TextField(
+                      controller: _dateController,
+                      maxLines: null,
+                      readOnly: true,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        labelText: "创建日期",
+                        suffixIcon: IconButton(
+                          icon: const Icon(
+                            Icons.calendar_month_outlined,
+                            size: 30,
+                          ),
+                          onPressed: () {
+                            showDateTimerPicker();
+                          },
+                        ),
+                      ),
+                    ),
+                  AppStyle.vGap4,
+                  MaterialTextField(
+                    labelText: "备注",
+                    hint: "请输入备注",
+                    controller: _remarkController,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    textInputAction: TextInputAction.next,
+                  ),
+                  if (!isNew) AppStyle.vGap4,
+                  if (!isNew)
+                    CheckboxListTile(
+                      contentPadding: const EdgeInsets.all(0),
+                      title: const Text('已结算'),
+                      value: _isPaid,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          _isPaid = value ?? false;
+                        });
+                      },
+                    ),
+                  if (!isNew) const SectionTitle(title: '费用信息'),
+                  if (!isNew) AppStyle.vGap4,
+                  if (!isNew)
+                    MaterialTextField(
+                      controller: _totalPriceController,
+                      labelText: "总价",
+                      hint: "请输入总价",
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      textInputAction: TextInputAction.next,
+                    ),
+                  if (!isNew) AppStyle.vGap4,
+                  if (!isNew)
+                    MaterialTextField(
+                      controller: _advancePaymentController,
+                      labelText: "垫付金额",
+                      hint: "请输入垫付金额",
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      textInputAction: TextInputAction.next,
+                    ),
+                  if (!isNew) AppStyle.vGap4,
+                  if (!isNew)
+                    MaterialTextField(
+                      controller: _shippingFeeController,
+                      labelText: "运费",
+                      hint: "请输入运费",
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      textInputAction: TextInputAction.done,
+                    ),
+                  const SectionTitle(title: '司机信息'),
+                  if (isNew) AppStyle.vGap4,
+                  if (isNew)
+                    SearchField(
+                      dynamicHeight: true,
+                      maxSuggestionBoxHeight: 300,
+                      offset: const Offset(0, 55),
+                      suggestionState: Suggestion.expand,
+                      textInputAction: TextInputAction.next,
+                      selectedValue: selectedVehicleValue,
+                      suggestions: widget.controller.vehicles
+                          .map((node) => SearchFieldListItem<Vehicle>(node.driverName ?? '',
+                              child: Text(node.driverName ?? ''), item: node))
+                          .toList(),
+                      hint: "请选择司机",
+                      onSuggestionTap: (SearchFieldListItem<Vehicle> x) {
+                        setState(() {
+                          selectedVehicleValue = x;
+                          _driverNameController.text = x.item!.driverName ?? '';
+                          _driverPhoneController.text = x.item!.driverPhone ?? '';
+                          _vehiclePlateNumberController.text = x.item!.plateNumber ?? '';
+                        });
+                      },
+                    ),
+                  if (!isNew)
+                    MaterialTextField(
+                      controller: _driverNameController,
+                      labelText: "司机姓名",
+                      hint: "请输入司机姓名",
+                      keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                    ),
+                  if (!isNew) AppStyle.vGap4,
+                  if (!isNew)
+                    MaterialTextField(
+                      controller: _driverPhoneController,
+                      labelText: "司机电话",
+                      hint: "请输入司机电话",
+                      keyboardType: TextInputType.phone,
+                      textInputAction: TextInputAction.next,
+                    ),
+                  if (!isNew) AppStyle.vGap4,
+                  if (!isNew)
+                    MaterialTextField(
+                      controller: _vehiclePlateNumberController,
+                      labelText: "车牌号",
+                      hint: "请输入车牌号",
+                      keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                    ),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: SizedBox(
+              height: 50,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  FilledButton(
+                    style: ButtonStyle(
+                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
+                    ),
+                    onPressed: () {
+                      Get.back(); // 使用 SmartDialog 方法关闭对话框
+                    },
+                    child: const Text('取消', style: TextStyle(fontSize: 18)),
+                  ),
+                  const SizedBox(width: 10),
+                  FilledButton(
+                    style: ButtonStyle(
+                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
+                    ),
+                    onPressed: _submitForm,
+                    child: Text(isNew ? '新增' : '保存', style: const TextStyle(fontSize: 18)),
+                  ),
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 

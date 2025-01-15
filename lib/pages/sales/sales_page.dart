@@ -23,16 +23,16 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
   }
 
   @override
+  void dispose() {
+    Get.delete<SalesController>();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
     return SafeArea(
       child: Scaffold(
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            controller.showAddOrEditOrderDialog();
-          },
-          label: const Icon(HugeIcons.strokeRoundedAddCircle, size: 40),
-        ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -54,35 +54,40 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
                     },
                   ),
                   Expanded(
-                    child: SearchField(
-                      key: const ValueKey('search_field'),
-                      dynamicHeight: true,
-                      maxSuggestionBoxHeight: 300,
-                      offset: const Offset(0, 55),
-                      suggestionState: Suggestion.expand,
-                      textInputAction: TextInputAction.next,
-                      selectedValue: searchFieldListItem,
-                      suggestions: controller.orderNames
-                          .map(
-                            (node) => SearchFieldListItem<String>(node, child: Text(node), item: node),
-                          )
-                          .toList(),
-                      hint: "请选择订单名称",
-                      onSuggestionTap: (SearchFieldListItem<String> x) {
-                        setState(() {
-                          searchFieldListItem = x;
-                          controller.searchQuery.value = x.item!;
-                        });
-                      },
-                    ),
+                    child: Obx(() => SearchField(
+                          key: const ValueKey('search_field'),
+                          dynamicHeight: true,
+                          maxSuggestionBoxHeight: 300,
+                          offset: const Offset(0, 55),
+                          suggestionState: Suggestion.expand,
+                          textInputAction: TextInputAction.next,
+                          selectedValue: searchFieldListItem,
+                          suggestions: controller.customerNames
+                              .map(
+                                (node) => SearchFieldListItem<String>(node, child: Text(node), item: node),
+                              )
+                              .toList(),
+                          hint: "请选择客户名称",
+                          onSuggestionTap: (SearchFieldListItem<String> x) {
+                            setState(() {
+                              searchFieldListItem = x;
+                              controller.searchQuery.value = x.item!;
+                            });
+                            controller.refreshData();
+                          },
+                        )),
                   ),
                   IconButton(
                     icon: const Icon(
-                      Icons.search,
+                      Icons.clear,
                       size: 30,
                     ),
                     onPressed: () {
-                      // 处理搜索图标点击事件
+                      setState(() {
+                        searchFieldListItem = null;
+                        controller.searchQuery.value = "";
+                      });
+                      controller.refreshData();
                     },
                   ),
                   IconButton(
@@ -94,6 +99,21 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
                       controller.showDateTimerPicker();
                     },
                   ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  FilledButton(
+                    onPressed: () {
+                      controller.showAddOrEditOrderPage();
+                    },
+                    child: const Text('新增订单'),
+                  )
                 ],
               ),
             ),

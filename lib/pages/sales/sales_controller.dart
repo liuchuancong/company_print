@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:company_print/utils/utils.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -33,6 +32,25 @@ class SalesController extends BasePageController {
     fetchCustomers();
     initCurrentDate();
     loadData();
+  }
+
+  onEditOrder(Order order) {
+    showAddOrEditOrderPage(order: order);
+  }
+
+  void onOrderTaped(Order order) {
+    Get.toNamed(RoutePath.kSaleDetails, arguments: [order.id]);
+  }
+
+  void onDeleteOrder(Order order) async {
+    var result = await Utils.showAlertDialog(
+      '确定删除该订单吗？',
+      title: '提示',
+    );
+    if (result == true) {
+      await deleteOrder(order);
+      refreshData();
+    }
   }
 
   void initCurrentDate() {
@@ -88,7 +106,10 @@ class SalesController extends BasePageController {
         ),
         actions: [
           TextButton(
-            onPressed: (() => Navigator.of(Get.context!).pop([])),
+            onPressed: (() {
+              currentDates = [];
+              Navigator.of(Get.context!).pop(currentDates);
+            }),
             child: const Text("取消"),
           ),
           TextButton(
@@ -98,10 +119,13 @@ class SalesController extends BasePageController {
         ],
       ),
     );
-    if (results != null) {
-      startDate(results[0]);
-      endDate(results[1]);
-      dateRange(results);
+    if (results != null && results.isNotEmpty) {
+      DateTime startOfDay = Utils.getStartOfDay(results[0]);
+      DateTime endOfDay = Utils.getEndOfDay(results[1]);
+      startDate(startOfDay);
+      endDate(endOfDay);
+      dateRange([startOfDay, endOfDay]);
+      refreshData();
     }
   }
 
@@ -116,13 +140,8 @@ class SalesController extends BasePageController {
   }
 
   Future<List<Order>> fetchOrders(int page, int pageSize) async {
-    var orders = await database.ordersDao.getOrdersForTimeRange(
-      dateRange[0],
-      dateRange[1],
-      searchQuery: searchQuery.value,
-      page: page,
-      pageSize: pageSize,
-    );
+    var orders = await database.ordersDao.getOrdersForTimeRange(dateRange[0], dateRange[1],
+        searchQuery: searchQuery.value, page: page, pageSize: pageSize);
     return orders;
   }
 
@@ -132,7 +151,7 @@ class SalesController extends BasePageController {
   }
 
   Future<void> fetchCustomerNames() async {
-    final customersList = await database.customerDao.getDistinctOrderNames();
+    final customersList = await database.ordersDao.getDistinctCustomerNames();
     customerNames.assignAll(customersList);
   }
 
@@ -146,15 +165,13 @@ class SalesController extends BasePageController {
     customers.assignAll(customersList);
   }
 
-  void showAddOrEditOrderDialog({Order? order}) {
-    SmartDialog.show(
-      builder: (context) {
-        return AddOrEditOrderDialog(
+  void showAddOrEditOrderPage({Order? order}) {
+    Get.to(() => AddOrEditOrderPage(
           controller: this,
           order: order,
-          onConfirm: (updatedOrder) {
+          onConfirm: (updatedOrder) async {
             if (updatedOrder.id == -1) {
-              addOrder(
+              await addOrder(
                 updatedOrder.customerName!,
                 updatedOrder.orderName,
                 updatedOrder.description,
@@ -169,9 +186,10 @@ class SalesController extends BasePageController {
                 updatedOrder.itemCount,
                 updatedOrder.shippingFee,
                 updatedOrder.isPaid,
+                updatedOrder.customerId,
               );
             } else {
-              updateOrder(
+              await updateOrder(
                 updatedOrder.id,
                 updatedOrder.customerName!,
                 updatedOrder.orderName,
@@ -190,10 +208,10 @@ class SalesController extends BasePageController {
                 updatedOrder.createdAt,
               );
             }
+            refreshData();
+            fetchCustomerNames();
           },
-        );
-      },
-    );
+        ));
   }
 
   Future<void> addOrder(
@@ -211,6 +229,7 @@ class SalesController extends BasePageController {
     double? itemCount,
     double? shippingFee,
     bool isPaid,
+    int? customerId,
   ) async {
     await database.ordersDao.createOrder(
       orderName: orderName,
@@ -227,6 +246,7 @@ class SalesController extends BasePageController {
       itemCount: itemCount!,
       shippingFee: shippingFee!,
       isPaid: isPaid,
+      customerId: customerId,
     );
   }
 
@@ -266,5 +286,9 @@ class SalesController extends BasePageController {
       isPaid: isPaid,
       createdAt: createdAt!,
     );
+  }
+
+  Future<void> deleteOrder(Order order) async {
+    await database.ordersDao.deleteOrder(order.id);
   }
 }

@@ -7,6 +7,7 @@ class Orders extends Table {
   TextColumn get description => text().nullable()(); // 描述，允许为空
   TextColumn get remark => text().nullable()(); // 备注，允许为空
   // 顾客信息
+  IntColumn get customerId => integer().nullable()(); // 订单ID
   TextColumn get customerName => text().nullable()(); // 顾客姓名
   TextColumn get customerPhone => text().nullable()(); // 顾客电话
   TextColumn get customerAddress => text().nullable()(); // 顾客地址，允许为空

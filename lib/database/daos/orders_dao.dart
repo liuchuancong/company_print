@@ -39,7 +39,7 @@ class OrdersDao extends DatabaseAccessor<AppDatabase> with _$OrdersDaoMixin {
     if (searchQuery.isNotEmpty) {
       query = query..where((tbl) => tbl.customerName.like('%$searchQuery%'));
     }
-    // query = query..limit(pageSize, offset: offset);
+    query = query..limit(pageSize, offset: offset);
     return await query.get();
   }
 
@@ -48,6 +48,13 @@ class OrdersDao extends DatabaseAccessor<AppDatabase> with _$OrdersDaoMixin {
     final query = selectOnly(orders, distinct: true)..addColumns([orders.orderName]);
     final result = await query.get();
     return result.map((row) => row.read(orders.orderName)).whereType<String>().toList();
+  }
+
+  Future<List<String>> getDistinctCustomerNames() async {
+    // 构建查询并执行，确保返回的结果集中每个订单名称只出现一次
+    final query = selectOnly(orders, distinct: true)..addColumns([orders.customerName]);
+    final result = await query.get();
+    return result.map((row) => row.read(orders.customerName)).whereType<String>().toList();
   }
 
   /// 创建新的订单
@@ -66,6 +73,7 @@ class OrdersDao extends DatabaseAccessor<AppDatabase> with _$OrdersDaoMixin {
     double advancePayment = 0.0,
     double shippingFee = 0.0,
     bool isPaid = false,
+    int? customerId,
   }) async {
     final entry = OrdersCompanion.insert(
       orderName: Value(orderName),
@@ -82,6 +90,7 @@ class OrdersDao extends DatabaseAccessor<AppDatabase> with _$OrdersDaoMixin {
       advancePayment: Value(advancePayment),
       shippingFee: Value(shippingFee),
       isPaid: Value(isPaid),
+      customerId: Value(customerId),
     );
     return await into(orders).insert(entry);
   }

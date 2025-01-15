@@ -1585,6 +1585,12 @@ class $OrdersTable extends Orders with TableInfo<$OrdersTable, Order> {
   late final GeneratedColumn<String> remark = GeneratedColumn<String>(
       'remark', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _customerIdMeta =
+      const VerificationMeta('customerId');
+  @override
+  late final GeneratedColumn<int> customerId = GeneratedColumn<int>(
+      'customer_id', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _customerNameMeta =
       const VerificationMeta('customerName');
   @override
@@ -1668,6 +1674,7 @@ class $OrdersTable extends Orders with TableInfo<$OrdersTable, Order> {
         orderName,
         description,
         remark,
+        customerId,
         customerName,
         customerPhone,
         customerAddress,
@@ -1707,6 +1714,12 @@ class $OrdersTable extends Orders with TableInfo<$OrdersTable, Order> {
     if (data.containsKey('remark')) {
       context.handle(_remarkMeta,
           remark.isAcceptableOrUnknown(data['remark']!, _remarkMeta));
+    }
+    if (data.containsKey('customer_id')) {
+      context.handle(
+          _customerIdMeta,
+          customerId.isAcceptableOrUnknown(
+              data['customer_id']!, _customerIdMeta));
     }
     if (data.containsKey('customer_name')) {
       context.handle(
@@ -1791,6 +1804,8 @@ class $OrdersTable extends Orders with TableInfo<$OrdersTable, Order> {
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
       remark: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}remark']),
+      customerId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}customer_id']),
       customerName: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}customer_name']),
       customerPhone: attachedDatabase.typeMapping
@@ -1829,6 +1844,7 @@ class Order extends DataClass implements Insertable<Order> {
   final String? orderName;
   final String? description;
   final String? remark;
+  final int? customerId;
   final String? customerName;
   final String? customerPhone;
   final String? customerAddress;
@@ -1846,6 +1862,7 @@ class Order extends DataClass implements Insertable<Order> {
       this.orderName,
       this.description,
       this.remark,
+      this.customerId,
       this.customerName,
       this.customerPhone,
       this.customerAddress,
@@ -1870,6 +1887,9 @@ class Order extends DataClass implements Insertable<Order> {
     }
     if (!nullToAbsent || remark != null) {
       map['remark'] = Variable<String>(remark);
+    }
+    if (!nullToAbsent || customerId != null) {
+      map['customer_id'] = Variable<int>(customerId);
     }
     if (!nullToAbsent || customerName != null) {
       map['customer_name'] = Variable<String>(customerName);
@@ -1917,6 +1937,9 @@ class Order extends DataClass implements Insertable<Order> {
           : Value(description),
       remark:
           remark == null && nullToAbsent ? const Value.absent() : Value(remark),
+      customerId: customerId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(customerId),
       customerName: customerName == null && nullToAbsent
           ? const Value.absent()
           : Value(customerName),
@@ -1960,6 +1983,7 @@ class Order extends DataClass implements Insertable<Order> {
       orderName: serializer.fromJson<String?>(json['orderName']),
       description: serializer.fromJson<String?>(json['description']),
       remark: serializer.fromJson<String?>(json['remark']),
+      customerId: serializer.fromJson<int?>(json['customerId']),
       customerName: serializer.fromJson<String?>(json['customerName']),
       customerPhone: serializer.fromJson<String?>(json['customerPhone']),
       customerAddress: serializer.fromJson<String?>(json['customerAddress']),
@@ -1983,6 +2007,7 @@ class Order extends DataClass implements Insertable<Order> {
       'orderName': serializer.toJson<String?>(orderName),
       'description': serializer.toJson<String?>(description),
       'remark': serializer.toJson<String?>(remark),
+      'customerId': serializer.toJson<int?>(customerId),
       'customerName': serializer.toJson<String?>(customerName),
       'customerPhone': serializer.toJson<String?>(customerPhone),
       'customerAddress': serializer.toJson<String?>(customerAddress),
@@ -2003,6 +2028,7 @@ class Order extends DataClass implements Insertable<Order> {
           Value<String?> orderName = const Value.absent(),
           Value<String?> description = const Value.absent(),
           Value<String?> remark = const Value.absent(),
+          Value<int?> customerId = const Value.absent(),
           Value<String?> customerName = const Value.absent(),
           Value<String?> customerPhone = const Value.absent(),
           Value<String?> customerAddress = const Value.absent(),
@@ -2020,6 +2046,7 @@ class Order extends DataClass implements Insertable<Order> {
         orderName: orderName.present ? orderName.value : this.orderName,
         description: description.present ? description.value : this.description,
         remark: remark.present ? remark.value : this.remark,
+        customerId: customerId.present ? customerId.value : this.customerId,
         customerName:
             customerName.present ? customerName.value : this.customerName,
         customerPhone:
@@ -2047,6 +2074,8 @@ class Order extends DataClass implements Insertable<Order> {
       description:
           data.description.present ? data.description.value : this.description,
       remark: data.remark.present ? data.remark.value : this.remark,
+      customerId:
+          data.customerId.present ? data.customerId.value : this.customerId,
       customerName: data.customerName.present
           ? data.customerName.value
           : this.customerName,
@@ -2083,6 +2112,7 @@ class Order extends DataClass implements Insertable<Order> {
           ..write('orderName: $orderName, ')
           ..write('description: $description, ')
           ..write('remark: $remark, ')
+          ..write('customerId: $customerId, ')
           ..write('customerName: $customerName, ')
           ..write('customerPhone: $customerPhone, ')
           ..write('customerAddress: $customerAddress, ')
@@ -2105,6 +2135,7 @@ class Order extends DataClass implements Insertable<Order> {
       orderName,
       description,
       remark,
+      customerId,
       customerName,
       customerPhone,
       customerAddress,
@@ -2125,6 +2156,7 @@ class Order extends DataClass implements Insertable<Order> {
           other.orderName == this.orderName &&
           other.description == this.description &&
           other.remark == this.remark &&
+          other.customerId == this.customerId &&
           other.customerName == this.customerName &&
           other.customerPhone == this.customerPhone &&
           other.customerAddress == this.customerAddress &&
@@ -2144,6 +2176,7 @@ class OrdersCompanion extends UpdateCompanion<Order> {
   final Value<String?> orderName;
   final Value<String?> description;
   final Value<String?> remark;
+  final Value<int?> customerId;
   final Value<String?> customerName;
   final Value<String?> customerPhone;
   final Value<String?> customerAddress;
@@ -2161,6 +2194,7 @@ class OrdersCompanion extends UpdateCompanion<Order> {
     this.orderName = const Value.absent(),
     this.description = const Value.absent(),
     this.remark = const Value.absent(),
+    this.customerId = const Value.absent(),
     this.customerName = const Value.absent(),
     this.customerPhone = const Value.absent(),
     this.customerAddress = const Value.absent(),
@@ -2179,6 +2213,7 @@ class OrdersCompanion extends UpdateCompanion<Order> {
     this.orderName = const Value.absent(),
     this.description = const Value.absent(),
     this.remark = const Value.absent(),
+    this.customerId = const Value.absent(),
     this.customerName = const Value.absent(),
     this.customerPhone = const Value.absent(),
     this.customerAddress = const Value.absent(),
@@ -2197,6 +2232,7 @@ class OrdersCompanion extends UpdateCompanion<Order> {
     Expression<String>? orderName,
     Expression<String>? description,
     Expression<String>? remark,
+    Expression<int>? customerId,
     Expression<String>? customerName,
     Expression<String>? customerPhone,
     Expression<String>? customerAddress,
@@ -2215,6 +2251,7 @@ class OrdersCompanion extends UpdateCompanion<Order> {
       if (orderName != null) 'order_name': orderName,
       if (description != null) 'description': description,
       if (remark != null) 'remark': remark,
+      if (customerId != null) 'customer_id': customerId,
       if (customerName != null) 'customer_name': customerName,
       if (customerPhone != null) 'customer_phone': customerPhone,
       if (customerAddress != null) 'customer_address': customerAddress,
@@ -2236,6 +2273,7 @@ class OrdersCompanion extends UpdateCompanion<Order> {
       Value<String?>? orderName,
       Value<String?>? description,
       Value<String?>? remark,
+      Value<int?>? customerId,
       Value<String?>? customerName,
       Value<String?>? customerPhone,
       Value<String?>? customerAddress,
@@ -2253,6 +2291,7 @@ class OrdersCompanion extends UpdateCompanion<Order> {
       orderName: orderName ?? this.orderName,
       description: description ?? this.description,
       remark: remark ?? this.remark,
+      customerId: customerId ?? this.customerId,
       customerName: customerName ?? this.customerName,
       customerPhone: customerPhone ?? this.customerPhone,
       customerAddress: customerAddress ?? this.customerAddress,
@@ -2282,6 +2321,9 @@ class OrdersCompanion extends UpdateCompanion<Order> {
     }
     if (remark.present) {
       map['remark'] = Variable<String>(remark.value);
+    }
+    if (customerId.present) {
+      map['customer_id'] = Variable<int>(customerId.value);
     }
     if (customerName.present) {
       map['customer_name'] = Variable<String>(customerName.value);
@@ -2329,6 +2371,7 @@ class OrdersCompanion extends UpdateCompanion<Order> {
           ..write('orderName: $orderName, ')
           ..write('description: $description, ')
           ..write('remark: $remark, ')
+          ..write('customerId: $customerId, ')
           ..write('customerName: $customerName, ')
           ..write('customerPhone: $customerPhone, ')
           ..write('customerAddress: $customerAddress, ')
@@ -4459,6 +4502,7 @@ typedef $$OrdersTableCreateCompanionBuilder = OrdersCompanion Function({
   Value<String?> orderName,
   Value<String?> description,
   Value<String?> remark,
+  Value<int?> customerId,
   Value<String?> customerName,
   Value<String?> customerPhone,
   Value<String?> customerAddress,
@@ -4477,6 +4521,7 @@ typedef $$OrdersTableUpdateCompanionBuilder = OrdersCompanion Function({
   Value<String?> orderName,
   Value<String?> description,
   Value<String?> remark,
+  Value<int?> customerId,
   Value<String?> customerName,
   Value<String?> customerPhone,
   Value<String?> customerAddress,
@@ -4530,6 +4575,9 @@ class $$OrdersTableFilterComposer
 
   ColumnFilters<String> get remark => $composableBuilder(
       column: $table.remark, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get customerId => $composableBuilder(
+      column: $table.customerId, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get customerName => $composableBuilder(
       column: $table.customerName, builder: (column) => ColumnFilters(column));
@@ -4613,6 +4661,9 @@ class $$OrdersTableOrderingComposer
   ColumnOrderings<String> get remark => $composableBuilder(
       column: $table.remark, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<int> get customerId => $composableBuilder(
+      column: $table.customerId, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get customerName => $composableBuilder(
       column: $table.customerName,
       builder: (column) => ColumnOrderings(column));
@@ -4675,6 +4726,9 @@ class $$OrdersTableAnnotationComposer
 
   GeneratedColumn<String> get remark =>
       $composableBuilder(column: $table.remark, builder: (column) => column);
+
+  GeneratedColumn<int> get customerId => $composableBuilder(
+      column: $table.customerId, builder: (column) => column);
 
   GeneratedColumn<String> get customerName => $composableBuilder(
       column: $table.customerName, builder: (column) => column);
@@ -4761,6 +4815,7 @@ class $$OrdersTableTableManager extends RootTableManager<
             Value<String?> orderName = const Value.absent(),
             Value<String?> description = const Value.absent(),
             Value<String?> remark = const Value.absent(),
+            Value<int?> customerId = const Value.absent(),
             Value<String?> customerName = const Value.absent(),
             Value<String?> customerPhone = const Value.absent(),
             Value<String?> customerAddress = const Value.absent(),
@@ -4779,6 +4834,7 @@ class $$OrdersTableTableManager extends RootTableManager<
             orderName: orderName,
             description: description,
             remark: remark,
+            customerId: customerId,
             customerName: customerName,
             customerPhone: customerPhone,
             customerAddress: customerAddress,
@@ -4797,6 +4853,7 @@ class $$OrdersTableTableManager extends RootTableManager<
             Value<String?> orderName = const Value.absent(),
             Value<String?> description = const Value.absent(),
             Value<String?> remark = const Value.absent(),
+            Value<int?> customerId = const Value.absent(),
             Value<String?> customerName = const Value.absent(),
             Value<String?> customerPhone = const Value.absent(),
             Value<String?> customerAddress = const Value.absent(),
@@ -4815,6 +4872,7 @@ class $$OrdersTableTableManager extends RootTableManager<
             orderName: orderName,
             description: description,
             remark: remark,
+            customerId: customerId,
             customerName: customerName,
             customerPhone: customerPhone,
             customerAddress: customerAddress,

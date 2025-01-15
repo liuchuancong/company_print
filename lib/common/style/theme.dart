@@ -50,10 +50,9 @@ class MyTheme {
         // 填充颜色
         filled: true,
         fillColor: Colors.white,
-        floatingLabelBehavior: FloatingLabelBehavior.never, // 强制标签始终浮动
+        floatingLabelBehavior: FloatingLabelBehavior.always, // 强制标签始终浮动
         floatingLabelStyle: const TextStyle(
-          color: Colors.black,
-          fontSize: 16.0,
+          fontSize: 18.0,
         ),
         // 标签文本样式
         floatingLabelAlignment: FloatingLabelAlignment.start,
@@ -104,7 +103,7 @@ class MyTheme {
         filled: true,
         fillColor: Colors.white,
         // 标签文本样式
-        labelStyle: const TextStyle(color: Colors.black, fontSize: 16.0),
+        labelStyle: const TextStyle(color: Colors.black, fontSize: 20.0),
         // 提示文本样式
         hintStyle: TextStyle(color: Colors.grey.shade700, fontSize: 16.0),
         // 错误文本样式
@@ -112,7 +111,7 @@ class MyTheme {
           color: Colors.red.shade700,
         ),
         floatingLabelAlignment: FloatingLabelAlignment.start,
-        floatingLabelBehavior: FloatingLabelBehavior.never, // 强制标签始终浮动
+        floatingLabelBehavior: FloatingLabelBehavior.always, // 强制标签始终浮动
         floatingLabelStyle: const TextStyle(
           color: Colors.black,
           fontSize: 16.0,

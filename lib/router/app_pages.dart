@@ -1,5 +1,7 @@
 import 'package:company_print/common/index.dart';
 import 'package:company_print/pages/home/home_page.dart';
+import 'package:company_print/pages/sale_details/sale_details_page.dart';
+import 'package:company_print/pages/sale_details/sale_details_binding.dart';
 import 'package:company_print/pages/customer_order_items/customer_order_items_page.dart';
 import 'package:company_print/pages/customer_order_items/customer_order_items_binding.dart';
 
@@ -19,6 +21,11 @@ class AppPages {
       name: RoutePath.kCustomerOrderItemsPage,
       page: CustomerOrderItemsPage.new,
       bindings: [CustomerOrderItemBinding()],
+    ),
+    GetPage(
+      name: RoutePath.kSaleDetails,
+      page: SaleDetailsPage.new,
+      bindings: [SaleDetailsBinding()],
     ),
   ];
 }

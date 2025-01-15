@@ -9,4 +9,6 @@ class RoutePath {
   static var kSettings = "/settings";
 
   static var kCustomerOrderItemsPage = "/customerOrderItemsPage";
+
+  static var kSaleDetails = "/saleDetails";
 }
