@@ -6,6 +6,7 @@ import 'package:cascade_widget/cascade_widget.dart';
 import 'package:company_print/common/style/app_style.dart';
 import 'package:material_text_fields/material_text_fields.dart';
 import 'package:company_print/pages/dishes/dishes_controller.dart';
+import 'package:company_print/common/widgets/section_listtile.dart';
 import 'package:company_print/pages/sale_details/sale_details_controller.dart';
 
 class SaleDetailsPage extends StatefulWidget {
@@ -49,7 +50,7 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                     icon: const Icon(Icons.import_export_outlined, color: Colors.black),
                     tooltip: '批量导入',
                     onPressed: () {
-                      controller.showMutipleOrderItemDialog();
+                      controller.showMutipleOrderItemPage();
                     },
                   ),
                   IconButton(
@@ -164,11 +165,11 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
   }
 }
 
-class EditOrderItemDialog extends StatefulWidget {
+class EditOrderItemsPage extends StatefulWidget {
   final OrderItem? orderItem; // 可选的 CustomerOrderItem，如果为 null 则表示新增
   final Function(OrderItem newOrUpdatedOrderItem) onConfirm;
   final SaleDetailsController controller;
-  const EditOrderItemDialog({
+  const EditOrderItemsPage({
     super.key,
     this.orderItem, // 如果是新增，则此参数为 null
     required this.onConfirm,
@@ -176,10 +177,10 @@ class EditOrderItemDialog extends StatefulWidget {
   });
 
   @override
-  EditOrderItemDialogState createState() => EditOrderItemDialogState();
+  EditOrderItemsPageState createState() => EditOrderItemsPageState();
 }
 
-class EditOrderItemDialogState extends State<EditOrderItemDialog> {
+class EditOrderItemsPageState extends State<EditOrderItemsPage> {
   bool isNew = false;
   late TextEditingController _itemNameController;
   late TextEditingController _itemShortNameController;
@@ -230,150 +231,168 @@ class EditOrderItemDialogState extends State<EditOrderItemDialog> {
         createdAt: isNew ? DateTime.now() : widget.orderItem!.createdAt,
       );
       widget.onConfirm(newOrUpdatedOrderItem);
-      SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
+      Get.back();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(isNew ? '新增订单' : '编辑订单'),
-      content: SizedBox(
-        width: Get.width < 600 ? Get.width * 0.9 : MediaQuery.of(context).size.width * 0.6,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SearchField(
-                key: const ValueKey('category_search_field'),
-                dynamicHeight: true,
-                maxSuggestionBoxHeight: 300,
-                suggestionState: Suggestion.expand,
-                textInputAction: TextInputAction.next,
-                selectedValue: selectedCategoryValue,
-                offset: const Offset(0, 55),
-                suggestions: widget.controller.nodes
-                    .map(
-                      (node) => SearchFieldListItem<CategoryTreeNode>(node.data.name,
-                          child: Text(node.data.name), item: node),
-                    )
-                    .toList(),
-                hint: "请选择商品名称",
-                validator: (dynamic value) {
-                  if (value == null) {
-                    return ("请选择商品名称");
-                  }
-                  return null;
-                },
-                onSuggestionTap: (SearchFieldListItem<CategoryTreeNode> x) {
-                  selectedCategoryValue = x;
-                  _itemNameController.text = x.item!.data.name;
-                  setState(() {});
-                },
-              ),
-              AppStyle.vGap4,
-              MaterialTextField(
-                controller: _itemShortNameController,
-                labelText: "备注",
-                hint: "请输入备注",
-                keyboardType: TextInputType.text,
-                textInputAction: TextInputAction.next,
-                maxLength: 100,
-              ),
-              AppStyle.vGap4,
-              SearchField(
-                key: const ValueKey('purchase_unit_search_field'),
-                dynamicHeight: true,
-                maxSuggestionBoxHeight: 300,
-                suggestionState: Suggestion.expand,
-                textInputAction: TextInputAction.next,
-                selectedValue: selectedPurchaseUnitValue,
-                offset: const Offset(0, 55),
-                suggestions: widget.controller.dishUtils
-                    .map(
-                      (node) => SearchFieldListItem<DishUnit>(node.name, child: Text(node.name), item: node),
-                    )
-                    .toList(),
-                hint: "请选择购买单位",
-                onSuggestionTap: (SearchFieldListItem<DishUnit> x) {
-                  selectedPurchaseUnitValue = x;
-                  _purchaseUnitController.text = x.item!.name;
-                  setState(() {});
-                },
-              ),
-              AppStyle.vGap4,
-              MaterialTextField(
-                controller: _purchaseQuantityController,
-                labelText: "购买数量",
-                hint: "请输入购买数量",
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                textInputAction: TextInputAction.next,
-              ),
-              AppStyle.vGap4,
-              MaterialTextField(
-                controller: _presetPriceController,
-                labelText: "购买单价",
-                hint: "请输入购买单价",
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                textInputAction: TextInputAction.next,
-              ),
-              AppStyle.vGap4,
-              SearchField(
-                dynamicHeight: true,
-                key: const ValueKey('actual_unit_search_field'),
-                maxSuggestionBoxHeight: 300,
-                suggestionState: Suggestion.expand,
-                textInputAction: TextInputAction.next,
-                selectedValue: selectedActualUnitValue,
-                offset: const Offset(0, 55),
-                suggestions: widget.controller.dishUtils
-                    .map(
-                      (node) => SearchFieldListItem<DishUnit>(node.name, child: Text(node.name), item: node),
-                    )
-                    .toList(),
-                hint: "请选择实际单位",
-                onSuggestionTap: (SearchFieldListItem<DishUnit> x) {
-                  setState(() {
-                    selectedActualUnitValue = x;
-                    _actualUnitController.text = x.item!.name;
-                  });
-                },
-              ),
-              AppStyle.vGap4,
-              MaterialTextField(
-                controller: _actualQuantityController,
-                labelText: "实际数量",
-                hint: "请输入实际数量",
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                textInputAction: TextInputAction.done,
-              ),
-              AppStyle.vGap4,
-              MaterialTextField(
-                controller: _actualPriceController,
-                labelText: "实际单价",
-                hint: "请输入实际单价",
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                textInputAction: TextInputAction.next,
-              ),
-              const SizedBox(
-                height: 400,
-              ),
-            ],
-          ),
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(isNew ? '新增订单' : '编辑订单'),
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
-          },
-          child: const Text('取消'),
-        ),
-        TextButton(
-          onPressed: _submitForm,
-          child: Text(isNew ? '新增' : '保存'),
-        ),
-      ],
+      body: Column(
+        children: [
+          Expanded(
+              child: Padding(
+            padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+            child: ListView(
+              children: [
+                const SectionTitle(title: '商品信息'),
+                SearchField(
+                  key: const ValueKey('category_search_field'),
+                  dynamicHeight: true,
+                  maxSuggestionBoxHeight: 300,
+                  suggestionState: Suggestion.expand,
+                  textInputAction: TextInputAction.next,
+                  selectedValue: selectedCategoryValue,
+                  offset: const Offset(0, 55),
+                  suggestions: widget.controller.nodes
+                      .map(
+                        (node) => SearchFieldListItem<CategoryTreeNode>(node.data.name,
+                            child: Text(node.data.name), item: node),
+                      )
+                      .toList(),
+                  hint: "请选择商品名称",
+                  validator: (dynamic value) {
+                    if (value == null) {
+                      return ("请选择商品名称");
+                    }
+                    return null;
+                  },
+                  onSuggestionTap: (SearchFieldListItem<CategoryTreeNode> x) {
+                    selectedCategoryValue = x;
+                    _itemNameController.text = x.item!.data.name;
+                    setState(() {});
+                  },
+                ),
+                AppStyle.vGap4,
+                MaterialTextField(
+                  controller: _itemShortNameController,
+                  labelText: "备注",
+                  hint: "请输入备注",
+                  keyboardType: TextInputType.text,
+                  textInputAction: TextInputAction.next,
+                  maxLength: 100,
+                ),
+                const SectionTitle(title: '购买信息'),
+                SearchField(
+                  key: const ValueKey('purchase_unit_search_field'),
+                  dynamicHeight: true,
+                  maxSuggestionBoxHeight: 300,
+                  suggestionState: Suggestion.expand,
+                  textInputAction: TextInputAction.next,
+                  selectedValue: selectedPurchaseUnitValue,
+                  offset: const Offset(0, 55),
+                  suggestions: widget.controller.dishUtils
+                      .map(
+                        (node) => SearchFieldListItem<DishUnit>(node.name, child: Text(node.name), item: node),
+                      )
+                      .toList(),
+                  hint: "请选择购买单位",
+                  onSuggestionTap: (SearchFieldListItem<DishUnit> x) {
+                    selectedPurchaseUnitValue = x;
+                    _purchaseUnitController.text = x.item!.name;
+                    setState(() {});
+                  },
+                ),
+                AppStyle.vGap4,
+                MaterialTextField(
+                  controller: _purchaseQuantityController,
+                  labelText: "购买数量",
+                  hint: "请输入购买数量",
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  textInputAction: TextInputAction.next,
+                ),
+                AppStyle.vGap4,
+                MaterialTextField(
+                  controller: _presetPriceController,
+                  labelText: "购买单价",
+                  hint: "请输入购买单价",
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  textInputAction: TextInputAction.next,
+                ),
+                AppStyle.vGap4,
+                SearchField(
+                  dynamicHeight: true,
+                  key: const ValueKey('actual_unit_search_field'),
+                  maxSuggestionBoxHeight: 300,
+                  suggestionState: Suggestion.expand,
+                  textInputAction: TextInputAction.next,
+                  selectedValue: selectedActualUnitValue,
+                  offset: const Offset(0, 55),
+                  suggestions: widget.controller.dishUtils
+                      .map(
+                        (node) => SearchFieldListItem<DishUnit>(node.name, child: Text(node.name), item: node),
+                      )
+                      .toList(),
+                  hint: "请选择实际单位",
+                  onSuggestionTap: (SearchFieldListItem<DishUnit> x) {
+                    setState(() {
+                      selectedActualUnitValue = x;
+                      _actualUnitController.text = x.item!.name;
+                    });
+                  },
+                ),
+                AppStyle.vGap4,
+                MaterialTextField(
+                  controller: _actualQuantityController,
+                  labelText: "实际数量",
+                  hint: "请输入实际数量",
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  textInputAction: TextInputAction.done,
+                ),
+                AppStyle.vGap4,
+                MaterialTextField(
+                  controller: _actualPriceController,
+                  labelText: "实际单价",
+                  hint: "请输入实际单价",
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  textInputAction: TextInputAction.next,
+                ),
+              ],
+            ),
+          )),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: SizedBox(
+              height: 50,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  FilledButton(
+                    style: ButtonStyle(
+                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
+                    ),
+                    onPressed: () {
+                      Get.back(); // 使用 SmartDialog 方法关闭对话框
+                    },
+                    child: const Text('取消', style: TextStyle(fontSize: 18)),
+                  ),
+                  const SizedBox(width: 10),
+                  FilledButton(
+                    style: ButtonStyle(
+                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
+                    ),
+                    onPressed: _submitForm,
+                    child: Text(isNew ? '新增' : '保存', style: const TextStyle(fontSize: 18)),
+                  ),
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 
@@ -449,20 +468,20 @@ class SaleDetailsDataSource extends AsyncDataTableSource {
   }
 }
 
-class MutipleOrderItemDialog extends StatefulWidget {
+class MutipleOrderItemPage extends StatefulWidget {
   final Function(OrderItem newOrUpdatedOrderItem, List<DropDownMenuModel> itemNames) onConfirm;
   final SaleDetailsController controller;
-  const MutipleOrderItemDialog({
+  const MutipleOrderItemPage({
     super.key,
     required this.onConfirm,
     required this.controller,
   });
 
   @override
-  MutipleOrderItemDialogDialogState createState() => MutipleOrderItemDialogDialogState();
+  MutipleOrderItemPageDialogState createState() => MutipleOrderItemPageDialogState();
 }
 
-class MutipleOrderItemDialogDialogState extends State<MutipleOrderItemDialog> {
+class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
   late TextEditingController _itemShortNameController;
   late TextEditingController _purchaseUnitController;
   late TextEditingController _purchaseQuantityController;
@@ -505,7 +524,7 @@ class MutipleOrderItemDialogDialogState extends State<MutipleOrderItemDialog> {
     );
 
     widget.onConfirm(newOrUpdatedOrderItem, selectedItems);
-    SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
+    Get.back();
   }
 
   @override
@@ -648,7 +667,7 @@ class MutipleOrderItemDialogDialogState extends State<MutipleOrderItemDialog> {
       actions: [
         TextButton(
           onPressed: () {
-            SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
+            Get.back();
           },
           child: const Text('取消'),
         ),

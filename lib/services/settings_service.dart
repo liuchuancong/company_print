@@ -39,6 +39,7 @@ class SettingsService extends GetxController {
     Get.changeTheme(lightTheme);
     Get.changeTheme(darkTheme);
   }
+  // 0052d9
 
   final themeColorSwitch = (PrefUtil.getString('themeColorSwitch') ?? Colors.blue.hex).obs;
 

@@ -115,7 +115,7 @@ class SaleDetailsController extends GetxController {
   void showCreateCustomerDialog() {
     SmartDialog.show(
       builder: (context) {
-        return EditOrderItemDialog(
+        return EditOrderItemsPage(
           controller: this,
           onConfirm: (orderItem) => addCustomerOrderItem(
             orderItem.itemName!,
@@ -134,16 +134,12 @@ class SaleDetailsController extends GetxController {
     );
   }
 
-  void showMutipleOrderItemDialog() {
-    SmartDialog.show(
-      builder: (context) {
-        return MutipleOrderItemDialog(
-            controller: this,
-            onConfirm: (orderItem, itemNames) {
-              handleMutipleOrderItem(itemNames, orderItem);
-            });
-      },
-    );
+  void showMutipleOrderItemPage() {
+    Get.to(() => MutipleOrderItemPage(
+        controller: this,
+        onConfirm: (orderItem, itemNames) {
+          handleMutipleOrderItem(itemNames, orderItem);
+        }));
   }
 
   void handleMutipleOrderItem(List<DropDownMenuModel> itemNames, OrderItem orderItem) async {
@@ -207,9 +203,7 @@ class SaleDetailsController extends GetxController {
   }
 
   void showEditCustomerDialog(OrderItem customerOrderItem) {
-    SmartDialog.show(
-      builder: (context) {
-        return EditOrderItemDialog(
+    Get.to(() => EditOrderItemsPage(
           controller: this,
           orderItem: customerOrderItem,
           onConfirm: (orderItem) => updateCustomerOrderItem(
@@ -225,9 +219,7 @@ class SaleDetailsController extends GetxController {
             orderItem.advancePayment!,
             orderItem.totalPrice!,
           ),
-        );
-      },
-    );
+        ));
   }
 
   Future<void> addCustomerOrderItem(
