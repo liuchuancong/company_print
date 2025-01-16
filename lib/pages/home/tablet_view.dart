@@ -103,7 +103,7 @@ class HomeTabletView extends StatelessWidget {
                     label: const Text('统计分析'),
                   ),
                 ],
-                selectedIndex: index > 2 ? 0 : index,
+                selectedIndex: index,
                 onDestinationSelected: onDestinationSelected,
               ),
               const VerticalDivider(width: 1),

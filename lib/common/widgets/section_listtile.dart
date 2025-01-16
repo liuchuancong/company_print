@@ -48,7 +48,7 @@ class SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
       title: Text(
         title,
         style: Theme.of(context).textTheme.titleLarge?.copyWith(

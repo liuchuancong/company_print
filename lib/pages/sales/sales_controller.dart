@@ -19,6 +19,7 @@ class SalesController extends BasePageController {
   var dateRange = <DateTime>[Utils.getStartOfDay(DateTime.now()), Utils.getEndOfDay(DateTime.now())].obs;
   TextEditingController searchController = TextEditingController();
   List<DateTime> currentDates = [];
+  FocusNode searchFocusNode = FocusNode();
   final refreshController = EasyRefreshController(
     controlFinishRefresh: true,
     controlFinishLoad: true,
@@ -116,12 +117,12 @@ class SalesController extends BasePageController {
                 lastDate: DateTime.now(),
                 controlsTextStyle: const TextStyle(color: Colors.black, fontSize: 18),
                 dayTextStyle: const TextStyle(color: Colors.black, fontSize: 18),
-                monthTextStyle: const TextStyle(fontSize: 18),
+                monthTextStyle: const TextStyle(fontSize: 18, color: Colors.black),
                 selectedDayTextStyle: const TextStyle(fontSize: 18, color: Colors.white),
                 yearTextStyle: const TextStyle(fontSize: 18),
                 selectedRangeHighlightColor: Theme.of(Get.context!).primaryColor,
                 weekdayLabelTextStyle: const TextStyle(fontSize: 18),
-                selectedMonthTextStyle: const TextStyle(fontSize: 18, color: Colors.black),
+                selectedMonthTextStyle: const TextStyle(fontSize: 18, color: Colors.white),
                 selectedRangeDayTextStyle: const TextStyle(fontSize: 18, color: Colors.white),
                 selectedYearTextStyle: const TextStyle(fontSize: 18, color: Colors.white),
               ),
@@ -159,6 +160,7 @@ class SalesController extends BasePageController {
       dateRange([startOfDay, endOfDay]);
       refreshData();
     }
+    searchFocusNode.unfocus();
   }
 
   @override

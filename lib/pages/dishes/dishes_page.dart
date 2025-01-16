@@ -29,7 +29,9 @@ class _DishesPageState extends State<DishesPage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final controller = Get.find<DishesController>();
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: const Text('商品分类'),
+      ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
@@ -39,14 +41,88 @@ class _DishesPageState extends State<DishesPage> with TickerProviderStateMixin {
       body: Obx(
         () => controller.isLoading.value
             ? const Center(child: CircularProgressIndicator())
-            : Obx(() => TDTreeSelect(
-                  height: double.infinity,
-                  style: TDTreeSelectStyle.outline,
-                  options: controller.nodes.value,
-                  onChange: (val, level) {
-                    print('$val, $level');
-                  },
-                )),
+            : Padding(
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 15.0, right: 15.0),
+                child: CustomScrollView(
+                  slivers: [
+                    Obx(() => SliverTreeView.simpleTyped<CategoryTreeNode, TreeNode<CategoryTreeNode>>(
+                          tree: TreeNode.root()..addAll(controller.nodes),
+                          showRootNode: false,
+                          expansionIndicatorBuilder: (context, node) {
+                            if (node.isRoot) {
+                              return PlusMinusIndicator(
+                                tree: node,
+                                padding: const EdgeInsets.only(left: 5.0, right: 5),
+                                alignment: Alignment.centerLeft,
+                                color: Colors.white,
+                              );
+                            }
+
+                            return ChevronIndicator.rightDown(
+                              tree: node,
+                              padding: const EdgeInsets.only(left: 5.0, right: 5),
+                              alignment: Alignment.centerLeft,
+                              color: Colors.white,
+                            );
+                          },
+                          indentation: Indentation(
+                            style: IndentStyle.roundJoint,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          builder: (context, node) => Container(
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 2.0,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              color: Theme.of(context).primaryColor.withAlpha(200),
+                            ),
+                            child: ListTile(
+                              title: Container(
+                                margin: const EdgeInsets.only(left: 15.0),
+                                child: Text('商品名称: ${node.data!.data.name}',
+                                    style: const TextStyle(fontSize: 18.0, color: Colors.white)),
+                              ),
+                              subtitle: Container(
+                                margin: const EdgeInsets.only(left: 15.0),
+                                child: Text('商品描述: ${node.data!.data.description}',
+                                    style: const TextStyle(fontSize: 16.0, color: Colors.white)),
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  TextButton(
+                                    onPressed: () {
+                                      controller.showEditCategoryDialog(node.data!.data);
+                                    },
+                                    child: const Text(
+                                      '编辑',
+                                      style: TextStyle(
+                                        fontSize: 16.0,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      controller.deleteCategory(node.data!.data.id);
+                                    },
+                                    child: const Text(
+                                      '删除',
+                                      style: TextStyle(
+                                        fontSize: 16.0,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ))
+                  ],
+                ),
+              ),
       ),
     );
   }
@@ -186,7 +262,51 @@ class EditOrCreateCategoryDialogState extends State<EditOrCreateCategoryDialog> 
             children: <Widget>[
               Expanded(
                 child: Padding(
-                    padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 15.0, right: 15.0), child: Container()),
+                  padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 15.0, right: 15.0),
+                  child: CustomScrollView(
+                    slivers: [
+                      Obx(() => SliverTreeView.simpleTyped<CategoryTreeNode, TreeNode<CategoryTreeNode>>(
+                            tree: TreeNode.root()..addAll(widget.controller.nodes),
+                            showRootNode: false,
+                            expansionIndicatorBuilder: (context, node) {
+                              if (node.isRoot) {
+                                return PlusMinusIndicator(
+                                  tree: node,
+                                  alignment: Alignment.centerLeft,
+                                  color: Colors.black,
+                                );
+                              }
+                              return ChevronIndicator.rightDown(
+                                tree: node,
+                                alignment: Alignment.centerLeft,
+                                color: Colors.black,
+                              );
+                            },
+                            indentation: const Indentation(),
+                            builder: (context, node) => Container(
+                              padding: const EdgeInsets.only(left: 25.0, right: 16.0, top: 2.0, bottom: 2.0),
+                              child: ListTile(
+                                title: Text(node.data!.data.name, style: const TextStyle(fontSize: 18.0)),
+                                subtitle: Text(node.data!.data.description, style: const TextStyle(fontSize: 16.0)),
+                                onTap: () {
+                                  _parentIdController.text = node.data!.data.name.toString();
+                                  parentId = node.data!.data.id;
+                                  SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
+                                },
+                                trailing: ElevatedButton(
+                                  onPressed: () {
+                                    _parentIdController.text = node.data!.data.name.toString();
+                                    parentId = node.data!.data.id;
+                                    SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
+                                  },
+                                  child: const Text('选择'),
+                                ),
+                              ),
+                            ),
+                          ))
+                    ],
+                  ),
+                ),
               ),
               const SizedBox(height: 16), // 确保 BottomSheet 不会被键盘遮挡
               Align(

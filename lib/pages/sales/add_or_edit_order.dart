@@ -198,71 +198,77 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                       },
                     ),
                   if (!isNew)
-                    MaterialTextField(
-                      controller: _customerNameController,
-                      labelText: "客户姓名",
-                      hint: "请输入客户姓名",
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
+                    InputTextField(
+                      labelText: '客户姓名',
+                      gap: 10,
+                      child: TextField(
+                        controller: _customerNameController,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.next,
+                      ),
                     ),
-                  if (!isNew) AppStyle.vGap4,
                   if (!isNew)
-                    MaterialTextField(
-                      controller: _customerPhoneController,
-                      labelText: "客户电话",
-                      hint: "请输入客户电话",
-                      keyboardType: TextInputType.phone,
-                      textInputAction: TextInputAction.next,
+                    InputTextField(
+                      labelText: '客户电话',
+                      gap: 10,
+                      child: TextField(
+                        controller: _customerPhoneController,
+                        keyboardType: TextInputType.phone,
+                        textInputAction: TextInputAction.next,
+                      ),
                     ),
-                  if (!isNew) AppStyle.vGap4,
                   if (!isNew)
-                    MaterialTextField(
-                      controller: _customerAddressController,
-                      labelText: "客户地址",
-                      hint: "请输入客户地址",
-                      keyboardType: TextInputType.streetAddress,
-                      textInputAction: TextInputAction.next,
+                    InputTextField(
+                      labelText: '客户地址',
+                      gap: 10,
+                      child: TextField(
+                        controller: _customerAddressController,
+                        keyboardType: TextInputType.streetAddress,
+                        textInputAction: TextInputAction.next,
+                      ),
                     ),
                   const SectionTitle(title: '订单信息'),
-                  if (!isNew) AppStyle.vGap4,
                   if (!isNew)
-                    MaterialTextField(
-                      controller: _itemCountController,
-                      labelText: "商品数量",
-                      hint: "请输入商品数量",
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      textInputAction: TextInputAction.next,
+                    InputTextField(
+                      labelText: '商品数量',
+                      gap: 10,
+                      child: TextField(
+                        controller: _itemCountController,
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        textInputAction: TextInputAction.next,
+                      ),
                     ),
-                  if (!isNew) AppStyle.vGap4,
                   if (!isNew)
-                    TextField(
-                      controller: _dateController,
-                      maxLines: null,
-                      readOnly: true,
-                      textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                        labelText: "创建日期",
-                        suffixIcon: IconButton(
-                          icon: const Icon(
-                            Icons.calendar_month_outlined,
-                            size: 30,
+                    InputTextField(
+                      labelText: '创建日期',
+                      gap: 10,
+                      child: TextField(
+                        readOnly: true,
+                        controller: _dateController,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            icon: const Icon(
+                              Icons.calendar_month_outlined,
+                              size: 30,
+                            ),
+                            onPressed: () {
+                              showDateTimerPicker();
+                            },
                           ),
-                          onPressed: () {
-                            showDateTimerPicker();
-                          },
                         ),
                       ),
                     ),
-                  AppStyle.vGap4,
-                  MaterialTextField(
-                    labelText: "备注",
-                    hint: "请输入备注",
-                    controller: _remarkController,
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    textInputAction: TextInputAction.next,
+                  InputTextField(
+                    labelText: '备注',
+                    gap: 10,
+                    child: TextField(
+                      controller: _remarkController,
+                      textInputAction: TextInputAction.next,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                    ),
                   ),
-                  if (!isNew) AppStyle.vGap4,
                   if (!isNew)
                     CheckboxListTile(
                       contentPadding: const EdgeInsets.all(0),
@@ -275,32 +281,35 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                       },
                     ),
                   if (!isNew) const SectionTitle(title: '费用信息'),
-                  if (!isNew) AppStyle.vGap4,
                   if (!isNew)
-                    MaterialTextField(
-                      controller: _totalPriceController,
-                      labelText: "总价",
-                      hint: "请输入总价",
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      textInputAction: TextInputAction.next,
+                    InputTextField(
+                      labelText: '总价',
+                      gap: 10,
+                      child: TextField(
+                        controller: _totalPriceController,
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        textInputAction: TextInputAction.next,
+                      ),
                     ),
-                  if (!isNew) AppStyle.vGap4,
                   if (!isNew)
-                    MaterialTextField(
-                      controller: _advancePaymentController,
-                      labelText: "垫付金额",
-                      hint: "请输入垫付金额",
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      textInputAction: TextInputAction.next,
+                    InputTextField(
+                      labelText: '垫付金额',
+                      gap: 10,
+                      child: TextField(
+                        controller: _advancePaymentController,
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        textInputAction: TextInputAction.next,
+                      ),
                     ),
-                  if (!isNew) AppStyle.vGap4,
                   if (!isNew)
-                    MaterialTextField(
-                      controller: _shippingFeeController,
-                      labelText: "运费",
-                      hint: "请输入运费",
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      textInputAction: TextInputAction.done,
+                    InputTextField(
+                      labelText: '运费',
+                      gap: 10,
+                      child: TextField(
+                        controller: _shippingFeeController,
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        textInputAction: TextInputAction.next,
+                      ),
                     ),
                   const SectionTitle(title: '司机信息'),
                   if (isNew) AppStyle.vGap4,
@@ -327,30 +336,34 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                       },
                     ),
                   if (!isNew)
-                    MaterialTextField(
-                      controller: _driverNameController,
-                      labelText: "司机姓名",
-                      hint: "请输入司机姓名",
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
+                    InputTextField(
+                      labelText: '司机姓名',
+                      gap: 10,
+                      child: TextField(
+                        controller: _driverNameController,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.next,
+                      ),
                     ),
-                  if (!isNew) AppStyle.vGap4,
                   if (!isNew)
-                    MaterialTextField(
-                      controller: _driverPhoneController,
-                      labelText: "司机电话",
-                      hint: "请输入司机电话",
-                      keyboardType: TextInputType.phone,
-                      textInputAction: TextInputAction.next,
+                    InputTextField(
+                      labelText: '司机电话',
+                      gap: 10,
+                      child: TextField(
+                        controller: _driverPhoneController,
+                        keyboardType: TextInputType.phone,
+                        textInputAction: TextInputAction.next,
+                      ),
                     ),
-                  if (!isNew) AppStyle.vGap4,
                   if (!isNew)
-                    MaterialTextField(
-                      controller: _vehiclePlateNumberController,
-                      labelText: "车牌号",
-                      hint: "请输入车牌号",
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
+                    InputTextField(
+                      labelText: '司机电话',
+                      gap: 10,
+                      child: TextField(
+                        controller: _vehiclePlateNumberController,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.done,
+                      ),
                     ),
                 ],
               ),

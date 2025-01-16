@@ -43,18 +43,14 @@ class _MyAppState extends State<MyApp> {
       ThemeData lightTheme = MyTheme(primaryColor: themeColor).lightThemeData;
       ThemeData darkTheme = MyTheme(primaryColor: themeColor).darkThemeData;
       return ScreenUtilInit(
-        designSize: const Size(360, 690),
+        designSize: const Size(1280, 800),
         minTextAdapt: true,
         splitScreenMode: true,
         child: GetMaterialApp(
           title: '账单记录',
           themeMode: SettingsService.themeModes[settings.themeModeName.value]!,
-          theme: lightTheme
-              .copyWith(appBarTheme: const AppBarTheme(surfaceTintColor: Colors.transparent))
-              .useSystemChineseFont(Brightness.light),
-          darkTheme: darkTheme
-              .copyWith(appBarTheme: const AppBarTheme(surfaceTintColor: Colors.transparent))
-              .useSystemChineseFont(Brightness.dark),
+          theme: lightTheme.useSystemChineseFont(Brightness.light),
+          darkTheme: darkTheme.useSystemChineseFont(Brightness.dark),
           navigatorObservers: [FlutterSmartDialog.observer],
           initialRoute: RoutePath.kInitial,
           defaultTransition: Transition.native,
@@ -79,7 +75,7 @@ class _MyAppState extends State<MyApp> {
             //字体大小不跟随系统变化
             builder: (context, child) => MediaQuery(
               data: MediaQuery.of(context).copyWith(
-                textScaler: const TextScaler.linear(1),
+                textScaler: const TextScaler.linear(1.1),
               ),
               child: child!,
             ),

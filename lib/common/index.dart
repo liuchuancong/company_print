@@ -16,4 +16,4 @@ export 'package:hugeicons/hugeicons.dart';
 export 'package:company_print/database/database_manager.dart';
 export 'package:company_print/database/db.dart';
 
-export 'package:tdesign_flutter/tdesign_flutter.dart';
+export 'package:company_print/common/widgets/input_text_filed.dart';

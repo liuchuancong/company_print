@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:company_print/utils/utils.dart';
 import 'package:company_print/common/index.dart';
 import 'package:animated_tree_view/animated_tree_view.dart';
 import 'package:company_print/pages/dishes/dishes_page.dart';
@@ -7,7 +8,7 @@ import 'package:company_print/pages/dishes/dishes_page.dart';
 class DishesController extends GetxController {
   final AppDatabase database = DatabaseManager.instance.appDatabase;
   final List<DishesCategoryData> categories = <DishesCategoryData>[].obs;
-  var nodes = <TDSelectOption>[].obs; // 分类哈希表
+  var nodes = <TreeNode<CategoryTreeNode>>[].obs; // 分类哈希表
   final RxList<int> pathStack = <int>[].obs; // 维护路径栈
   GlobalKey menuViewKey = GlobalKey();
   var isLoading = false.obs; // 添加一个加载状态标记
@@ -21,39 +22,39 @@ class DishesController extends GetxController {
     isLoading(true);
     final result = await database.dishesCategoryDao.getAllCategories();
     categories.assignAll(result);
-    nodes.assignAll(buildTree(result));
+    nodes.assignAll(generateTreeNodes(buildTree(result)));
     log(result.toString());
     await Future.delayed(const Duration(milliseconds: 20));
     isLoading(false);
   }
 
-  List<TDSelectOption> generateTreeNodes(List<CategoryTreeNode> nodes) {
+  List<TreeNode<CategoryTreeNode>> generateTreeNodes(List<CategoryTreeNode> nodes) {
     return nodes.map((node) {
-      final currentNode = TDSelectOption(label: node.data.name.toString(), value: node.data.id, children: []);
+      final currentNode = TreeNode<CategoryTreeNode>(
+        key: node.data.id.toString(),
+        data: node,
+      );
       if (node.children.isNotEmpty) {
         final filteredChildren = node.children;
 
         if (filteredChildren.isNotEmpty) {
           final children = generateTreeNodes(filteredChildren); // 递归调用并添加所有子节点
-          currentNode.children.addAll(children);
+          currentNode.addAll(children);
         }
       }
       return currentNode;
     }).toList();
   }
 
-  List<TDSelectOption> buildTree(List<DishesCategoryData> data) {
+  List<CategoryTreeNode> buildTree(List<DishesCategoryData> data) {
     final Map<int, CategoryTreeNode> nodeMap = {};
     for (var item in data) {
       nodeMap[item.id] = CategoryTreeNode(data: item);
     }
-    final List<TDSelectOption> rootNodes = [];
+    final List<CategoryTreeNode> rootNodes = [];
     for (var item in data) {
       if (item.parentId == null) {
-        rootNodes.add(TDSelectOption(
-          label: item.name.toString(),
-          value: item.id,
-        ));
+        rootNodes.add(nodeMap[item.id]!);
       } else {
         final parentNode = nodeMap[item.parentId];
         if (parentNode != null) {
@@ -112,8 +113,11 @@ class DishesController extends GetxController {
   }
 
   Future<void> deleteCategory(int id) async {
-    await database.dishesCategoryDao.deleteCategory(id);
-    fetchCategories();
+    var result = await Utils.showAlertDialog('确认删除该商品以及子分类？', title: '提示');
+    if (result == true) {
+      await database.dishesCategoryDao.deleteCategory(id);
+      fetchCategories();
+    }
   }
 
   // 添加路径

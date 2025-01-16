@@ -27,7 +27,7 @@ class MenuButton extends GetView {
           padding: EdgeInsets.symmetric(horizontal: 12),
           child: MenuListTile(
             leading: Icon(Icons.settings_rounded),
-            text: 'Settings',
+            text: '设置',
           ),
         )
       ],

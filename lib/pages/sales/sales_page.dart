@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:searchfield/searchfield.dart';
 import 'package:company_print/common/index.dart';
+import 'package:company_print/common/style/app_style.dart';
 import 'package:company_print/common/widgets/menu_button.dart';
 import 'package:company_print/pages/sales/order_grid_view.dart';
 import 'package:company_print/pages/sales/sales_controller.dart';
@@ -39,17 +40,40 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
         title: TextField(
           controller: controller.searchController,
           autofocus: false,
+          focusNode: controller.searchFocusNode,
           decoration: InputDecoration(
-            hintText: '请选择客户名称',
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
+            hintText: '请输入客户名称',
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
             contentPadding: const EdgeInsets.symmetric(horizontal: 10.0),
             suffixIcon: IconButton(
-                onPressed: () {
-                  controller.searchController.text = "";
-                  controller.searchQuery.value = "";
-                },
-                icon: const Icon(Icons.clear)),
-            prefixIcon: IconButton(onPressed: () {}, icon: const Icon(Icons.supervised_user_circle_outlined)),
+              onPressed: () {
+                controller.searchController.text = "";
+                controller.searchQuery.value = "";
+              },
+              icon: const Icon(Icons.clear),
+            ),
+            prefixIcon: GestureDetector(
+              onTap: () {},
+              child: Container(
+                height: 48,
+                width: 100,
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.only(topLeft: Radius.circular(5), bottomLeft: Radius.circular(5)),
+                  color: Theme.of(context).primaryColor,
+                ),
+                margin: const EdgeInsets.only(left: 0, right: 10),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    margin: const EdgeInsets.only(left: 10),
+                    child: const Text(
+                      '选择客户',
+                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
         actions: [
@@ -62,102 +86,22 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
               controller.showDateTimerPicker();
             },
           ),
+          IconButton(
+            icon: const Icon(
+              Icons.add_circle_outline,
+              size: 30,
+            ),
+            onPressed: () {
+              controller.showAddOrEditOrderPage();
+            },
+          ),
+          AppStyle.hGap20,
         ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            height: 80,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                IconButton(
-                  icon: const Icon(
-                    Icons.search,
-                    size: 30,
-                  ),
-                  onPressed: () {
-                    // 处理搜索图标点击事件
-                  },
-                ),
-                const Expanded(
-                  child: TDSearchBar(
-                    placeHolder: '搜索预设文案',
-                    style: TDSearchStyle.square,
-                    autoFocus: false,
-                  ),
-                ),
-
-                // Expanded(
-                //   child: Obx(() => SearchField(
-                //         key: const ValueKey('search_field'),
-                //         dynamicHeight: true,
-                //         maxSuggestionBoxHeight: 300,
-                //         offset: const Offset(0, 55),
-                //         suggestionState: Suggestion.expand,
-                //         textInputAction: TextInputAction.next,
-                //         selectedValue: searchFieldListItem,
-                //         suggestions: controller.customerNames
-                //             .map(
-                //               (node) => SearchFieldListItem<String>(node, child: Text(node), item: node),
-                //             )
-                //             .toList(),
-                //         hint: "请选择客户名称",
-                //         onSuggestionTap: (SearchFieldListItem<String> x) {
-                //           setState(() {
-                //             searchFieldListItem = x;
-                //             controller.searchQuery.value = x.item!;
-                //           });
-                //           controller.refreshData();
-                //         },
-                //       )),
-                // ),
-                // IconButton(
-                //   icon: const Icon(
-                //     Icons.clear,
-                //     size: 30,
-                //   ),
-                //   onPressed: () {
-                //     setState(() {
-                //       searchFieldListItem = null;
-                //       controller.searchQuery.value = "";
-                //     });
-                //     controller.refreshData();
-                //   },
-                // ),
-                // IconButton(
-                //   icon: const Icon(
-                //     Icons.calendar_month_outlined,
-                //     size: 30,
-                //   ),
-                //   onPressed: () {
-                //     controller.showDateTimerPicker();
-                //   },
-                // ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                FilledButton(
-                  onPressed: () {
-                    controller.showAddOrEditOrderPage();
-                  },
-                  child: const Text('新增订单'),
-                )
-              ],
-            ),
-          ),
-          Expanded(child: OrderGridView(controller: controller))
-        ],
+        children: [Expanded(child: OrderGridView(controller: controller))],
       ),
     );
   }

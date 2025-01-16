@@ -32,7 +32,7 @@ class _CustomerOrderItemsPageState extends State<CustomerOrderItemsPage> {
     final controller = Get.find<CustomerOrderItemsController>();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('用户常用商品'),
+        title: const Text('用户商品管理'),
       ),
       body: Column(
         children: [
