@@ -38,7 +38,6 @@ class _CustomersPageState extends State<CustomersPage> with AutomaticKeepAliveCl
                 return const Center(child: CircularProgressIndicator());
               }
               return AsyncPaginatedDataTable2(
-                horizontalMargin: 10,
                 header: Container(),
                 actions: [
                   IconButton(
@@ -57,15 +56,23 @@ class _CustomersPageState extends State<CustomersPage> with AutomaticKeepAliveCl
                   ),
                 ],
                 checkboxHorizontalMargin: 10,
+                horizontalMargin: 10,
                 wrapInCard: true,
                 rowsPerPage: controller.rowsPerPage.value,
                 onRowsPerPageChanged: controller.handleRowsPerPageChanged,
                 sortColumnIndex: controller.sortColumnIndex.value,
                 sortAscending: controller.sortAscending.value,
-                minWidth: 500,
+                columnSpacing: 1,
+                minWidth: 800,
                 isVerticalScrollBarVisible: true,
                 isHorizontalScrollBarVisible: true,
+                fixedLeftColumns: 1,
                 columns: [
+                  const DataColumn2(
+                    label: Text('操作'),
+                    fixedWidth: 200,
+                    headingRowAlignment: MainAxisAlignment.center,
+                  ),
                   DataColumn2(
                     label: const Text('姓名'),
                     fixedWidth: 80,
@@ -82,11 +89,6 @@ class _CustomersPageState extends State<CustomersPage> with AutomaticKeepAliveCl
                     label: const Text('地址'),
                     headingRowAlignment: MainAxisAlignment.center,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
-                  ),
-                  const DataColumn2(
-                    label: Text('操作'),
-                    fixedWidth: 200,
-                    headingRowAlignment: MainAxisAlignment.center,
                   ),
                 ],
                 fit: FlexFit.tight,
@@ -259,9 +261,6 @@ class CustomersDataSource extends AsyncDataTableSource {
           return DataRow(
             key: ValueKey<int>(custom.id),
             cells: [
-              DataCell(Text(custom.name ?? '')),
-              DataCell(Text(custom.phone ?? '')),
-              DataCell(Text(custom.address ?? '')),
               DataCell(
                 Row(
                   children: [
@@ -295,7 +294,10 @@ class CustomersDataSource extends AsyncDataTableSource {
                     ),
                   ],
                 ),
-              )
+              ),
+              DataCell(Text(custom.name ?? '')),
+              DataCell(Text(custom.phone ?? '')),
+              DataCell(Text(custom.address ?? '')),
             ],
           );
         }).toList());

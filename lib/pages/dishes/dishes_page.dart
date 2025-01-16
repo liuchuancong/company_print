@@ -39,57 +39,14 @@ class _DishesPageState extends State<DishesPage> with TickerProviderStateMixin {
       body: Obx(
         () => controller.isLoading.value
             ? const Center(child: CircularProgressIndicator())
-            : Padding(
-                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 15.0, right: 15.0),
-                child: CustomScrollView(
-                  slivers: [
-                    Obx(() => SliverTreeView.simpleTyped<CategoryTreeNode, TreeNode<CategoryTreeNode>>(
-                          tree: TreeNode.root()..addAll(controller.nodes),
-                          showRootNode: false,
-                          expansionIndicatorBuilder: (context, node) {
-                            if (node.isRoot) {
-                              return PlusMinusIndicator(
-                                tree: node,
-                                alignment: Alignment.centerLeft,
-                                color: Colors.black,
-                              );
-                            }
-
-                            return ChevronIndicator.rightDown(
-                              tree: node,
-                              alignment: Alignment.centerLeft,
-                              color: Colors.black,
-                            );
-                          },
-                          indentation: const Indentation(),
-                          builder: (context, node) => Card(
-                            margin: const EdgeInsets.only(left: 25.0, right: 16.0, top: 8.0, bottom: 8.0),
-                            child: ListTile(
-                              title: Text(node.data!.data.name, style: const TextStyle(fontSize: 18.0)),
-                              subtitle: Text(node.data!.data.description, style: const TextStyle(fontSize: 16.0)),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.edit),
-                                    onPressed: () {
-                                      controller.showEditCategoryDialog(node.data!.data);
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete),
-                                    onPressed: () {
-                                      controller.deleteCategory(node.data!.data.id);
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ))
-                  ],
-                ),
-              ),
+            : Obx(() => TDTreeSelect(
+                  height: double.infinity,
+                  style: TDTreeSelectStyle.outline,
+                  options: controller.nodes.value,
+                  onChange: (val, level) {
+                    print('$val, $level');
+                  },
+                )),
       ),
     );
   }
@@ -229,51 +186,7 @@ class EditOrCreateCategoryDialogState extends State<EditOrCreateCategoryDialog> 
             children: <Widget>[
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 15.0, right: 15.0),
-                  child: CustomScrollView(
-                    slivers: [
-                      Obx(() => SliverTreeView.simpleTyped<CategoryTreeNode, TreeNode<CategoryTreeNode>>(
-                            tree: TreeNode.root()..addAll(widget.controller.nodes),
-                            showRootNode: false,
-                            expansionIndicatorBuilder: (context, node) {
-                              if (node.isRoot) {
-                                return PlusMinusIndicator(
-                                  tree: node,
-                                  alignment: Alignment.centerLeft,
-                                  color: Colors.black,
-                                );
-                              }
-                              return ChevronIndicator.rightDown(
-                                tree: node,
-                                alignment: Alignment.centerLeft,
-                                color: Colors.black,
-                              );
-                            },
-                            indentation: const Indentation(),
-                            builder: (context, node) => Container(
-                              padding: const EdgeInsets.only(left: 25.0, right: 16.0, top: 2.0, bottom: 2.0),
-                              child: ListTile(
-                                title: Text(node.data!.data.name, style: const TextStyle(fontSize: 18.0)),
-                                subtitle: Text(node.data!.data.description, style: const TextStyle(fontSize: 16.0)),
-                                onTap: () {
-                                  _parentIdController.text = node.data!.data.name.toString();
-                                  parentId = node.data!.data.id;
-                                  SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
-                                },
-                                trailing: ElevatedButton(
-                                  onPressed: () {
-                                    _parentIdController.text = node.data!.data.name.toString();
-                                    parentId = node.data!.data.id;
-                                    SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
-                                  },
-                                  child: const Text('选择'),
-                                ),
-                              ),
-                            ),
-                          ))
-                    ],
-                  ),
-                ),
+                    padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 15.0, right: 15.0), child: Container()),
               ),
               const SizedBox(height: 16), // 确保 BottomSheet 不会被键盘遮挡
               Align(

@@ -51,7 +51,7 @@ class DishUnitsDao extends DatabaseAccessor<AppDatabase> with _$DishUnitsDaoMixi
     return result ?? 0;
   }
 
-  // 创建一个新的菜品单位
+  // 创建一个新的商品单位
   Future<int> createDishUnit(String name, String abbreviation, String? description) async {
     final entry = DishUnitsCompanion(
       name: Value(name),
@@ -61,17 +61,17 @@ class DishUnitsDao extends DatabaseAccessor<AppDatabase> with _$DishUnitsDaoMixi
     return await db.into(db.dishUnits).insert(entry);
   }
 
-  // 获取所有菜品单位
+  // 获取所有商品单位
   Future<List<DishUnit>> getAllDishUnits() async {
     return await db.select(db.dishUnits).get();
   }
 
-  // 根据 ID 更新菜品单位
+  // 根据 ID 更新商品单位
   Future updateDishUnit(DishUnitsCompanion entry, int id) async {
     return await (db.update(db.dishUnits)..where((t) => t.id.equals(id))).write(entry);
   }
 
-  // 根据 ID 删除菜品单位
+  // 根据 ID 删除商品单位
   Future deleteDishUnit(int id) async {
     return await (db.delete(db.dishUnits)..where((t) => t.id.equals(id))).go();
   }

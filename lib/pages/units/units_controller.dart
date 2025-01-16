@@ -70,7 +70,7 @@ class UnitsController extends GetxController {
     }
   }
 
-  // 添加新菜品单位的方法
+  // 添加新商品单位的方法
   Future<void> addNewDishUnit(String name, String abbreviation, String? description) async {
     await _database.dishUnitsDao.createDishUnit(name, abbreviation, description);
     dataSource?.refreshDatasource();

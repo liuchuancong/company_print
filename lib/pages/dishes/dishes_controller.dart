@@ -7,7 +7,7 @@ import 'package:company_print/pages/dishes/dishes_page.dart';
 class DishesController extends GetxController {
   final AppDatabase database = DatabaseManager.instance.appDatabase;
   final List<DishesCategoryData> categories = <DishesCategoryData>[].obs;
-  var nodes = <TreeNode<CategoryTreeNode>>[].obs; // 分类哈希表
+  var nodes = <TDSelectOption>[].obs; // 分类哈希表
   final RxList<int> pathStack = <int>[].obs; // 维护路径栈
   GlobalKey menuViewKey = GlobalKey();
   var isLoading = false.obs; // 添加一个加载状态标记
@@ -21,39 +21,39 @@ class DishesController extends GetxController {
     isLoading(true);
     final result = await database.dishesCategoryDao.getAllCategories();
     categories.assignAll(result);
-    nodes.assignAll(generateTreeNodes(buildTree(result)));
+    nodes.assignAll(buildTree(result));
     log(result.toString());
     await Future.delayed(const Duration(milliseconds: 20));
     isLoading(false);
   }
 
-  List<TreeNode<CategoryTreeNode>> generateTreeNodes(List<CategoryTreeNode> nodes) {
+  List<TDSelectOption> generateTreeNodes(List<CategoryTreeNode> nodes) {
     return nodes.map((node) {
-      final currentNode = TreeNode<CategoryTreeNode>(
-        key: node.data.id.toString(),
-        data: node,
-      );
+      final currentNode = TDSelectOption(label: node.data.name.toString(), value: node.data.id, children: []);
       if (node.children.isNotEmpty) {
         final filteredChildren = node.children;
 
         if (filteredChildren.isNotEmpty) {
           final children = generateTreeNodes(filteredChildren); // 递归调用并添加所有子节点
-          currentNode.addAll(children);
+          currentNode.children.addAll(children);
         }
       }
       return currentNode;
     }).toList();
   }
 
-  List<CategoryTreeNode> buildTree(List<DishesCategoryData> data) {
+  List<TDSelectOption> buildTree(List<DishesCategoryData> data) {
     final Map<int, CategoryTreeNode> nodeMap = {};
     for (var item in data) {
       nodeMap[item.id] = CategoryTreeNode(data: item);
     }
-    final List<CategoryTreeNode> rootNodes = [];
+    final List<TDSelectOption> rootNodes = [];
     for (var item in data) {
       if (item.parentId == null) {
-        rootNodes.add(nodeMap[item.id]!);
+        rootNodes.add(TDSelectOption(
+          label: item.name.toString(),
+          value: item.id,
+        ));
       } else {
         final parentNode = nodeMap[item.parentId];
         if (parentNode != null) {

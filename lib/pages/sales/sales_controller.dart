@@ -17,6 +17,7 @@ class SalesController extends BasePageController {
   var startDate = DateTime.now().obs;
   var endDate = DateTime.now().obs;
   var dateRange = <DateTime>[Utils.getStartOfDay(DateTime.now()), Utils.getEndOfDay(DateTime.now())].obs;
+  TextEditingController searchController = TextEditingController();
   List<DateTime> currentDates = [];
   final refreshController = EasyRefreshController(
     controlFinishRefresh: true,
