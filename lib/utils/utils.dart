@@ -193,10 +193,10 @@ class Utils {
     if (str1 == null && str2 == null) {
       return '';
     }
-    if (str1 == null && str2 != null) {
+    if (str1 == null && str2 != null && str2.toString().trim().isNotEmpty) {
       return str2.toString();
     }
-    if (str2 == null && str1 != null) {
+    if (str2 == null && str1 != null && str1.toString().trim().isNotEmpty) {
       return str1.toString();
     }
     return '${str1.toString()} (${str2.toString()})';
