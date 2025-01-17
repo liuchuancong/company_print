@@ -4,7 +4,9 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/common/style/app_style.dart';
 import 'package:material_text_fields/material_text_fields.dart';
+import 'package:company_print/common/style/custom_scaffold.dart';
 import 'package:company_print/pages/units/units_controller.dart';
+import 'package:company_print/common/widgets/section_listtile.dart';
 
 class UnitsPage extends StatefulWidget {
   const UnitsPage({super.key});
@@ -38,7 +40,10 @@ class _UnitsPageState extends State<UnitsPage> {
                 return const Center(child: CircularProgressIndicator());
               }
               return AsyncPaginatedDataTable2(
-                horizontalMargin: 20,
+                horizontalMargin: 10,
+                isVerticalScrollBarVisible: true,
+                isHorizontalScrollBarVisible: true,
+                fixedLeftColumns: 1,
                 header: Container(),
                 actions: [
                   IconButton(
@@ -62,19 +67,16 @@ class _UnitsPageState extends State<UnitsPage> {
                 onRowsPerPageChanged: controller.handleRowsPerPageChanged,
                 sortColumnIndex: controller.sortColumnIndex.value,
                 sortAscending: controller.sortAscending.value,
-                minWidth: 1000,
-                isVerticalScrollBarVisible: true,
-                isHorizontalScrollBarVisible: true,
+                minWidth: 800,
                 columns: [
+                  const DataColumn2(
+                    label: Text('操作'),
+                    fixedWidth: 160,
+                    headingRowAlignment: MainAxisAlignment.center,
+                  ),
                   DataColumn2(
                     label: const Text('单位'),
                     fixedWidth: 100,
-                    headingRowAlignment: MainAxisAlignment.center,
-                    onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
-                  ),
-                  DataColumn2(
-                    label: const Text('简称'),
-                    fixedWidth: 300,
                     headingRowAlignment: MainAxisAlignment.center,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
@@ -88,11 +90,6 @@ class _UnitsPageState extends State<UnitsPage> {
                     fixedWidth: 220,
                     headingRowAlignment: MainAxisAlignment.center,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
-                  ),
-                  const DataColumn2(
-                    label: Text('操作'),
-                    fixedWidth: 200,
-                    headingRowAlignment: MainAxisAlignment.center,
                   ),
                 ],
                 fit: FlexFit.tight,
@@ -136,10 +133,6 @@ class DishUnitsDataSource extends AsyncDataTableSource {
           return DataRow(
             key: ValueKey<int>(unit.id),
             cells: [
-              DataCell(Text(unit.name)),
-              DataCell(Text(unit.abbreviation ?? '')),
-              DataCell(Text(unit.description ?? '')),
-              DataCell(Text(formatDate(unit.createdAt, [yyyy, '-', mm, '-', dd, ' ', HH, ':', nn, ':', ss]))),
               DataCell(
                 Row(
                   children: [
@@ -166,29 +159,31 @@ class DishUnitsDataSource extends AsyncDataTableSource {
                     ),
                   ],
                 ),
-              )
+              ),
+              DataCell(Text(unit.name)),
+              DataCell(Text(unit.description ?? '')),
+              DataCell(Text(formatDate(unit.createdAt, [yyyy, '-', mm, '-', dd, ' ', HH, ':', nn, ':', ss]))),
             ],
           );
         }).toList());
   }
 }
 
-class EditOrCreateDishUnitDialog extends StatefulWidget {
+class EditOrCreateDishUnitPage extends StatefulWidget {
   final DishUnit? dishUnit; // 可选的 DishUnit，如果为 null 则表示新增
   final Function(DishUnit newOrUpdatedDishUnit) onConfirm;
 
-  const EditOrCreateDishUnitDialog({
+  const EditOrCreateDishUnitPage({
     super.key,
     this.dishUnit, // 如果是新增，则此参数为 null
     required this.onConfirm,
   });
 
   @override
-  EditOrCreateDishUnitDialogState createState() => EditOrCreateDishUnitDialogState();
+  EditOrCreateDishUnitPageState createState() => EditOrCreateDishUnitPageState();
 }
 
-class EditOrCreateDishUnitDialogState extends State<EditOrCreateDishUnitDialog> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+class EditOrCreateDishUnitPageState extends State<EditOrCreateDishUnitPage> {
   bool isNew = false;
   late TextEditingController _nameController;
   late TextEditingController _abbreviationController;
@@ -204,74 +199,78 @@ class EditOrCreateDishUnitDialogState extends State<EditOrCreateDishUnitDialog> 
   }
 
   void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      final newOrUpdatedDishUnit = DishUnit(
-        id: isNew ? DateTime.now().millisecondsSinceEpoch : widget.dishUnit!.id,
-        name: _nameController.text,
-        abbreviation: _abbreviationController.text,
-        description: _descriptionController.text.isNotEmpty ? _descriptionController.text : null,
-        createdAt: isNew ? DateTime.now() : widget.dishUnit!.createdAt,
-      );
-      widget.onConfirm(newOrUpdatedDishUnit);
-      SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
+    if (_nameController.text.trim().isEmpty) {
+      SmartDialog.showToast('请输入单位名称');
+      return;
     }
+    final newOrUpdatedDishUnit = DishUnit(
+      id: isNew ? DateTime.now().millisecondsSinceEpoch : widget.dishUnit!.id,
+      name: _nameController.text,
+      abbreviation: _abbreviationController.text,
+      description: _descriptionController.text.isNotEmpty ? _descriptionController.text : null,
+      createdAt: isNew ? DateTime.now() : widget.dishUnit!.createdAt,
+    );
+    widget.onConfirm(newOrUpdatedDishUnit);
+    Get.back();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(isNew ? '新增' : '编辑'),
-      content: SizedBox(
-        width: Get.width < 600 ? Get.width * 0.9 : MediaQuery.of(context).size.width * 0.6,
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                MaterialTextField(
-                  controller: _nameController,
-                  labelText: "单位",
-                  hint: "请输入单位",
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.next,
-                  validator: (value) => value!.trim().isEmpty ? '请输入单位' : null,
-                  maxLength: 20,
+    return CustomScaffold(
+      appbar: AppBar(
+        title: Text(isNew ? '新增单位' : '编辑单位'),
+      ),
+      body: ListView(
+        children: [
+          const SectionTitle(title: '商品单位'),
+          InputTextField(
+            labelText: '单位名称',
+            maxLength: 100,
+            gap: 10,
+            child: TextField(
+              controller: _nameController,
+              textInputAction: TextInputAction.next,
+              maxLength: 100,
+              maxLines: null,
+              decoration: const InputDecoration(
+                suffixIcon: Icon(
+                  Icons.info_outline,
+                  size: 30,
+                  color: Colors.redAccent,
                 ),
-                AppStyle.vGap4,
-                MaterialTextField(
-                  controller: _abbreviationController,
-                  labelText: "简称",
-                  hint: "请输入简称",
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.next,
-                  maxLength: 100,
-                ),
-                AppStyle.vGap4,
-                MaterialTextField(
-                  controller: _descriptionController,
-                  labelText: "描述",
-                  hint: "请输入描述",
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.done,
-                  maxLength: 100,
-                  maxLines: 3,
-                ),
-              ],
+              ),
             ),
           ),
-        ),
+          InputTextField(
+            labelText: '单位描述',
+            gap: 10,
+            maxLength: 100,
+            child: TextField(
+              controller: _descriptionController,
+              textInputAction: TextInputAction.done,
+              maxLines: null,
+              maxLength: 100,
+            ),
+          ),
+        ],
       ),
       actions: [
-        TextButton(
+        FilledButton(
+          style: ButtonStyle(
+            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
+          ),
           onPressed: () {
-            SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
+            Get.back(); // 使用 SmartDialog 方法关闭对话框
           },
-          child: const Text('取消'),
+          child: const Text('取消', style: TextStyle(fontSize: 18)),
         ),
-        TextButton(
+        const SizedBox(width: 10),
+        FilledButton(
+          style: ButtonStyle(
+            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
+          ),
           onPressed: _submitForm,
-          child: Text(isNew ? '新增' : '保存'),
+          child: Text(isNew ? '新增' : '保存', style: const TextStyle(fontSize: 18)),
         ),
       ],
     );

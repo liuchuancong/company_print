@@ -77,7 +77,6 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                 minWidth: 4000,
                 isVerticalScrollBarVisible: true,
                 isHorizontalScrollBarVisible: true,
-                fixedTopRows: 1,
                 fixedLeftColumns: 1,
                 fixedColumnsColor: Theme.of(context).focusColor,
                 fixedCornerColor: Theme.of(context).focusColor,
@@ -215,6 +214,7 @@ class EditOrderItemsPageState extends State<EditOrderItemsPage> {
   void _submitForm() {
     if (_itemNameController.text.isEmpty) {
       SmartDialog.showToast("商品名称不能为空");
+      return;
     }
     if (_itemNameController.text.isNotEmpty) {
       final newOrUpdatedOrderItem = OrderItem(

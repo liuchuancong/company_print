@@ -66,11 +66,8 @@ class DishesController extends GetxController {
   }
 
   void showCreateCategoryDialog() {
-    SmartDialog.show(
-      builder: (context) {
-        return EditOrCreateCategoryDialog(
+    Get.to(() => EditOrCreateCategoryPage(
           controller: this,
-          key: menuViewKey,
           onConfirm: (newCategory) {
             addCategory(
               newCategory.name,
@@ -78,15 +75,11 @@ class DishesController extends GetxController {
               newCategory.description,
             );
           },
-        );
-      },
-    );
+        ));
   }
 
   void showEditCategoryDialog(DishesCategoryData category) {
-    SmartDialog.show(
-      builder: (context) {
-        return EditOrCreateCategoryDialog(
+    Get.to(() => EditOrCreateCategoryPage(
           controller: this,
           category: category,
           onConfirm: (updatedCategory) {
@@ -97,9 +90,7 @@ class DishesController extends GetxController {
               updatedCategory.description,
             );
           },
-        );
-      },
-    );
+        ));
   }
 
   Future<void> addCategory(String name, int? parentId, String? description) async {

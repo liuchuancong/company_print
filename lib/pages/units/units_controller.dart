@@ -87,33 +87,29 @@ class UnitsController extends GetxController {
   }
 
   void showCreateDishUnitDialog() {
-    SmartDialog.show(
-      builder: (context) {
-        return EditOrCreateDishUnitDialog(
-          onConfirm: (newDishUnit) {
-            addNewDishUnit(newDishUnit.name, newDishUnit.abbreviation ?? '', newDishUnit.description ?? '');
-          },
-        );
-      },
+    Get.to(
+      () => EditOrCreateDishUnitPage(
+        onConfirm: (newDishUnit) {
+          addNewDishUnit(newDishUnit.name, newDishUnit.abbreviation ?? '', newDishUnit.description ?? '');
+        },
+      ),
     );
   }
 
   void showEditDishUnitDialog(DishUnit dishUnit) {
-    SmartDialog.show(
-      builder: (context) {
-        return EditOrCreateDishUnitDialog(
-          dishUnit: dishUnit,
-          onConfirm: (updatedDishUnit) {
-            updateDishUnit(DishUnit(
-              id: dishUnit.id,
-              name: updatedDishUnit.name,
-              abbreviation: updatedDishUnit.abbreviation,
-              description: updatedDishUnit.description,
-              createdAt: dishUnit.createdAt,
-            ));
-          },
-        );
-      },
+    Get.to(
+      () => EditOrCreateDishUnitPage(
+        dishUnit: dishUnit,
+        onConfirm: (updatedDishUnit) {
+          updateDishUnit(DishUnit(
+            id: dishUnit.id,
+            name: updatedDishUnit.name,
+            abbreviation: updatedDishUnit.abbreviation,
+            description: updatedDishUnit.description,
+            createdAt: dishUnit.createdAt,
+          ));
+        },
+      ),
     );
   }
 

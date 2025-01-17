@@ -204,6 +204,7 @@ class EditOrderItemDialogState extends State<EditOrderItemDialog> {
   void _submitForm() {
     if (_itemNameController.text.isEmpty) {
       SmartDialog.showToast("商品名称不能为空");
+      return;
     }
     if (_itemNameController.text.isNotEmpty) {
       final newOrUpdatedOrderItem = CustomerOrderItem(

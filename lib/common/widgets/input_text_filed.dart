@@ -4,7 +4,8 @@ class InputTextField extends StatelessWidget {
   final String labelText;
   final Widget child;
   final double gap;
-  const InputTextField({super.key, required this.labelText, required this.child, this.gap = 10});
+  final int? maxLength;
+  const InputTextField({super.key, required this.labelText, required this.child, this.gap = 10, this.maxLength});
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -76,6 +77,27 @@ class InputTextField extends StatelessWidget {
             ],
           ),
         ),
+        if (maxLength != null)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 10, top: 10),
+                child: Text.rich(
+                  TextSpan(
+                    text: '最多可输入',
+                    children: [
+                      TextSpan(
+                        text: maxLength.toString(),
+                        style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                      ),
+                      const TextSpan(text: '个字符'),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         SizedBox(height: gap),
       ],
     );

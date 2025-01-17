@@ -37,6 +37,8 @@ class MyTheme {
         focusedErrorBorder: InputBorder.none,
         errorStyle: const TextStyle(color: Colors.red),
         filled: true,
+        helperMaxLines: 0,
+        helperStyle: const TextStyle(fontSize: 0),
         contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
         fillColor: primaryColor!.withAlpha(15),
       ),

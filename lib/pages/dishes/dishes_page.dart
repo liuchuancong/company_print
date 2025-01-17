@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:company_print/common/index.dart';
-import 'package:company_print/common/style/app_style.dart';
 import 'package:animated_tree_view/animated_tree_view.dart';
-import 'package:material_text_fields/material_text_fields.dart';
 import 'package:company_print/pages/dishes/dishes_controller.dart';
+import 'package:company_print/common/widgets/section_listtile.dart';
 
 class DishesPage extends StatefulWidget {
   const DishesPage({super.key});
@@ -128,12 +127,12 @@ class _DishesPageState extends State<DishesPage> with TickerProviderStateMixin {
   }
 }
 
-class EditOrCreateCategoryDialog extends StatefulWidget {
+class EditOrCreateCategoryPage extends StatefulWidget {
   final DishesCategoryData? category; // 可选的 DishesCategoryData，如果为 null 则表示新增
   final Function(DishesCategoryData newOrUpdatedCategory) onConfirm;
 
   final DishesController controller; // 级联选择器控制器
-  const EditOrCreateCategoryDialog({
+  const EditOrCreateCategoryPage({
     super.key,
     this.category, // 如果是新增，则此参数为 null
     required this.onConfirm,
@@ -141,10 +140,10 @@ class EditOrCreateCategoryDialog extends StatefulWidget {
   });
 
   @override
-  EditOrCreateCategoryDialogState createState() => EditOrCreateCategoryDialogState();
+  EditOrCreateCategoryPageState createState() => EditOrCreateCategoryPageState();
 }
 
-class EditOrCreateCategoryDialogState extends State<EditOrCreateCategoryDialog> {
+class EditOrCreateCategoryPageState extends State<EditOrCreateCategoryPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool isNew = false;
   late TextEditingController _nameController;
@@ -162,89 +161,134 @@ class EditOrCreateCategoryDialogState extends State<EditOrCreateCategoryDialog> 
   }
 
   void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      final newOrUpdatedCategory = DishesCategoryData(
-        id: isNew ? 0 : widget.category!.id, // 如果是新的记录，id 应该由数据库自动生成
-        name: _nameController.text,
-        parentId: parentId, // 默认值为0，假设0代表没有父级分类
-        description: _descriptionController.text,
-        createdAt: isNew ? DateTime.now() : widget.category!.createdAt,
-      );
-      widget.onConfirm(newOrUpdatedCategory);
-      SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
+    if (_nameController.text.isEmpty) {
+      SmartDialog.showToast('商品名称不能为空');
+      return;
     }
+    final newOrUpdatedCategory = DishesCategoryData(
+      id: isNew ? 0 : widget.category!.id, // 如果是新的记录，id 应该由数据库自动生成
+      name: _nameController.text,
+      parentId: parentId, // 默认值为0，假设0代表没有父级分类
+      description: _descriptionController.text,
+      createdAt: isNew ? DateTime.now() : widget.category!.createdAt,
+    );
+    widget.onConfirm(newOrUpdatedCategory);
+    Get.back();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(isNew ? '新增' : '编辑'),
-      content: SizedBox(
-        width: Get.width < 600 ? Get.width * 0.9 : MediaQuery.of(context).size.width * 0.6,
-        height: isNew ? Get.height * 0.9 : Get.height * 0.5,
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                MaterialTextField(
-                  controller: _nameController,
-                  labelText: "名称",
-                  hint: "请输入名称",
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.next,
-                  validator: (value) => value!.trim().isEmpty ? '请输入分类名称' : null,
-                  maxLength: 100,
-                ),
-                AppStyle.vGap4,
-                MaterialTextField(
-                  controller: _descriptionController,
-                  labelText: "描述",
-                  hint: "请输入描述",
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.next,
-                  maxLength: 100,
-                  maxLines: 3,
-                ),
-                if (isNew) AppStyle.vGap4,
-                if (isNew)
-                  TextField(
-                    controller: _parentIdController,
-                    readOnly: true,
-                    decoration: InputDecoration(
-                      labelText: '父级分类',
-                      border: const OutlineInputBorder(),
-                      hintText: '请选择父级分类',
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.add),
-                        onPressed: () {
-                          showTreeBottomSheet(context);
-                        },
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(isNew ? '新增' : '编辑'),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+              child: ListView(
+                children: [
+                  const SectionTitle(title: '商品信息'),
+                  InputTextField(
+                    labelText: '商品名称',
+                    maxLength: 100,
+                    gap: 10,
+                    child: TextField(
+                      controller: _nameController,
+                      textInputAction: TextInputAction.next,
+                      maxLength: 100,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        suffixIcon: Icon(
+                          Icons.info_outline,
+                          size: 30,
+                          color: Colors.redAccent,
+                        ),
                       ),
                     ),
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.done,
-                    maxLength: 100,
-                    enabled: true,
                   ),
-              ],
+                  InputTextField(
+                    labelText: '商品描述',
+                    gap: 10,
+                    maxLength: 100,
+                    child: TextField(
+                      controller: _descriptionController,
+                      textInputAction: TextInputAction.done,
+                      maxLines: null,
+                      maxLength: 100,
+                    ),
+                  ),
+                  if (isNew)
+                    InputTextField(
+                      labelText: '父级分类',
+                      gap: 10,
+                      child: TextField(
+                        readOnly: true,
+                        controller: _parentIdController,
+                        textInputAction: TextInputAction.done,
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            icon: const Icon(
+                              Icons.chevron_right_outlined,
+                              size: 30,
+                            ),
+                            onPressed: () async {
+                              final result = await Get.toNamed(RoutePath.kDishSelectPage);
+                              if (result != null) {
+                                _parentIdController.text = result.name.toString();
+                                parentId = result.id;
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
-        ),
+          Container(
+            padding: const EdgeInsets.all(10.0),
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(color: Theme.of(context).primaryColor, width: 0.5),
+              ),
+            ),
+            child: SizedBox(
+              height: 50,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      FilledButton(
+                        style: ButtonStyle(
+                          padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
+                        ),
+                        onPressed: () {
+                          Get.back(); // 使用 SmartDialog 方法关闭对话框
+                        },
+                        child: const Text('取消', style: TextStyle(fontSize: 18)),
+                      ),
+                      const SizedBox(width: 10),
+                      FilledButton(
+                        style: ButtonStyle(
+                          padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
+                        ),
+                        onPressed: _submitForm,
+                        child: Text(isNew ? '新增' : '保存', style: const TextStyle(fontSize: 18)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          )
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
-          },
-          child: const Text('取消'),
-        ),
-        TextButton(
-          onPressed: _submitForm,
-          child: Text(isNew ? '新增' : '保存'),
-        ),
-      ],
     );
   }
 
