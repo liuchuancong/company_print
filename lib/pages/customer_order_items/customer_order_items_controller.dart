@@ -38,13 +38,11 @@ class CustomerOrderItemsController extends GetxController {
     var sortNames = [
       '',
       'itemName',
-      'itemShortName',
       'purchaseQuantity',
       'presetPrice',
-      'purchaseUnit',
       'actualQuantity',
       'actualPrice',
-      'actualUnit',
+      'itemShortName',
     ];
     return sortNames[sortColumnIndex.value];
   }
@@ -98,7 +96,7 @@ class CustomerOrderItemsController extends GetxController {
     }
   }
 
-  void showPreviewCustomerDialog(CustomerOrderItem customer) {
+  void showPreviewCustomerPage(CustomerOrderItem customer) {
     Utils.showMapAlertDialog({
       '商品名称': customer.itemName,
       '商品简介': customer.itemShortName ?? '',
@@ -112,10 +110,8 @@ class CustomerOrderItemsController extends GetxController {
     });
   }
 
-  void showCreateCustomerDialog() {
-    SmartDialog.show(
-      builder: (context) {
-        return EditOrderItemDialog(
+  void showCreateCustomerPage() {
+    Get.to(() => EditOrderItemPage(
           controller: this,
           onConfirm: (newCustomerOrderItem) => addCustomerOrderItem(
             newCustomerOrderItem.itemName,
@@ -127,15 +123,13 @@ class CustomerOrderItemsController extends GetxController {
             newCustomerOrderItem.presetPrice,
             newCustomerOrderItem.actualPrice,
           ),
-        );
-      },
-    );
+        ));
   }
 
-  void showMutipleOrderItemDialog() {
+  void showMutipleOrderItemPage() {
     SmartDialog.show(
       builder: (context) {
-        return MutipleOrderItemDialog(
+        return MutipleOrderItemPage(
             controller: this,
             onConfirm: (newCustomerOrderItem, itemNames) {
               handleMutipleOrderItem(itemNames, newCustomerOrderItem);
@@ -198,14 +192,12 @@ class CustomerOrderItemsController extends GetxController {
     }
   }
 
-  void showEditCustomerDialog(CustomerOrderItem customerOrderItem) {
-    SmartDialog.show(
-      builder: (context) {
-        return EditOrderItemDialog(
+  void showEditCustomerPage(CustomerOrderItem customerOrderItem) {
+    Get.to(() => EditOrderItemPage(
           controller: this,
           orderItem: customerOrderItem,
           onConfirm: (updatedCustomerOrderItem) => updateCustomerOrderItem(
-            updatedCustomerOrderItem.id,
+            customerId,
             updatedCustomerOrderItem.itemName,
             updatedCustomerOrderItem.itemShortName,
             updatedCustomerOrderItem.purchaseUnit,
@@ -215,9 +207,7 @@ class CustomerOrderItemsController extends GetxController {
             updatedCustomerOrderItem.presetPrice,
             updatedCustomerOrderItem.actualPrice,
           ),
-        );
-      },
-    );
+        ));
   }
 
   Future<void> addCustomerOrderItem(

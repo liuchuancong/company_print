@@ -188,6 +188,19 @@ class Utils {
       ),
     );
   }
+
+  static String concatenation(dynamic str1, dynamic str2) {
+    if (str1 == null && str2 == null) {
+      return '';
+    }
+    if (str1 == null && str2 != null) {
+      return str2.toString();
+    }
+    if (str2 == null && str1 != null) {
+      return str1.toString();
+    }
+    return '${str1.toString()} (${str2.toString()})';
+  }
 }
 
 class TwoDigitDecimalFormatter extends TextInputFormatter {

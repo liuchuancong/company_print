@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:searchfield/searchfield.dart';
+import 'package:company_print/utils/utils.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:company_print/common/index.dart';
 import 'package:cascade_widget/cascade_widget.dart';
 import 'package:company_print/common/style/app_style.dart';
 import 'package:material_text_fields/material_text_fields.dart';
+import 'package:company_print/common/style/custom_scaffold.dart';
 import 'package:company_print/pages/dishes/dishes_controller.dart';
+import 'package:company_print/common/widgets/section_listtile.dart';
 import 'package:company_print/pages/customer_order_items/customer_order_items_controller.dart';
 
 class CustomerOrderItemsPage extends StatefulWidget {
@@ -32,7 +36,7 @@ class _CustomerOrderItemsPageState extends State<CustomerOrderItemsPage> {
     final controller = Get.find<CustomerOrderItemsController>();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('用户商品管理'),
+        title: const Text('客户商品管理'),
       ),
       body: Column(
         children: [
@@ -48,14 +52,14 @@ class _CustomerOrderItemsPageState extends State<CustomerOrderItemsPage> {
                     icon: const Icon(Icons.import_export_outlined, color: Colors.black),
                     tooltip: '批量导入',
                     onPressed: () {
-                      controller.showMutipleOrderItemDialog();
+                      controller.showMutipleOrderItemPage();
                     },
                   ),
                   IconButton(
                     icon: const Icon(Icons.add, color: Colors.black),
                     tooltip: '新增',
                     onPressed: () {
-                      controller.showCreateCustomerDialog();
+                      controller.showCreateCustomerPage();
                     },
                   ),
                   IconButton(
@@ -75,15 +79,15 @@ class _CustomerOrderItemsPageState extends State<CustomerOrderItemsPage> {
                 minWidth: 1500,
                 isHorizontalScrollBarVisible: true,
                 columnSpacing: 20,
+                fixedLeftColumns: 1,
                 columns: [
-                  DataColumn2(
-                    label: const Text('商品名称'),
-                    fixedWidth: 80,
-                    onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
+                  const DataColumn2(
+                    label: Text('操作'),
+                    fixedWidth: 160,
                   ),
                   DataColumn2(
-                    label: const Text('商品简介'),
-                    fixedWidth: 170,
+                    label: const Text('商品名称'),
+                    fixedWidth: 150,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
@@ -93,11 +97,6 @@ class _CustomerOrderItemsPageState extends State<CustomerOrderItemsPage> {
                   ),
                   DataColumn2(
                     label: const Text('购买单价'),
-                    fixedWidth: 160,
-                    onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
-                  ),
-                  DataColumn2(
-                    label: const Text('购买单位'),
                     fixedWidth: 160,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
@@ -112,13 +111,9 @@ class _CustomerOrderItemsPageState extends State<CustomerOrderItemsPage> {
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
-                    label: const Text('实际单位'),
-                    fixedWidth: 160,
+                    label: const Text('备注'),
+                    fixedWidth: 170,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
-                  ),
-                  const DataColumn2(
-                    label: Text('操作'),
-                    fixedWidth: 160,
                   ),
                 ],
                 fit: FlexFit.tight,
@@ -144,11 +139,11 @@ class _CustomerOrderItemsPageState extends State<CustomerOrderItemsPage> {
   }
 }
 
-class EditOrderItemDialog extends StatefulWidget {
+class EditOrderItemPage extends StatefulWidget {
   final CustomerOrderItem? orderItem; // 可选的 CustomerOrderItem，如果为 null 则表示新增
   final Function(CustomerOrderItem newOrUpdatedOrderItem) onConfirm;
   final CustomerOrderItemsController controller;
-  const EditOrderItemDialog({
+  const EditOrderItemPage({
     super.key,
     this.orderItem, // 如果是新增，则此参数为 null
     required this.onConfirm,
@@ -156,10 +151,10 @@ class EditOrderItemDialog extends StatefulWidget {
   });
 
   @override
-  EditOrderItemDialogState createState() => EditOrderItemDialogState();
+  EditOrderItemPageState createState() => EditOrderItemPageState();
 }
 
-class EditOrderItemDialogState extends State<EditOrderItemDialog> {
+class EditOrderItemPageState extends State<EditOrderItemPage> {
   bool isNew = false;
   late TextEditingController _itemNameController;
   late TextEditingController _itemShortNameController;
@@ -211,148 +206,172 @@ class EditOrderItemDialogState extends State<EditOrderItemDialog> {
         createdAt: isNew ? DateTime.now() : widget.orderItem!.createdAt,
       );
       widget.onConfirm(newOrUpdatedOrderItem);
-      SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
+      Get.back();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(isNew ? '新增订单' : '编辑订单'),
-      content: SizedBox(
-        width: Get.width < 600 ? Get.width * 0.9 : MediaQuery.of(context).size.width * 0.6,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SearchField(
-                key: const ValueKey('category_search_field'),
-                dynamicHeight: true,
-                maxSuggestionBoxHeight: 300,
-                suggestionState: Suggestion.expand,
-                textInputAction: TextInputAction.next,
-                selectedValue: selectedCategoryValue,
-                offset: const Offset(0, 55),
-                suggestions: widget.controller.nodes
-                    .map(
-                      (node) => SearchFieldListItem<CategoryTreeNode>(node.data.name,
-                          child: Text(node.data.name), item: node),
-                    )
-                    .toList(),
-                hint: "请选择商品名称",
-                validator: (dynamic value) {
-                  if (value == null) {
-                    return ("请选择商品名称");
-                  }
-                  return null;
-                },
-                onSuggestionTap: (SearchFieldListItem<CategoryTreeNode> x) {
-                  selectedCategoryValue = x;
-                  _itemNameController.text = x.item!.data.name;
-                  setState(() {});
-                },
+    return CustomScaffold(
+      appbar: AppBar(
+        title: Text(isNew ? '新增订单' : '编辑订单'),
+      ),
+      body: ListView(
+        children: [
+          const SectionTitle(title: '商品信息'),
+          InputTextField(
+            labelText: '商品名称',
+            gap: 10,
+            child: TextField(
+              controller: _itemNameController,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.next,
+              decoration: InputDecoration(
+                suffixIcon: IconButton(
+                  icon: const Icon(
+                    Icons.chevron_right_outlined,
+                    size: 30,
+                  ),
+                  onPressed: () async {
+                    final result = await Get.toNamed(RoutePath.kDishSelectPage);
+                    if (result != null) {
+                      _itemNameController.text = result.name ?? '';
+                    }
+                  },
+                ),
               ),
-              AppStyle.vGap4,
-              MaterialTextField(
-                controller: _itemShortNameController,
-                labelText: "备注",
-                hint: "请输入备注",
-                keyboardType: TextInputType.text,
-                textInputAction: TextInputAction.next,
-                maxLength: 100,
-              ),
-              AppStyle.vGap4,
-              SearchField(
-                key: const ValueKey('purchase_unit_search_field'),
-                dynamicHeight: true,
-                maxSuggestionBoxHeight: 300,
-                suggestionState: Suggestion.expand,
-                textInputAction: TextInputAction.next,
-                selectedValue: selectedPurchaseUnitValue,
-                offset: const Offset(0, 55),
-                suggestions: widget.controller.dishUtils
-                    .map(
-                      (node) => SearchFieldListItem<DishUnit>(node.name, child: Text(node.name), item: node),
-                    )
-                    .toList(),
-                hint: "请选择购买单位",
-                onSuggestionTap: (SearchFieldListItem<DishUnit> x) {
-                  selectedPurchaseUnitValue = x;
-                  _purchaseUnitController.text = x.item!.name;
-                  setState(() {});
-                },
-              ),
-              AppStyle.vGap4,
-              MaterialTextField(
-                controller: _purchaseQuantityController,
-                labelText: "购买数量",
-                hint: "请输入购买数量",
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                textInputAction: TextInputAction.next,
-              ),
-              AppStyle.vGap4,
-              MaterialTextField(
-                controller: _presetPriceController,
-                labelText: "购买单价",
-                hint: "请输入购买单价",
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                textInputAction: TextInputAction.next,
-              ),
-              AppStyle.vGap4,
-              SearchField(
-                dynamicHeight: true,
-                key: const ValueKey('actual_unit_search_field'),
-                maxSuggestionBoxHeight: 300,
-                suggestionState: Suggestion.expand,
-                textInputAction: TextInputAction.next,
-                selectedValue: selectedActualUnitValue,
-                offset: const Offset(0, 55),
-                suggestions: widget.controller.dishUtils
-                    .map(
-                      (node) => SearchFieldListItem<DishUnit>(node.name, child: Text(node.name), item: node),
-                    )
-                    .toList(),
-                hint: "请选择实际单位",
-                onSuggestionTap: (SearchFieldListItem<DishUnit> x) {
-                  setState(() {
-                    selectedActualUnitValue = x;
-                    _actualUnitController.text = x.item!.name;
-                  });
-                },
-              ),
-              AppStyle.vGap4,
-              MaterialTextField(
-                controller: _actualQuantityController,
-                labelText: "实际数量",
-                hint: "请输入实际数量",
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                textInputAction: TextInputAction.done,
-              ),
-              AppStyle.vGap4,
-              MaterialTextField(
-                controller: _actualPriceController,
-                labelText: "实际单价",
-                hint: "请输入实际单价",
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                textInputAction: TextInputAction.next,
-              ),
-              const SizedBox(
-                height: 400,
-              ),
-            ],
+            ),
           ),
-        ),
+          const SectionTitle(title: '订购信息'),
+          InputTextField(
+            labelText: '购买数量',
+            gap: 10,
+            child: TextField(
+              controller: _purchaseQuantityController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              textInputAction: TextInputAction.next,
+              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))],
+              maxLines: null,
+              maxLength: 100,
+            ),
+          ),
+          InputTextField(
+            labelText: '购买单位',
+            gap: 10,
+            child: TextField(
+              controller: _purchaseUnitController,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.next,
+              decoration: InputDecoration(
+                suffixIcon: IconButton(
+                  icon: const Icon(
+                    Icons.chevron_right_outlined,
+                    size: 30,
+                  ),
+                  onPressed: () async {
+                    final result = await Get.toNamed(RoutePath.kDishSelectPage);
+                    if (result != null) {
+                      _purchaseUnitController.text = result.name ?? '';
+                    }
+                  },
+                ),
+              ),
+            ),
+          ),
+          InputTextField(
+            labelText: '购买单价',
+            gap: 10,
+            child: TextField(
+              controller: _presetPriceController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              textInputAction: TextInputAction.next,
+              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))],
+              maxLines: null,
+              maxLength: 100,
+            ),
+          ),
+          const SectionTitle(title: '实际信息'),
+          InputTextField(
+            labelText: '实际数量',
+            gap: 10,
+            child: TextField(
+              controller: _actualQuantityController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              textInputAction: TextInputAction.next,
+              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))],
+              maxLines: null,
+              maxLength: 100,
+            ),
+          ),
+          InputTextField(
+            labelText: '实际单位',
+            gap: 10,
+            child: TextField(
+              controller: _actualUnitController,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.next,
+              decoration: InputDecoration(
+                suffixIcon: IconButton(
+                  icon: const Icon(
+                    Icons.chevron_right_outlined,
+                    size: 30,
+                  ),
+                  onPressed: () async {
+                    final result = await Get.toNamed(RoutePath.kDishSelectPage);
+                    if (result != null) {
+                      _actualUnitController.text = result.name ?? '';
+                    }
+                  },
+                ),
+              ),
+            ),
+          ),
+          InputTextField(
+            labelText: '实际单价',
+            gap: 10,
+            child: TextField(
+              controller: _actualPriceController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              textInputAction: TextInputAction.next,
+              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))],
+              maxLines: null,
+              maxLength: 100,
+            ),
+          ),
+          const SectionTitle(title: '备注信息'),
+          InputTextField(
+            labelText: '备注',
+            gap: 10,
+            child: TextField(
+              controller: _itemShortNameController,
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.text,
+              maxLines: null,
+              maxLength: 100,
+            ),
+          ),
+          const SizedBox(
+            height: 40,
+          )
+        ],
       ),
       actions: [
-        TextButton(
+        FilledButton(
+          style: ButtonStyle(
+            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
+          ),
           onPressed: () {
-            SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
+            Get.back(); // 使用 SmartDialog 方法关闭对话框
           },
-          child: const Text('取消'),
+          child: const Text('取消', style: TextStyle(fontSize: 18)),
         ),
-        TextButton(
+        const SizedBox(width: 10),
+        FilledButton(
+          style: ButtonStyle(
+            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
+          ),
           onPressed: _submitForm,
-          child: Text(isNew ? '新增' : '保存'),
+          child: Text(isNew ? '新增' : '保存', style: const TextStyle(fontSize: 18)),
         ),
       ],
     );
@@ -388,14 +407,6 @@ class CustomerOrderItemsDataSource extends AsyncDataTableSource {
           return DataRow(
             key: ValueKey<int>(orderItem.id),
             cells: [
-              DataCell(Text(orderItem.itemName)),
-              DataCell(Text(orderItem.itemShortName ?? '')),
-              DataCell(Text(orderItem.purchaseQuantity.toString())),
-              DataCell(Text(orderItem.presetPrice.toString())),
-              DataCell(Text(orderItem.purchaseUnit.toString())),
-              DataCell(Text(orderItem.actualQuantity.toString())),
-              DataCell(Text(orderItem.actualPrice.toString())),
-              DataCell(Text(orderItem.actualUnit.toString())),
               DataCell(
                 Row(
                   children: [
@@ -403,14 +414,14 @@ class CustomerOrderItemsDataSource extends AsyncDataTableSource {
                       icon: const Icon(Icons.remove_red_eye),
                       tooltip: '查看',
                       onPressed: () {
-                        controller.showPreviewCustomerDialog(orderItem);
+                        controller.showPreviewCustomerPage(orderItem);
                       },
                     ),
                     IconButton(
                       icon: const Icon(Icons.edit),
                       tooltip: '编辑',
                       onPressed: () {
-                        controller.showEditCustomerDialog(orderItem);
+                        controller.showEditCustomerPage(orderItem);
                       },
                     ),
                     IconButton(
@@ -422,27 +433,33 @@ class CustomerOrderItemsDataSource extends AsyncDataTableSource {
                     ),
                   ],
                 ),
-              )
+              ),
+              DataCell(Text(orderItem.itemName)),
+              DataCell(Text(Utils.concatenation(orderItem.purchaseQuantity, orderItem.purchaseUnit))),
+              DataCell(Text(orderItem.presetPrice.toString())),
+              DataCell(Text(Utils.concatenation(orderItem.actualQuantity, orderItem.actualUnit))),
+              DataCell(Text(orderItem.actualPrice.toString())),
+              DataCell(Text(orderItem.itemShortName ?? '')),
             ],
           );
         }).toList());
   }
 }
 
-class MutipleOrderItemDialog extends StatefulWidget {
+class MutipleOrderItemPage extends StatefulWidget {
   final Function(CustomerOrderItem newOrUpdatedOrderItem, List<DropDownMenuModel> itemNames) onConfirm;
   final CustomerOrderItemsController controller;
-  const MutipleOrderItemDialog({
+  const MutipleOrderItemPage({
     super.key,
     required this.onConfirm,
     required this.controller,
   });
 
   @override
-  MutipleOrderItemDialogDialogState createState() => MutipleOrderItemDialogDialogState();
+  MutipleOrderItemPageDialogState createState() => MutipleOrderItemPageDialogState();
 }
 
-class MutipleOrderItemDialogDialogState extends State<MutipleOrderItemDialog> {
+class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
   late TextEditingController _itemShortNameController;
   late TextEditingController _purchaseUnitController;
   late TextEditingController _purchaseQuantityController;

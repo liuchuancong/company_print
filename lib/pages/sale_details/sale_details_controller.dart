@@ -36,6 +36,7 @@ class SaleDetailsController extends GetxController {
 
   String getSortName() {
     final sortNames = [
+      '',
       'itemName',
       'itemShortName',
       'purchaseQuantity',
