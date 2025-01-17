@@ -422,9 +422,11 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
             child: SizedBox(
               height: 50,
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       FilledButton(
                         style: ButtonStyle(

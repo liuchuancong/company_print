@@ -24,147 +24,162 @@ class CardOrder extends StatelessWidget {
       onTap: () {
         onTap(order);
       },
-      child: Card(
-        margin: const EdgeInsets.all(0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Stack(
-              children: [
-                Positioned(
-                  left: 4,
-                  top: 8,
-                  child: OrderChip(
-                    icon: Icons.monetization_on_outlined,
-                    count: '${index + 1}',
-                  ),
-                ),
-                Positioned(
-                  right: 4,
-                  top: 8,
-                  child: GestureDetector(
-                    onTap: () => complete(order),
-                    child: CountChip(
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white, // 背景颜色
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.2), // 阴影颜色
+              spreadRadius: 2, // 扩展半径
+              blurRadius: 7, // 模糊半径
+              offset: const Offset(0, 1), // 偏移量 (x, y)
+            ),
+          ],
+          borderRadius: BorderRadius.circular(10), // 圆角
+        ),
+        child: Card(
+          elevation: 1,
+          margin: const EdgeInsets.all(0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                children: [
+                  Positioned(
+                    left: 4,
+                    top: 8,
+                    child: OrderChip(
                       icon: Icons.monetization_on_outlined,
-                      count: order.isPaid ? '已结算' : '未结算',
-                      isPaid: order.isPaid,
+                      count: '${index + 1}',
                     ),
                   ),
-                ),
-                Container(
-                  padding: const EdgeInsets.only(top: 50),
-                  height: 260,
-                  child: Column(
-                    children: [
-                      Divider(
-                        color: Theme.of(context).primaryColor.withAlpha(50),
+                  Positioned(
+                    right: 4,
+                    top: 8,
+                    child: GestureDetector(
+                      onTap: () => complete(order),
+                      child: CountChip(
+                        icon: Icons.monetization_on_outlined,
+                        count: order.isPaid ? '已结算' : '未结算',
+                        isPaid: order.isPaid,
                       ),
-                      Expanded(
-                        child: ListTile(
-                          dense: true,
-                          contentPadding: const EdgeInsets.only(left: 8, right: 10),
-                          title: Text(
-                            '客户名称: ${order.customerName!}',
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          subtitle: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '备注: ${order.remark}',
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              Text(
-                                '司机: ${order.driverName}',
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              Text(
-                                '创建时间: ${formatDate(order.createdAt, [
-                                      yyyy,
-                                      '-',
-                                      mm,
-                                      '-',
-                                      dd,
-                                      ' ',
-                                      HH,
-                                      ':',
-                                      nn,
-                                      ':',
-                                      ss
-                                    ])}',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
-                          ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.only(top: 50),
+                    height: 260,
+                    child: Column(
+                      children: [
+                        Divider(
+                          color: Theme.of(context).primaryColor.withAlpha(50),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              '合计: ${order.totalPrice} 元',
+                        Expanded(
+                          child: ListTile(
+                            dense: true,
+                            contentPadding: const EdgeInsets.only(left: 8, right: 10),
+                            title: Text(
+                              '客户名称: ${order.customerName!}',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
-                                fontSize: 14,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
-                            Expanded(
-                                child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                            subtitle: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                FilledButton(
-                                  onPressed: () {
-                                    onDelete(order);
-                                  },
-                                  style: ButtonStyle(
-                                    backgroundColor: WidgetStateProperty.all(Colors.red),
+                                Text(
+                                  '备注: ${order.remark}',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14,
                                   ),
-                                  child: const Text('删除'),
                                 ),
-                                const SizedBox(width: 10),
-                                FilledButton(
-                                  onPressed: () {
-                                    onEdit(order);
-                                  },
-                                  child: const Text('编辑'),
+                                Text(
+                                  '司机: ${order.driverName}',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                Text(
+                                  '创建时间: ${formatDate(order.createdAt, [
+                                        yyyy,
+                                        '-',
+                                        mm,
+                                        '-',
+                                        dd,
+                                        ' ',
+                                        HH,
+                                        ':',
+                                        nn,
+                                        ':',
+                                        ss
+                                      ])}',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                 ),
                               ],
-                            )),
-                          ],
+                            ),
+                          ),
                         ),
-                      )
-                    ],
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                '合计: ${order.totalPrice} 元',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              Expanded(
+                                  child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  FilledButton(
+                                    onPressed: () {
+                                      onDelete(order);
+                                    },
+                                    style: ButtonStyle(
+                                      backgroundColor: WidgetStateProperty.all(Colors.red),
+                                    ),
+                                    child: const Text('删除'),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  FilledButton(
+                                    onPressed: () {
+                                      onEdit(order);
+                                    },
+                                    child: const Text('编辑'),
+                                  ),
+                                ],
+                              )),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            )
-          ],
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
