@@ -65,15 +65,16 @@ class _CustomersPageState extends State<CustomersPage> with AutomaticKeepAliveCl
                 columnSpacing: 20,
                 minWidth: 1000,
                 isHorizontalScrollBarVisible: true,
+                isVerticalScrollBarVisible: true,
                 fixedLeftColumns: 1,
                 columns: [
                   const DataColumn2(
                     label: Text('操作'),
-                    fixedWidth: 180,
+                    fixedWidth: 220,
                   ),
                   DataColumn2(
                     label: const Text('姓名'),
-                    fixedWidth: 100,
+                    fixedWidth: 120,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
@@ -230,7 +231,8 @@ class EditOrCreateCustomerPageState extends State<EditOrCreateCustomerPage> {
       actions: [
         FilledButton(
           style: ButtonStyle(
-            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
+            shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
           ),
           onPressed: () {
             Get.back(); // 使用 SmartDialog 方法关闭对话框
@@ -240,7 +242,8 @@ class EditOrCreateCustomerPageState extends State<EditOrCreateCustomerPage> {
         const SizedBox(width: 10),
         FilledButton(
           style: ButtonStyle(
-            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
+            shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
           ),
           onPressed: _submitForm,
           child: Text(isNew ? '新增' : '保存', style: const TextStyle(fontSize: 18)),

@@ -5,7 +5,7 @@ import 'package:company_print/utils/utils.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:company_print/common/index.dart';
 import 'package:cascade_widget/cascade_widget.dart';
-import 'package:company_print/pages/dishes/dishes_controller.dart';
+import 'package:company_print/pages/customer_order_items/mutiple_order_items.dart';
 import 'package:company_print/pages/customer_order_items/customer_order_items_page.dart';
 
 class CustomerOrderItemsController extends GetxController {
@@ -22,16 +22,12 @@ class CustomerOrderItemsController extends GetxController {
   var sortAscending = false.obs;
   var sortColumnIndex = 1.obs;
   var initialRow = 0.obs;
-  var nodes = <CategoryTreeNode>[].obs;
-  var dishUtils = <DishUnit>[].obs;
   final PaginatorController paginatorController = PaginatorController();
   CustomerOrderItemsDataSource? dataSource;
   @override
   void onInit() {
     super.onInit();
     dataSource = CustomerOrderItemsDataSource(this);
-    fetchCategories();
-    ggetAllDishUnits();
   }
 
   String getSortName() {
@@ -127,15 +123,11 @@ class CustomerOrderItemsController extends GetxController {
   }
 
   void showMutipleOrderItemPage() {
-    SmartDialog.show(
-      builder: (context) {
-        return MutipleOrderItemPage(
-            controller: this,
-            onConfirm: (newCustomerOrderItem, itemNames) {
-              handleMutipleOrderItem(itemNames, newCustomerOrderItem);
-            });
-      },
-    );
+    Get.to(() => MutipleOrderItemPage(
+        controller: this,
+        onConfirm: (newCustomerOrderItem, itemNames) {
+          handleMutipleOrderItem(itemNames, newCustomerOrderItem);
+        }));
   }
 
   void handleMutipleOrderItem(List<DropDownMenuModel> itemNames, CustomerOrderItem newCustomerOrderItem) async {
@@ -269,55 +261,5 @@ class CustomerOrderItemsController extends GetxController {
   Future<void> deleteCustomerOrderItem(int id) async {
     await database.customerOrderItemsDao.deleteCustomerOrderItem(id);
     dataSource?.refreshDatasource();
-  }
-
-  List<CategoryTreeNode> buildTree(List<DishesCategoryData> data) {
-    final Map<int, CategoryTreeNode> nodeMap = {};
-    for (var item in data) {
-      nodeMap[item.id] = CategoryTreeNode(data: item);
-    }
-    final List<CategoryTreeNode> rootNodes = [];
-    for (var item in data) {
-      if (item.parentId == null) {
-        rootNodes.add(nodeMap[item.id]!);
-      } else {
-        final parentNode = nodeMap[item.parentId];
-        if (parentNode != null) {
-          parentNode.children = List.of(parentNode.children)..add(nodeMap[item.id]!);
-        }
-      }
-    }
-    return rootNodes;
-  }
-
-  List<CategoryTreeNode> collectLeafNodes(CategoryTreeNode node) {
-    if (node.children.isEmpty) {
-      return [node];
-    } else {
-      List<CategoryTreeNode> leafNodes = [];
-      for (var child in node.children) {
-        leafNodes.addAll(collectLeafNodes(child));
-      }
-      return leafNodes;
-    }
-  }
-
-// 定义一个函数来从根节点列表开始收集所有的叶子节点
-  List<CategoryTreeNode> getAllLeafNodes(List<CategoryTreeNode> rootNodes) {
-    List<CategoryTreeNode> allLeafNodes = [];
-    for (var rootNode in rootNodes) {
-      allLeafNodes.addAll(collectLeafNodes(rootNode));
-    }
-    return allLeafNodes;
-  }
-
-  Future<void> fetchCategories() async {
-    final result = await database.dishesCategoryDao.getAllCategories();
-    nodes.assignAll(getAllLeafNodes(buildTree(result)));
-  }
-
-  Future<void> ggetAllDishUnits() async {
-    final result = await database.dishUnitsDao.getAllDishUnits();
-    dishUtils.assignAll(result);
   }
 }

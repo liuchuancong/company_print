@@ -253,7 +253,8 @@ class EditOrCreateDishUnitPageState extends State<EditOrCreateDishUnitPage> {
       actions: [
         FilledButton(
           style: ButtonStyle(
-            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
+            shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
           ),
           onPressed: () {
             Get.back(); // 使用 SmartDialog 方法关闭对话框
@@ -263,7 +264,8 @@ class EditOrCreateDishUnitPageState extends State<EditOrCreateDishUnitPage> {
         const SizedBox(width: 10),
         FilledButton(
           style: ButtonStyle(
-            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
+            shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
           ),
           onPressed: _submitForm,
           child: Text(isNew ? '新增' : '保存', style: const TextStyle(fontSize: 18)),

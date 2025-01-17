@@ -5,12 +5,16 @@ import 'package:company_print/pages/settings/settings_binding.dart';
 import 'package:company_print/pages/sale_details/sale_details_page.dart';
 import 'package:company_print/pages/dish_select_page/dish_select_page.dart';
 import 'package:company_print/pages/sale_details/sale_details_binding.dart';
+import 'package:company_print/pages/unit_select_page/unit_select_page.dart';
 import 'package:company_print/pages/dish_select_page/dish_select_binding.dart';
+import 'package:company_print/pages/unit_select_page/unit_select_binding.dart';
 import 'package:company_print/pages/driver_select_page/driver_select_page.dart';
 import 'package:company_print/pages/driver_select_page/driver_select_binding.dart';
 import 'package:company_print/pages/customer_select_page/customer_select_page.dart';
+import 'package:company_print/pages/mutiple_dish_select/mutiple_dish_select_page.dart';
 import 'package:company_print/pages/customer_select_page/customer_select_binding.dart';
 import 'package:company_print/pages/customer_order_items/customer_order_items_page.dart';
+import 'package:company_print/pages/mutiple_dish_select/mutiple_dish_select_binding.dart';
 import 'package:company_print/pages/customer_order_items/customer_order_items_binding.dart';
 
 // auth
@@ -55,5 +59,17 @@ class AppPages {
       page: DriverSelectPage.new,
       bindings: [DriverSelectBinding()],
     ),
+    GetPage(
+      name: RoutePath.kMutipleDishSelectPage,
+      page: MutipleDishSelectPage.new,
+      bindings: [MutipleDishSelectBinding()],
+    ),
+    GetPage(
+      name: RoutePath.kUnitSelectPage,
+      page: UnitSelectPage.new,
+      bindings: [UnitSelectBinding()],
+    ),
+
+    // UnitSelectPage
   ];
 }

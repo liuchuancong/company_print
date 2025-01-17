@@ -23,4 +23,9 @@ class RoutePath {
 
   /// 配送员选择页
   static var kDriverSelectPage = "/driverSelectPage";
+
+  // 多商品选择页
+  static var kMutipleDishSelectPage = "/mutipleDishSelectPage";
+  // 单位选择
+  static var kUnitSelectPage = "/unitSelectPage";
 }

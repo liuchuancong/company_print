@@ -193,13 +193,16 @@ class Utils {
     if (str1 == null && str2 == null) {
       return '';
     }
-    if (str1 == null && str2 != null && str2.toString().trim().isNotEmpty) {
-      return str2.toString();
+    if (str1 == null && str2 != null) {
+      return str2.toString().trim().isEmpty ? '' : str2.toString();
+    } else if (str1 != null && str2 == null) {
+      return str1.toString().trim().isEmpty ? '' : str1.toString();
+    } else if (str1.toString().trim().isEmpty && str2.toString().trim().isNotEmpty) {
+      return str2.toString().trim();
+    } else if (str1.toString().trim().isNotEmpty && str2.toString().trim().isEmpty) {
+      return str1.toString().trim();
     }
-    if (str2 == null && str1 != null && str1.toString().trim().isNotEmpty) {
-      return str1.toString();
-    }
-    return '${str1.toString()} (${str2.toString()})';
+    return '${str1.toString().trim()} (${str2.toString().trim()})';
   }
 }
 

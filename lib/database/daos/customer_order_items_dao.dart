@@ -84,6 +84,44 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
     return await query.get();
   }
 
+  Future<List<CustomerOrderItem>> getAllSortedOrderItemsByCustomerId(
+    int customerId, {
+    String orderByField = 'createdAt', // 默认按照创建时间排序
+    bool ascending = false, // 默认倒序
+  }) async {
+    final query = db.select(db.customerOrderItems)..where((tbl) => tbl.customerId.equals(customerId));
+
+    // 定义一个映射来将字符串字段名转换为表中的列
+    final columnMap = <String, dynamic>{
+      'id': db.customerOrderItems.id,
+      'customerId': db.customerOrderItems.customerId,
+      'itemName': db.customerOrderItems.itemName,
+      'itemShortName': db.customerOrderItems.itemShortName,
+      'purchaseUnit': db.customerOrderItems.purchaseUnit,
+      'purchaseQuantity': db.customerOrderItems.purchaseQuantity,
+      'actualUnit': db.customerOrderItems.actualUnit,
+      'actualQuantity': db.customerOrderItems.actualQuantity,
+      'presetPrice': db.customerOrderItems.presetPrice,
+      'actualPrice': db.customerOrderItems.actualPrice,
+      'createdAt': db.customerOrderItems.createdAt,
+    };
+
+    // 检查是否提供了有效的排序字段
+    if (columnMap.containsKey(orderByField)) {
+      final column = columnMap[orderByField]!;
+      final orderMode = ascending ? OrderingMode.asc : OrderingMode.desc;
+      query.orderBy([
+        (t) => OrderingTerm(expression: column, mode: orderMode),
+      ]);
+    } else {
+      query.orderBy([
+        (t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc),
+      ]);
+    }
+
+    return await query.get();
+  }
+
   Future<int> getTotalCustomerOrderItemsCount(int customerId) async {
     final count = countAll();
     final countQuery = selectOnly(db.customerOrderItems)..addColumns([count]);
@@ -99,15 +137,16 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
 
   /// 更新订单项
   Future updateCustomerOrderItem(
-      int id,
-      String itemName,
-      String? itemShortName,
-      String? purchaseUnit,
-      double? purchaseQuantity,
-      String? actualUnit,
-      double? actualQuantity,
-      double? presetPrice,
-      double? actualPrice) async {
+    int id,
+    String itemName,
+    String? itemShortName,
+    String? purchaseUnit,
+    double? purchaseQuantity,
+    String? actualUnit,
+    double? actualQuantity,
+    double? presetPrice,
+    double? actualPrice,
+  ) async {
     final entry = CustomerOrderItemsCompanion(
       itemName: Value(itemName),
       customerId: Value(id),
