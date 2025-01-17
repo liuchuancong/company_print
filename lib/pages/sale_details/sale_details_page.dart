@@ -43,7 +43,6 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                 return const Center(child: CircularProgressIndicator());
               }
               return AsyncPaginatedDataTable2(
-                horizontalMargin: 10,
                 header: Container(),
                 actions: [
                   IconButton(
@@ -84,60 +83,50 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                   const DataColumn2(
                     label: Text('操作'),
                     fixedWidth: 160,
-                    headingRowAlignment: MainAxisAlignment.center,
                   ),
                   DataColumn2(
                     label: const Text('商品名称'),
                     fixedWidth: 200,
-                    headingRowAlignment: MainAxisAlignment.center,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
                     label: const Text('总价'),
                     fixedWidth: 150,
-                    headingRowAlignment: MainAxisAlignment.center,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
                     label: const Text('垫付'),
                     fixedWidth: 150,
-                    headingRowAlignment: MainAxisAlignment.center,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
                     label: const Text('购买数量'),
                     fixedWidth: 160,
-                    headingRowAlignment: MainAxisAlignment.center,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
                     label: const Text('购买单价'),
                     fixedWidth: 160,
-                    headingRowAlignment: MainAxisAlignment.center,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
                     label: const Text('购买单位'),
                     fixedWidth: 160,
-                    headingRowAlignment: MainAxisAlignment.center,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
                     label: const Text('实际数量'),
                     fixedWidth: 160,
-                    headingRowAlignment: MainAxisAlignment.center,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
                     label: const Text('实际单价'),
                     fixedWidth: 160,
-                    headingRowAlignment: MainAxisAlignment.center,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
                     label: const Text('实际单位'),
                     fixedWidth: 160,
-                    headingRowAlignment: MainAxisAlignment.center,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                 ],

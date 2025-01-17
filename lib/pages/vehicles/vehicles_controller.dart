@@ -14,7 +14,7 @@ class VehiclesController extends GetxController {
   var rowsPerPage = PaginatedDataTable.defaultRowsPerPage.obs;
   var currentPage = 0.obs;
   var sortAscending = false.obs;
-  var sortColumnIndex = 3.obs;
+  var sortColumnIndex = 1.obs;
   var initialRow = 0.obs;
 
   final PaginatorController paginatorController = PaginatorController();
@@ -28,7 +28,7 @@ class VehiclesController extends GetxController {
   }
 
   String getSortName() {
-    var sortNames = ['driverName', 'driverPhone', 'plateNumber', 'createdAt'];
+    var sortNames = ['', 'driverName', 'driverPhone', 'plateNumber', 'createdAt'];
     return sortNames[sortColumnIndex.value];
   }
 
@@ -80,7 +80,7 @@ class VehiclesController extends GetxController {
     }
   }
 
-  void showPreviewVehicleDialog(Vehicle vehicle) {
+  void showPreviewVehiclePage(Vehicle vehicle) {
     Utils.showMapAlertDialog({
       '车牌号': vehicle.plateNumber!,
       '司机名称': vehicle.driverName ?? '',
@@ -89,24 +89,18 @@ class VehiclesController extends GetxController {
     });
   }
 
-  void showCreateVehicleDialog() {
-    SmartDialog.show(
-      builder: (context) {
-        return EditOrCreateVehicleDialog(
+  void showCreateVehiclePage() {
+    Get.to(() => EditOrCreateVehiclePage(
           onConfirm: (newVehicle) => addVehicle(
             newVehicle.plateNumber!,
             newVehicle.driverName,
             newVehicle.driverPhone,
           ),
-        );
-      },
-    );
+        ));
   }
 
-  void showEditVehicleDialog(Vehicle vehicle) {
-    SmartDialog.show(
-      builder: (context) {
-        return EditOrCreateVehicleDialog(
+  void showEditVehiclePage(Vehicle vehicle) {
+    Get.to(() => EditOrCreateVehiclePage(
           vehicle: vehicle,
           onConfirm: (updatedVehicle) => updateVehicle(
             updatedVehicle.id,
@@ -114,9 +108,7 @@ class VehiclesController extends GetxController {
             updatedVehicle.driverName,
             updatedVehicle.driverPhone,
           ),
-        );
-      },
-    );
+        ));
   }
 
   Future<void> addVehicle(String plateNumber, String? driverName, String? driverPhone) async {
@@ -129,7 +121,7 @@ class VehiclesController extends GetxController {
     dataSource?.refreshDatasource();
   }
 
-  void showDeleteVehicleDialog(int id) async {
+  void showDeleteVehiclePage(int id) async {
     var result = await Utils.showAlertDialog("确定要删除吗？", title: "删除");
     if (result == true) {
       deleteVehicle(id);

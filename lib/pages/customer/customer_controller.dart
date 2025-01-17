@@ -15,7 +15,7 @@ class CustomersController extends GetxController {
   var rowsPerPage = PaginatedDataTable.defaultRowsPerPage.obs;
   var currentPage = 0.obs;
   var sortAscending = false.obs;
-  var sortColumnIndex = 2.obs;
+  var sortColumnIndex = 1.obs;
   var initialRow = 0.obs;
 
   final PaginatorController paginatorController = PaginatorController();
@@ -27,7 +27,7 @@ class CustomersController extends GetxController {
   }
 
   String getSortName() {
-    var sortNames = ['name', 'phone', 'address', 'createdAt'];
+    var sortNames = ['', 'name', 'phone', 'address', 'additionalInfo', 'createdAt'];
     return sortNames[sortColumnIndex.value];
   }
 
@@ -90,24 +90,20 @@ class CustomersController extends GetxController {
   }
 
   void showCreateCustomerDialog() {
-    SmartDialog.show(
-      builder: (context) {
-        return EditOrCreateCustomerDialog(
-          onConfirm: (newCustomer) => addCustomer(
-            newCustomer.name!,
-            newCustomer.phone,
-            newCustomer.address,
-            newCustomer.additionalInfo,
-          ),
-        );
-      },
+    Get.to(
+      () => EditOrCreateCustomerPage(
+        onConfirm: (newCustomer) => addCustomer(
+          newCustomer.name!,
+          newCustomer.phone,
+          newCustomer.address,
+          newCustomer.additionalInfo,
+        ),
+      ),
     );
   }
 
   void showEditCustomerDialog(Customer customer) {
-    SmartDialog.show(
-      builder: (context) {
-        return EditOrCreateCustomerDialog(
+    Get.to(() => EditOrCreateCustomerPage(
           customer: customer,
           onConfirm: (updatedCustomer) => updateCustomer(
             updatedCustomer.id,
@@ -116,9 +112,7 @@ class CustomersController extends GetxController {
             updatedCustomer.address,
             updatedCustomer.additionalInfo,
           ),
-        );
-      },
-    );
+        ));
   }
 
   Future<void> addCustomer(String name, String? phone, String? address, String? additionalInfo) async {

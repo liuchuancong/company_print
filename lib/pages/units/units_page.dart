@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:date_format/date_format.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:company_print/common/index.dart';
-import 'package:company_print/common/style/app_style.dart';
-import 'package:material_text_fields/material_text_fields.dart';
 import 'package:company_print/common/style/custom_scaffold.dart';
 import 'package:company_print/pages/units/units_controller.dart';
 import 'package:company_print/common/widgets/section_listtile.dart';
@@ -32,6 +30,9 @@ class _UnitsPageState extends State<UnitsPage> {
   Widget build(BuildContext context) {
     final controller = Get.find<UnitsController>();
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('商品单位'),
+      ),
       body: Column(
         children: [
           Expanded(
@@ -40,7 +41,7 @@ class _UnitsPageState extends State<UnitsPage> {
                 return const Center(child: CircularProgressIndicator());
               }
               return AsyncPaginatedDataTable2(
-                horizontalMargin: 10,
+                columnSpacing: 20,
                 isVerticalScrollBarVisible: true,
                 isHorizontalScrollBarVisible: true,
                 fixedLeftColumns: 1,
@@ -50,7 +51,7 @@ class _UnitsPageState extends State<UnitsPage> {
                     icon: const Icon(Icons.add, color: Colors.black),
                     tooltip: '新增',
                     onPressed: () {
-                      controller.showCreateDishUnitDialog();
+                      controller.showCreateDishUnitPage();
                     },
                   ),
                   IconButton(
@@ -72,23 +73,19 @@ class _UnitsPageState extends State<UnitsPage> {
                   const DataColumn2(
                     label: Text('操作'),
                     fixedWidth: 160,
-                    headingRowAlignment: MainAxisAlignment.center,
                   ),
                   DataColumn2(
                     label: const Text('单位'),
-                    fixedWidth: 100,
-                    headingRowAlignment: MainAxisAlignment.center,
+                    fixedWidth: 140,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
                     label: const Text('描述'),
-                    headingRowAlignment: MainAxisAlignment.center,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
                     label: const Text('创建时间'),
                     fixedWidth: 220,
-                    headingRowAlignment: MainAxisAlignment.center,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                 ],
@@ -140,21 +137,21 @@ class DishUnitsDataSource extends AsyncDataTableSource {
                       icon: const Icon(Icons.remove_red_eye),
                       tooltip: '查看',
                       onPressed: () {
-                        controller.showPreviewDishUnitDialog(unit);
+                        controller.showPreviewDishUnitPage(unit);
                       },
                     ),
                     IconButton(
                       icon: const Icon(Icons.edit),
                       tooltip: '编辑',
                       onPressed: () {
-                        controller.showEditDishUnitDialog(unit);
+                        controller.showEditDishUnitPage(unit);
                       },
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete),
                       tooltip: '删除',
                       onPressed: () {
-                        controller.showDeleteDishUnitDialog(unit);
+                        controller.showDeleteDishUnitPage(unit);
                       },
                     ),
                   ],

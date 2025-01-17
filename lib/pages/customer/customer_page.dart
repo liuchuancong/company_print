@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:company_print/common/index.dart';
-import 'package:company_print/common/style/app_style.dart';
-import 'package:material_text_fields/material_text_fields.dart';
+import 'package:company_print/common/style/custom_scaffold.dart';
 import 'package:company_print/pages/customer/customer_controller.dart';
 
 class CustomersPage extends StatefulWidget {
@@ -30,6 +29,9 @@ class _CustomersPageState extends State<CustomersPage> with AutomaticKeepAliveCl
     super.build(context);
     final controller = Get.find<CustomersController>();
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('客户管理'),
+      ),
       body: Column(
         children: [
           Expanded(
@@ -55,39 +57,38 @@ class _CustomersPageState extends State<CustomersPage> with AutomaticKeepAliveCl
                     },
                   ),
                 ],
-                checkboxHorizontalMargin: 10,
-                horizontalMargin: 10,
                 wrapInCard: true,
                 rowsPerPage: controller.rowsPerPage.value,
                 onRowsPerPageChanged: controller.handleRowsPerPageChanged,
                 sortColumnIndex: controller.sortColumnIndex.value,
                 sortAscending: controller.sortAscending.value,
-                columnSpacing: 1,
-                minWidth: 800,
+                columnSpacing: 20,
+                minWidth: 1000,
                 isVerticalScrollBarVisible: true,
                 isHorizontalScrollBarVisible: true,
                 fixedLeftColumns: 1,
                 columns: [
                   const DataColumn2(
                     label: Text('操作'),
-                    fixedWidth: 200,
-                    headingRowAlignment: MainAxisAlignment.center,
+                    fixedWidth: 180,
                   ),
                   DataColumn2(
                     label: const Text('姓名'),
-                    fixedWidth: 80,
-                    headingRowAlignment: MainAxisAlignment.center,
+                    fixedWidth: 100,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
                     label: const Text('电话'),
-                    fixedWidth: 170,
-                    headingRowAlignment: MainAxisAlignment.center,
+                    fixedWidth: 180,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
                     label: const Text('地址'),
-                    headingRowAlignment: MainAxisAlignment.center,
+                    fixedWidth: 180,
+                    onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
+                  ),
+                  DataColumn2(
+                    label: const Text('备注'),
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                 ],
@@ -117,22 +118,21 @@ class _CustomersPageState extends State<CustomersPage> with AutomaticKeepAliveCl
   bool get wantKeepAlive => true;
 }
 
-class EditOrCreateCustomerDialog extends StatefulWidget {
+class EditOrCreateCustomerPage extends StatefulWidget {
   final Customer? customer; // 可选的 Customer，如果为 null 则表示新增
   final Function(Customer newOrUpdatedCustomer) onConfirm;
 
-  const EditOrCreateCustomerDialog({
+  const EditOrCreateCustomerPage({
     super.key,
     this.customer, // 如果是新增，则此参数为 null
     required this.onConfirm,
   });
 
   @override
-  EditOrCreateCustomerDialogState createState() => EditOrCreateCustomerDialogState();
+  EditOrCreateCustomerPageState createState() => EditOrCreateCustomerPageState();
 }
 
-class EditOrCreateCustomerDialogState extends State<EditOrCreateCustomerDialog> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+class EditOrCreateCustomerPageState extends State<EditOrCreateCustomerPage> {
   bool isNew = false;
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
@@ -150,84 +150,101 @@ class EditOrCreateCustomerDialogState extends State<EditOrCreateCustomerDialog> 
   }
 
   void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      final newOrUpdatedCustomer = Customer(
-        id: isNew ? DateTime.now().millisecondsSinceEpoch : widget.customer!.id,
-        name: _nameController.text,
-        phone: _phoneController.text.isNotEmpty ? _phoneController.text : null,
-        address: _addressController.text.isNotEmpty ? _addressController.text : null,
-        additionalInfo: _additionalInfoController.text.isNotEmpty ? _additionalInfoController.text : null,
-        createdAt: isNew ? DateTime.now() : widget.customer!.createdAt,
-      );
-      widget.onConfirm(newOrUpdatedCustomer);
-      SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
+    if (_nameController.text.isEmpty) {
+      SmartDialog.showToast('姓名不能为空');
+      return;
     }
+    final newOrUpdatedCustomer = Customer(
+      id: isNew ? DateTime.now().millisecondsSinceEpoch : widget.customer!.id,
+      name: _nameController.text,
+      phone: _phoneController.text.isNotEmpty ? _phoneController.text : null,
+      address: _addressController.text.isNotEmpty ? _addressController.text : null,
+      additionalInfo: _additionalInfoController.text.isNotEmpty ? _additionalInfoController.text : null,
+      createdAt: isNew ? DateTime.now() : widget.customer!.createdAt,
+    );
+    widget.onConfirm(newOrUpdatedCustomer);
+    Get.back();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(isNew ? '新增客户' : '编辑客户'),
-      content: SizedBox(
-        width: Get.width < 600 ? Get.width * 0.9 : MediaQuery.of(context).size.width * 0.6,
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                MaterialTextField(
-                  controller: _nameController,
-                  labelText: "姓名",
-                  hint: "请输入姓名",
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.next,
-                  validator: (value) => value!.trim().isEmpty ? '请输入姓名' : null,
-                  maxLength: 10,
+    return CustomScaffold(
+      appbar: AppBar(
+        title: Text(isNew ? '新增客户' : '编辑客户'),
+      ),
+      body: ListView(
+        children: [
+          InputTextField(
+            labelText: '姓名',
+            gap: 10,
+            maxLength: 10,
+            child: TextField(
+              controller: _nameController,
+              textInputAction: TextInputAction.next,
+              maxLines: null,
+              maxLength: 10,
+              decoration: const InputDecoration(
+                suffixIcon: Icon(
+                  Icons.info_outline,
+                  size: 30,
+                  color: Colors.redAccent,
                 ),
-                AppStyle.vGap4,
-                MaterialTextField(
-                  controller: _phoneController,
-                  labelText: "电话",
-                  hint: "请输入电话",
-                  keyboardType: TextInputType.phone,
-                  textInputAction: TextInputAction.next,
-                  maxLength: 20,
-                ),
-                AppStyle.vGap4,
-                MaterialTextField(
-                  controller: _addressController,
-                  labelText: "地址",
-                  hint: "请输入地址",
-                  keyboardType: TextInputType.streetAddress,
-                  textInputAction: TextInputAction.next,
-                  maxLength: 255,
-                ),
-                AppStyle.vGap4,
-                MaterialTextField(
-                  controller: _additionalInfoController,
-                  labelText: "其他信息",
-                  hint: "请输入其他信息",
-                  keyboardType: TextInputType.multiline,
-                  textInputAction: TextInputAction.done,
-                  maxLength: 255,
-                  maxLines: 3,
-                ),
-              ],
+              ),
             ),
           ),
-        ),
+          InputTextField(
+            labelText: '电话',
+            gap: 10,
+            maxLength: 20,
+            child: TextField(
+              controller: _phoneController,
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.phone,
+              maxLines: null,
+              maxLength: 20,
+            ),
+          ),
+          InputTextField(
+            labelText: '地址',
+            gap: 10,
+            maxLength: 100,
+            child: TextField(
+              controller: _addressController,
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.streetAddress,
+              maxLines: null,
+              maxLength: 100,
+            ),
+          ),
+          InputTextField(
+            labelText: '备注',
+            gap: 10,
+            child: TextField(
+              controller: _additionalInfoController,
+              textInputAction: TextInputAction.done,
+              keyboardType: TextInputType.text,
+              maxLines: null,
+            ),
+          ),
+        ],
       ),
       actions: [
-        TextButton(
+        FilledButton(
+          style: ButtonStyle(
+            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
+          ),
           onPressed: () {
-            SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
+            Get.back(); // 使用 SmartDialog 方法关闭对话框
           },
-          child: const Text('取消'),
+          child: const Text('取消', style: TextStyle(fontSize: 18)),
         ),
-        TextButton(
+        const SizedBox(width: 10),
+        FilledButton(
+          style: ButtonStyle(
+            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
+          ),
           onPressed: _submitForm,
-          child: Text(isNew ? '新增' : '保存'),
+          child: Text(isNew ? '新增' : '保存', style: const TextStyle(fontSize: 18)),
         ),
       ],
     );
@@ -298,6 +315,7 @@ class CustomersDataSource extends AsyncDataTableSource {
               DataCell(Text(custom.name ?? '')),
               DataCell(Text(custom.phone ?? '')),
               DataCell(Text(custom.address ?? '')),
+              DataCell(Text(custom.additionalInfo ?? '')),
             ],
           );
         }).toList());

@@ -144,7 +144,6 @@ class EditOrCreateCategoryPage extends StatefulWidget {
 }
 
 class EditOrCreateCategoryPageState extends State<EditOrCreateCategoryPage> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool isNew = false;
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;

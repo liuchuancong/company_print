@@ -20,7 +20,7 @@ class CustomerOrderItemsController extends GetxController {
   var rowsPerPage = PaginatedDataTable.defaultRowsPerPage.obs;
   var currentPage = 0.obs;
   var sortAscending = false.obs;
-  var sortColumnIndex = 0.obs;
+  var sortColumnIndex = 1.obs;
   var initialRow = 0.obs;
   var nodes = <CategoryTreeNode>[].obs;
   var dishUtils = <DishUnit>[].obs;
@@ -36,6 +36,7 @@ class CustomerOrderItemsController extends GetxController {
 
   String getSortName() {
     var sortNames = [
+      '',
       'itemName',
       'itemShortName',
       'purchaseQuantity',

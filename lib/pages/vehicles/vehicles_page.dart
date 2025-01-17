@@ -3,6 +3,7 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/common/style/app_style.dart';
 import 'package:material_text_fields/material_text_fields.dart';
+import 'package:company_print/common/style/custom_scaffold.dart';
 import 'package:company_print/pages/vehicles/vehicles_controller.dart';
 
 class VehiclesPage extends StatefulWidget {
@@ -30,6 +31,9 @@ class _VehiclesPageState extends State<VehiclesPage> with AutomaticKeepAliveClie
     super.build(context);
     final controller = Get.find<VehiclesController>();
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('司机信息'),
+      ),
       body: Column(
         children: [
           Expanded(
@@ -38,14 +42,13 @@ class _VehiclesPageState extends State<VehiclesPage> with AutomaticKeepAliveClie
                 return const Center(child: CircularProgressIndicator());
               }
               return AsyncPaginatedDataTable2(
-                horizontalMargin: 10,
                 header: Container(),
                 actions: [
                   IconButton(
                     icon: const Icon(Icons.add, color: Colors.black),
                     tooltip: '新增',
                     onPressed: () {
-                      controller.showCreateVehicleDialog();
+                      controller.showCreateVehiclePage();
                     },
                   ),
                   IconButton(
@@ -62,31 +65,29 @@ class _VehiclesPageState extends State<VehiclesPage> with AutomaticKeepAliveClie
                 onRowsPerPageChanged: controller.handleRowsPerPageChanged,
                 sortColumnIndex: controller.sortColumnIndex.value,
                 sortAscending: controller.sortAscending.value,
-                minWidth: 500,
+                minWidth: 600,
+                columnSpacing: 20,
+                fixedLeftColumns: 1,
                 isVerticalScrollBarVisible: true,
                 isHorizontalScrollBarVisible: true,
                 columns: [
+                  const DataColumn2(
+                    label: Text('操作'),
+                    fixedWidth: 160,
+                  ),
                   DataColumn2(
                     label: const Text('司机姓名'),
-                    fixedWidth: 80,
-                    headingRowAlignment: MainAxisAlignment.center,
+                    fixedWidth: 120,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
                     label: const Text('司机电话'),
-                    fixedWidth: 170,
-                    headingRowAlignment: MainAxisAlignment.center,
+                    fixedWidth: 200,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
                     label: const Text('车牌号'),
-                    headingRowAlignment: MainAxisAlignment.center,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
-                  ),
-                  const DataColumn2(
-                    label: Text('操作'),
-                    fixedWidth: 200,
-                    headingRowAlignment: MainAxisAlignment.center,
                   ),
                 ],
                 fit: FlexFit.tight,
@@ -115,22 +116,21 @@ class _VehiclesPageState extends State<VehiclesPage> with AutomaticKeepAliveClie
   bool get wantKeepAlive => true;
 }
 
-class EditOrCreateVehicleDialog extends StatefulWidget {
+class EditOrCreateVehiclePage extends StatefulWidget {
   final Vehicle? vehicle; // 可选的 Vehicle，如果为 null 则表示新增
   final Function(Vehicle newOrUpdatedVehicle) onConfirm;
 
-  const EditOrCreateVehicleDialog({
+  const EditOrCreateVehiclePage({
     super.key,
     this.vehicle, // 如果是新增，则此参数为 null
     required this.onConfirm,
   });
 
   @override
-  EditOrCreateVehicleDialogState createState() => EditOrCreateVehicleDialogState();
+  EditOrCreateVehiclePageState createState() => EditOrCreateVehiclePageState();
 }
 
-class EditOrCreateVehicleDialogState extends State<EditOrCreateVehicleDialog> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+class EditOrCreateVehiclePageState extends State<EditOrCreateVehiclePage> {
   bool isNew = false;
   late TextEditingController _plateNumberController;
   late TextEditingController _driverNameController;
@@ -146,74 +146,91 @@ class EditOrCreateVehicleDialogState extends State<EditOrCreateVehicleDialog> {
   }
 
   void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      final newOrUpdatedVehicle = Vehicle(
-        id: isNew ? DateTime.now().millisecondsSinceEpoch : widget.vehicle!.id,
-        plateNumber: _plateNumberController.text,
-        driverName: _driverNameController.text.isNotEmpty ? _driverNameController.text : null,
-        driverPhone: _driverPhoneController.text.isNotEmpty ? _driverPhoneController.text : null,
-        createdAt: isNew ? DateTime.now() : widget.vehicle!.createdAt,
-      );
-      widget.onConfirm(newOrUpdatedVehicle);
-      SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
+    if (_driverNameController.text.isEmpty) {
+      SmartDialog.showToast('姓名不能为空');
+      return;
     }
+    final newOrUpdatedVehicle = Vehicle(
+      id: isNew ? DateTime.now().millisecondsSinceEpoch : widget.vehicle!.id,
+      plateNumber: _plateNumberController.text,
+      driverName: _driverNameController.text.isNotEmpty ? _driverNameController.text : null,
+      driverPhone: _driverPhoneController.text.isNotEmpty ? _driverPhoneController.text : null,
+      createdAt: isNew ? DateTime.now() : widget.vehicle!.createdAt,
+    );
+    widget.onConfirm(newOrUpdatedVehicle);
+    Get.back();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(isNew ? '新增车辆' : '编辑车辆'),
-      content: SizedBox(
-        width: Get.width < 600 ? Get.width * 0.9 : MediaQuery.of(context).size.width * 0.6,
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                MaterialTextField(
-                  controller: _driverNameController,
-                  labelText: "司机名称",
-                  hint: "请输入司机名称",
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.next,
-                  validator: (value) => value!.trim().isEmpty ? '请输入司机名称' : null,
-                  maxLength: 50,
+    return CustomScaffold(
+      appbar: AppBar(
+        title: Text(isNew ? '新增司机' : '编辑司机'),
+      ),
+      body: ListView(
+        children: [
+          InputTextField(
+            labelText: '司机姓名',
+            gap: 10,
+            maxLength: 10,
+            child: TextField(
+              controller: _driverNameController,
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.text,
+              maxLines: null,
+              maxLength: 10,
+              decoration: const InputDecoration(
+                suffixIcon: Icon(
+                  Icons.info_outline,
+                  size: 30,
+                  color: Colors.redAccent,
                 ),
-                AppStyle.vGap4,
-                MaterialTextField(
-                  controller: _driverPhoneController,
-                  labelText: "司机电话",
-                  hint: "请输入司机电话",
-                  keyboardType: TextInputType.phone,
-                  textInputAction: TextInputAction.done,
-                  maxLength: 20,
-                ),
-                AppStyle.vGap4,
-                MaterialTextField(
-                  controller: _plateNumberController,
-                  labelText: "车牌号",
-                  hint: "请输入车牌号",
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.next,
-                  validator: (value) => value!.trim().isEmpty ? '请输入车牌号' : null,
-                  maxLength: 20,
-                ),
-              ],
+              ),
             ),
           ),
-        ),
+          InputTextField(
+            labelText: '司机电话',
+            gap: 10,
+            maxLength: 20,
+            child: TextField(
+              controller: _driverPhoneController,
+              textInputAction: TextInputAction.done,
+              keyboardType: TextInputType.phone,
+              maxLines: null,
+              maxLength: 20,
+            ),
+          ),
+          InputTextField(
+            labelText: '车牌号',
+            gap: 10,
+            maxLength: 20,
+            child: TextField(
+              controller: _plateNumberController,
+              textInputAction: TextInputAction.done,
+              keyboardType: TextInputType.text,
+              maxLines: null,
+              maxLength: 20,
+            ),
+          ),
+        ],
       ),
       actions: [
-        TextButton(
+        FilledButton(
+          style: ButtonStyle(
+            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
+          ),
           onPressed: () {
-            SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
+            Get.back(); // 使用 SmartDialog 方法关闭对话框
           },
-          child: const Text('取消'),
+          child: const Text('取消', style: TextStyle(fontSize: 18)),
         ),
-        TextButton(
+        const SizedBox(width: 10),
+        FilledButton(
+          style: ButtonStyle(
+            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
+          ),
           onPressed: _submitForm,
-          child: Text(isNew ? '新增' : '保存'),
+          child: Text(isNew ? '新增' : '保存', style: const TextStyle(fontSize: 18)),
         ),
       ],
     );
@@ -247,9 +264,6 @@ class VehiclesDataSource extends AsyncDataTableSource {
           return DataRow(
             key: ValueKey<int>(vehicle.id),
             cells: [
-              DataCell(Text(vehicle.driverName ?? '')),
-              DataCell(Text(vehicle.driverPhone ?? '')),
-              DataCell(Text(vehicle.plateNumber ?? '')),
               DataCell(
                 Row(
                   children: [
@@ -257,26 +271,29 @@ class VehiclesDataSource extends AsyncDataTableSource {
                       icon: const Icon(Icons.remove_red_eye),
                       tooltip: '查看',
                       onPressed: () {
-                        controller.showPreviewVehicleDialog(vehicle);
+                        controller.showPreviewVehiclePage(vehicle);
                       },
                     ),
                     IconButton(
                       icon: const Icon(Icons.edit),
                       tooltip: '编辑',
                       onPressed: () {
-                        controller.showEditVehicleDialog(vehicle);
+                        controller.showEditVehiclePage(vehicle);
                       },
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete),
                       tooltip: '删除',
                       onPressed: () {
-                        controller.showDeleteVehicleDialog(vehicle.id);
+                        controller.showDeleteVehiclePage(vehicle.id);
                       },
                     ),
                   ],
                 ),
-              )
+              ),
+              DataCell(Text(vehicle.driverName ?? '')),
+              DataCell(Text(vehicle.driverPhone ?? '')),
+              DataCell(Text(vehicle.plateNumber ?? '')),
             ],
           );
         }).toList());

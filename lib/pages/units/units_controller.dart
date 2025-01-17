@@ -12,7 +12,7 @@ class UnitsController extends GetxController {
   var rowsPerPage = PaginatedDataTable.defaultRowsPerPage.obs;
   var currentPage = 0.obs;
   var sortAscending = false.obs;
-  var sortColumnIndex = 3.obs;
+  var sortColumnIndex = 1.obs;
   var initialRow = 0.obs;
   var isLoading = false.obs; // 添加一个加载状态标记
 
@@ -26,7 +26,7 @@ class UnitsController extends GetxController {
   }
 
   String getSortName() {
-    var sortNames = ['name', 'abbreviation', 'description', 'createdAt'];
+    var sortNames = ['', 'name', 'description', 'createdAt'];
     return sortNames[sortColumnIndex.value];
   }
 
@@ -86,7 +86,7 @@ class UnitsController extends GetxController {
     dataSource?.refreshDatasource();
   }
 
-  void showCreateDishUnitDialog() {
+  void showCreateDishUnitPage() {
     Get.to(
       () => EditOrCreateDishUnitPage(
         onConfirm: (newDishUnit) {
@@ -96,7 +96,7 @@ class UnitsController extends GetxController {
     );
   }
 
-  void showEditDishUnitDialog(DishUnit dishUnit) {
+  void showEditDishUnitPage(DishUnit dishUnit) {
     Get.to(
       () => EditOrCreateDishUnitPage(
         dishUnit: dishUnit,
@@ -113,7 +113,7 @@ class UnitsController extends GetxController {
     );
   }
 
-  void showPreviewDishUnitDialog(DishUnit dishUnit) {
+  void showPreviewDishUnitPage(DishUnit dishUnit) {
     Utils.showMapAlertDialog({
       '名称': dishUnit.name,
       '简称': dishUnit.abbreviation ?? '',
@@ -122,7 +122,7 @@ class UnitsController extends GetxController {
     });
   }
 
-  void showDeleteDishUnitDialog(DishUnit dishUnit) async {
+  void showDeleteDishUnitPage(DishUnit dishUnit) async {
     var result = await Utils.showAlertDialog("确定要删除吗？", title: "删除");
     if (result == true) {
       deleteDishUnit(dishUnit);
