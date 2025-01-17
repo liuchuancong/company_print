@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:date_format/date_format.dart';
 import 'package:searchfield/searchfield.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/common/style/app_style.dart';
-import 'package:material_text_fields/material_text_fields.dart';
 import 'package:company_print/pages/sales/sales_controller.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:company_print/common/widgets/section_listtile.dart';
@@ -175,36 +175,55 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                 children: [
                   const SectionTitle(title: '客户信息'),
                   if (isNew)
-                    SearchField(
-                      dynamicHeight: true,
-                      maxSuggestionBoxHeight: 300,
-                      offset: const Offset(0, 55),
-                      suggestionState: Suggestion.expand,
-                      textInputAction: TextInputAction.next,
-                      selectedValue: selectedCustomerValue,
-                      suggestions: widget.controller.customers
-                          .map((node) =>
-                              SearchFieldListItem<Customer>(node.name ?? '', child: Text(node.name ?? ''), item: node))
-                          .toList(),
-                      hint: "请选择客户",
-                      onSuggestionTap: (SearchFieldListItem<Customer> x) {
-                        setState(() {
-                          selectedCustomerValue = x;
-                          _customerNameController.text = x.item!.name ?? '';
-                          _customerPhoneController.text = x.item!.phone ?? '';
-                          _customerAddressController.text = x.item!.address ?? '';
-                          customerId = x.item!.id;
-                        });
-                      },
+                    InputTextField(
+                      labelText: '客户名称',
+                      gap: 10,
+                      child: TextField(
+                        readOnly: true,
+                        controller: _customerNameController,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            icon: const Icon(
+                              Icons.chevron_right_outlined,
+                              size: 30,
+                            ),
+                            onPressed: () async {
+                              final result = await Get.toNamed(RoutePath.kCustomerSelectPage);
+                              if (result != null) {
+                                _customerNameController.text = result.name ?? '';
+                                _customerPhoneController.text = result.phone ?? '';
+                                _customerAddressController.text = result.address ?? '';
+                              }
+                            },
+                          ),
+                        ),
+                      ),
                     ),
                   if (!isNew)
                     InputTextField(
-                      labelText: '客户姓名',
+                      labelText: '客户名称',
                       gap: 10,
                       child: TextField(
                         controller: _customerNameController,
                         keyboardType: TextInputType.text,
                         textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            icon: const Icon(
+                              Icons.chevron_right_outlined,
+                              size: 30,
+                            ),
+                            onPressed: () async {
+                              final result = await Get.toNamed(RoutePath.kCustomerSelectPage);
+                              if (result != null) {
+                                _customerNameController.text = result.name ?? '';
+                                _customerPhoneController.text = result.phone ?? '';
+                                _customerAddressController.text = result.address ?? '';
+                              }
+                            },
+                          ),
+                        ),
                       ),
                     ),
                   if (!isNew)
@@ -289,6 +308,7 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                         controller: _totalPriceController,
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         textInputAction: TextInputAction.next,
+                        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))],
                       ),
                     ),
                   if (!isNew)
@@ -296,6 +316,7 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                       labelText: '垫付金额',
                       gap: 10,
                       child: TextField(
+                        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))],
                         controller: _advancePaymentController,
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         textInputAction: TextInputAction.next,
@@ -306,6 +327,7 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                       labelText: '运费',
                       gap: 10,
                       child: TextField(
+                        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))],
                         controller: _shippingFeeController,
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         textInputAction: TextInputAction.next,
@@ -314,26 +336,30 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                   const SectionTitle(title: '司机信息'),
                   if (isNew) AppStyle.vGap4,
                   if (isNew)
-                    SearchField(
-                      dynamicHeight: true,
-                      maxSuggestionBoxHeight: 300,
-                      offset: const Offset(0, 55),
-                      suggestionState: Suggestion.expand,
-                      textInputAction: TextInputAction.next,
-                      selectedValue: selectedVehicleValue,
-                      suggestions: widget.controller.vehicles
-                          .map((node) => SearchFieldListItem<Vehicle>(node.driverName ?? '',
-                              child: Text(node.driverName ?? ''), item: node))
-                          .toList(),
-                      hint: "请选择司机",
-                      onSuggestionTap: (SearchFieldListItem<Vehicle> x) {
-                        setState(() {
-                          selectedVehicleValue = x;
-                          _driverNameController.text = x.item!.driverName ?? '';
-                          _driverPhoneController.text = x.item!.driverPhone ?? '';
-                          _vehiclePlateNumberController.text = x.item!.plateNumber ?? '';
-                        });
-                      },
+                    InputTextField(
+                      labelText: '司机姓名',
+                      gap: 10,
+                      child: TextField(
+                        readOnly: true,
+                        controller: _driverNameController,
+                        textInputAction: TextInputAction.done,
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            icon: const Icon(
+                              Icons.chevron_right_outlined,
+                              size: 30,
+                            ),
+                            onPressed: () async {
+                              final result = await Get.toNamed(RoutePath.kDriverSelectPage);
+                              if (result != null) {
+                                _driverNameController.text = result.driverName ?? '';
+                                _driverPhoneController.text = result.driverPhone ?? '';
+                                _vehiclePlateNumberController.text = result.plateNumber ?? '';
+                              }
+                            },
+                          ),
+                        ),
+                      ),
                     ),
                   if (!isNew)
                     InputTextField(
@@ -343,6 +369,22 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                         controller: _driverNameController,
                         keyboardType: TextInputType.text,
                         textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            icon: const Icon(
+                              Icons.chevron_right_outlined,
+                              size: 30,
+                            ),
+                            onPressed: () async {
+                              final result = await Get.toNamed(RoutePath.kDriverSelectPage);
+                              if (result != null) {
+                                _driverNameController.text = result.driverName ?? '';
+                                _driverPhoneController.text = result.driverPhone ?? '';
+                                _vehiclePlateNumberController.text = result.plateNumber ?? '';
+                              }
+                            },
+                          ),
+                        ),
                       ),
                     ),
                   if (!isNew)
@@ -357,7 +399,7 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                     ),
                   if (!isNew)
                     InputTextField(
-                      labelText: '司机电话',
+                      labelText: '车牌号',
                       gap: 10,
                       child: TextField(
                         controller: _vehiclePlateNumberController,
@@ -365,33 +407,43 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                         textInputAction: TextInputAction.done,
                       ),
                     ),
+                  AppStyle.vGap40
                 ],
               ),
             ),
           ),
-          Padding(
+          Container(
             padding: const EdgeInsets.all(10.0),
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(color: Theme.of(context).primaryColor, width: 0.5),
+              ),
+            ),
             child: SizedBox(
               height: 50,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+              child: Column(
                 children: [
-                  FilledButton(
-                    style: ButtonStyle(
-                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
-                    ),
-                    onPressed: () {
-                      Get.back(); // 使用 SmartDialog 方法关闭对话框
-                    },
-                    child: const Text('取消', style: TextStyle(fontSize: 18)),
-                  ),
-                  const SizedBox(width: 10),
-                  FilledButton(
-                    style: ButtonStyle(
-                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
-                    ),
-                    onPressed: _submitForm,
-                    child: Text(isNew ? '新增' : '保存', style: const TextStyle(fontSize: 18)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      FilledButton(
+                        style: ButtonStyle(
+                          padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
+                        ),
+                        onPressed: () {
+                          Get.back(); // 使用 SmartDialog 方法关闭对话框
+                        },
+                        child: const Text('取消', style: TextStyle(fontSize: 18)),
+                      ),
+                      const SizedBox(width: 10),
+                      FilledButton(
+                        style: ButtonStyle(
+                          padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
+                        ),
+                        onPressed: _submitForm,
+                        child: Text(isNew ? '新增' : '保存', style: const TextStyle(fontSize: 18)),
+                      ),
+                    ],
                   ),
                 ],
               ),

@@ -4,7 +4,7 @@ class InputTextField extends StatelessWidget {
   final String labelText;
   final Widget child;
   final double gap;
-  const InputTextField({super.key, required this.labelText, required this.child, this.gap = 0});
+  const InputTextField({super.key, required this.labelText, required this.child, this.gap = 10});
   @override
   Widget build(BuildContext context) {
     return Column(

@@ -39,16 +39,17 @@ class CupertinoSwitchListTile extends StatelessWidget {
 
 class SectionTitle extends StatelessWidget {
   final String title;
-
+  final double? horizontal;
   const SectionTitle({
     required this.title,
     super.key,
+    this.horizontal = 20,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+      contentPadding: EdgeInsets.symmetric(horizontal: horizontal!, vertical: 4),
       title: Text(
         title,
         style: Theme.of(context).textTheme.titleLarge?.copyWith(

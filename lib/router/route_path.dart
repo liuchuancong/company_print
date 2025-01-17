@@ -14,4 +14,13 @@ class RoutePath {
 
   /// 订单详情
   static var kSaleDetails = "/saleDetails";
+
+  /// 商品选择页
+  static var kDishSelectPage = "/dishSelectPage";
+
+  /// 客户选择页
+  static var kCustomerSelectPage = "/customerSelectPage";
+
+  /// 配送员选择页
+  static var kDriverSelectPage = "/driverSelectPage";
 }

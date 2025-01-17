@@ -26,7 +26,6 @@ class MyTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         border: InputBorder.none,
-        isDense: true,
         alignLabelWithHint: false,
         outlineBorder: BorderSide.none,
         activeIndicatorBorder: BorderSide.none,

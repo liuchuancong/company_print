@@ -119,18 +119,6 @@ class DishesController extends GetxController {
       fetchCategories();
     }
   }
-
-  // 添加路径
-  void pushPath(int categoryId) {
-    pathStack.add(categoryId);
-  }
-
-  // 移除路径
-  void popPath() {
-    if (pathStack.isNotEmpty) {
-      pathStack.removeLast();
-    }
-  }
 }
 
 class CategoryTreeNode {

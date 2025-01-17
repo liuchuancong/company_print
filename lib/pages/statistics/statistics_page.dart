@@ -6,7 +6,7 @@ class StatisticsPage extends StatelessWidget {
   const StatisticsPage({super.key});
   @override
   Widget build(BuildContext context) {
-    final logic = Get.put(StatisticsController());
+    Get.put(StatisticsController());
     return Scaffold(
       appBar: AppBar(
         title: const Text('Statistics'),
