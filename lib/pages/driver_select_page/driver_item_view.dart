@@ -37,7 +37,7 @@ class DriverListItemView extends StatelessWidget {
           alignment: Alignment.centerLeft,
           margin: const EdgeInsets.only(left: 16.0),
           child: Text(
-            driver.driverName!,
+            driver.driverPhone!.isNotEmpty ? '${driver.driverName!}(电话: ${driver.driverPhone!})' : driver.driverName!,
             style: const TextStyle(color: Colors.black, fontSize: 16),
           ),
         ),

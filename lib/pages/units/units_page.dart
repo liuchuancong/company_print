@@ -42,7 +42,6 @@ class _UnitsPageState extends State<UnitsPage> {
               }
               return AsyncPaginatedDataTable2(
                 columnSpacing: 20,
-                isVerticalScrollBarVisible: true,
                 isHorizontalScrollBarVisible: true,
                 fixedLeftColumns: 1,
                 header: Container(),

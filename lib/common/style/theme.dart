@@ -61,6 +61,7 @@ class MyTheme {
         contentTextStyle: TextStyle(fontSize: 16),
         actionsPadding: EdgeInsets.only(left: 16, right: 16, bottom: 5),
       ),
+      inputDecorationTheme: const InputDecorationTheme(),
     );
   }
 }

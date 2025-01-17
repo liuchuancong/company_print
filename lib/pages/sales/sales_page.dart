@@ -45,6 +45,18 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
             hintText: '请输入客户名称',
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
             contentPadding: const EdgeInsets.symmetric(horizontal: 10.0),
+            alignLabelWithHint: false,
+            floatingLabelBehavior: FloatingLabelBehavior.never,
+            errorBorder: const OutlineInputBorder(),
+            focusedBorder: const OutlineInputBorder(),
+            disabledBorder: const OutlineInputBorder(),
+            enabledBorder: const OutlineInputBorder(),
+            focusedErrorBorder: const OutlineInputBorder(),
+            errorStyle: const TextStyle(color: Colors.red),
+            filled: true,
+            helperMaxLines: null,
+            helperStyle: const TextStyle(fontSize: 0),
+            fillColor: Theme.of(context).primaryColor.withAlpha(15),
             suffixIcon: IconButton(
               onPressed: () {
                 controller.searchController.text = "";
@@ -53,7 +65,15 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
               icon: const Icon(Icons.clear),
             ),
             prefixIcon: GestureDetector(
-              onTap: () {},
+              onTap: () async {
+                final result = await Get.toNamed(RoutePath.kCustomerSelectPage);
+                if (result != null) {
+                  controller.searchController.text = result.name;
+                  controller.searchQuery.value = result.name;
+                  controller.searchFocusNode.unfocus();
+                  controller.refreshData();
+                }
+              },
               child: Container(
                 height: 48,
                 width: 100,

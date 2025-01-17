@@ -73,8 +73,8 @@ class _CustomerOrderItemsPageState extends State<CustomerOrderItemsPage> {
                 sortColumnIndex: controller.sortColumnIndex.value,
                 sortAscending: controller.sortAscending.value,
                 minWidth: 1500,
-                isVerticalScrollBarVisible: true,
                 isHorizontalScrollBarVisible: true,
+                columnSpacing: 20,
                 columns: [
                   DataColumn2(
                     label: const Text('商品名称'),
