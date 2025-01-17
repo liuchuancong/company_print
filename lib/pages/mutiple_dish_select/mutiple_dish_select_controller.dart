@@ -1,11 +1,16 @@
 import 'package:pinyin/pinyin.dart';
 import 'package:flutter/material.dart';
+import 'package:company_print/utils/utils.dart';
 import 'package:company_print/common/index.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:company_print/pages/dishes/dishes_controller.dart';
 import 'package:company_print/pages/mutiple_dish_select/mutiple_dish_select_model.dart';
 
 class MutipleDishSelectController extends GetxController {
+  MutipleDishSelectController({required this.selected});
+
+  final List<DishesCategoryData> selected;
+  var text = '请选择商品'.obs;
   final AppDatabase database = DatabaseManager.instance.appDatabase;
   var dishesList = <MutipleDishListDishModel>[].obs;
   final chineseRegExp = RegExp(r'[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]');
@@ -17,28 +22,32 @@ class MutipleDishSelectController extends GetxController {
   ScrollController scrollController = ScrollController();
   late SliverObserverController observerController;
   Map<int, BuildContext> sliverContextMap = {};
+  // 数据库存在的分类数据
   final List<DishesCategoryData> categories = <DishesCategoryData>[].obs;
+  // 页面已经勾选的分类数据
+  var selectedCategories = <MutipleDishesCategoryData>[].obs;
+
   var nodes = <CategoryTreeNode>[].obs;
   @override
   void onInit() {
     super.onInit();
     fetchCategories();
     observerController = SliverObserverController(controller: scrollController);
+    text.value = selectedCategories.isNotEmpty ? '已选择${selectedCategories.length}个商品' : '请选择商品';
   }
 
-  handleSwitchModeBtnTap() {
-    isShowListMode.toggle();
-    // Clear the offset cache.
-    for (var ctx in sliverContextMap.values) {
-      observerController.clearScrollIndexCache(sliverContext: ctx);
+  handleBackTap() async {
+    if (selectedCategories.isEmpty) {
+      final result = await Utils.showAlertDialog('未选择商品是否退出？', title: '提示');
+      if (result == true) {
+        Get.back(result: selectedCategories.value.map((e) => e.category).toList());
+      }
     }
-    sliverContextMap.clear();
-    observerController.reattach();
   }
 
-  Map<String, List<DishesCategoryData>> getSortedFirstLetters(List<DishesCategoryData> categories) {
+  Map<String, List<MutipleDishesCategoryData>> getSortedFirstLetters(List<DishesCategoryData> categories) {
     // 创建映射来存储每个拼音首字母对应的所有原始字符串
-    Map<String, List<DishesCategoryData>> firstLetterMap = {};
+    Map<String, List<MutipleDishesCategoryData>> firstLetterMap = {};
     const specialKey = '*'; // 特殊分组标识符
 
     for (DishesCategoryData category in categories) {
@@ -62,11 +71,11 @@ class MutipleDishSelectController extends GetxController {
       if (!firstLetterMap.containsKey(letter)) {
         firstLetterMap[letter] = [];
       }
-      firstLetterMap[letter]?.add(category);
+      firstLetterMap[letter]?.add(MutipleDishesCategoryData(selected: false, category: category));
     }
 
     // 按照 A-Z 排序拼音首字母，并构建最终的结果映射
-    Map<String, List<DishesCategoryData>> sortedMap = {};
+    Map<String, List<MutipleDishesCategoryData>> sortedMap = {};
     List<String> keys = firstLetterMap.keys.toList()..sort(); // 确保 '*' 分组排在最后
     for (String key in keys) {
       sortedMap[key] = firstLetterMap[key]!;
@@ -93,8 +102,6 @@ class MutipleDishSelectController extends GetxController {
     // 只匹配 CJK 统一表意文字和其他中文字符
     return RegExp(r'[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]').hasMatch(char);
   }
-
-  generateDishData() {}
 
   List<CategoryTreeNode> buildTree(List<DishesCategoryData> data) {
     final Map<int, CategoryTreeNode> nodeMap = {};
@@ -148,9 +155,38 @@ class MutipleDishSelectController extends GetxController {
     nodes.assignAll(getAllLeafNodes(buildTree(result)));
     dishesList.assignAll(getSortedDishModels(nodes));
     symbols.assignAll(dishesList.map((e) => e.section).toList());
+    handleExitSelect();
   }
 
-  void onCategoryPressed(DishesCategoryData data) {
-    Get.back(result: data);
+  void onCategoryPressed(MutipleDishesCategoryData data) {
+    final categoryId = data.category.id;
+    final isSelected = selectedCategories.any((e) => e.category.id == categoryId);
+
+    if (isSelected) {
+      selectedCategories.removeWhere((e) => e.category.id == categoryId);
+    } else {
+      selectedCategories.add(data);
+    }
+
+    // 直接更新传入的数据对象的选择状态
+    data.selected = !isSelected;
+
+    // 触发 UI 更新
+    dishesList.value = List.from(dishesList);
+
+    // 更新文本提示
+    text.value = selectedCategories.isNotEmpty ? '已选择${selectedCategories.length}个商品' : '请选择商品';
+  }
+
+  void handleExitSelect() {
+    final selectedMap = Map.fromEntries(selected.map((item) => MapEntry(item.id, item)));
+    for (var category in dishesList) {
+      for (var categoryData in category.categories) {
+        categoryData.selected = selectedMap.containsKey(categoryData.category.id);
+      }
+    }
+    dishesList.value = List.from(dishesList.value);
+    selectedCategories.value =
+        selected.map((item) => MutipleDishesCategoryData(selected: true, category: item)).toList();
   }
 }

@@ -10,7 +10,7 @@ import 'package:company_print/pages/mutiple_dish_select/mutiple_dish_index_bar.d
 import 'package:company_print/pages/mutiple_dish_select/mutiple_dish_select_model.dart';
 import 'package:company_print/pages/mutiple_dish_select/mutiple_dish_select_controller.dart';
 
-typedef OnCategoryPressed = void Function(DishesCategoryData data);
+typedef OnMitipleDishCategoryPressed = void Function(MutipleDishesCategoryData data);
 
 class MutipleDishSelectPage extends GetView<MutipleDishSelectController> {
   const MutipleDishSelectPage({super.key});
@@ -18,8 +18,8 @@ class MutipleDishSelectPage extends GetView<MutipleDishSelectController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("请选择商品"),
-        actions: [buildSwitchModeBtn()],
+        title: Obx(() => Text(controller.text.value)),
+        actions: [buildSelectBackBtn()],
       ),
       body: Obx(() => Stack(
             children: [
@@ -47,12 +47,12 @@ class MutipleDishSelectPage extends GetView<MutipleDishSelectController> {
     );
   }
 
-  Widget buildSwitchModeBtn() {
+  Widget buildSelectBackBtn() {
     return IconButton(
       onPressed: () {
-        controller.handleSwitchModeBtnTap();
+        controller.handleBackTap();
       },
-      icon: const Icon(Icons.swap_horizontal_circle_sharp),
+      icon: const Icon(Icons.add_circle_outline_outlined),
     );
   }
 

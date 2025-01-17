@@ -189,6 +189,7 @@ class CustomerOrderItemsController extends GetxController {
           controller: this,
           orderItem: customerOrderItem,
           onConfirm: (updatedCustomerOrderItem) => updateCustomerOrderItem(
+            customerOrderItem.id,
             customerId,
             updatedCustomerOrderItem.itemName,
             updatedCustomerOrderItem.itemShortName,
@@ -228,6 +229,7 @@ class CustomerOrderItemsController extends GetxController {
 
   Future<void> updateCustomerOrderItem(
     int id,
+    int customerId,
     String itemName,
     String? itemShortName,
     String? purchaseUnit,
@@ -237,17 +239,8 @@ class CustomerOrderItemsController extends GetxController {
     double? presetPrice,
     double? actualPrice,
   ) async {
-    await database.customerOrderItemsDao.updateCustomerOrderItem(
-      id,
-      itemName,
-      itemShortName,
-      purchaseUnit,
-      purchaseQuantity,
-      actualUnit,
-      actualQuantity,
-      presetPrice,
-      actualPrice,
-    );
+    await database.customerOrderItemsDao.updateCustomerOrderItem(id, customerId, itemName, itemShortName, purchaseUnit,
+        purchaseQuantity, actualUnit, actualQuantity, presetPrice, actualPrice);
     dataSource?.refreshDatasource();
   }
 

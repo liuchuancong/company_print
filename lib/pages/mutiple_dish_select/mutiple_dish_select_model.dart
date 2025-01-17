@@ -13,10 +13,20 @@ class MutipleDishListCursorInfoModel {
 
 class MutipleDishListDishModel {
   final String section;
-  final List<DishesCategoryData> categories;
+  final List<MutipleDishesCategoryData> categories;
 
   MutipleDishListDishModel({
     required this.section,
     required this.categories,
+  });
+}
+
+class MutipleDishesCategoryData {
+  bool selected;
+  final DishesCategoryData category;
+
+  MutipleDishesCategoryData({
+    this.selected = false,
+    required this.category,
   });
 }

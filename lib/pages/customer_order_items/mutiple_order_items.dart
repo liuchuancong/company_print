@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:searchfield/searchfield.dart';
@@ -5,6 +6,7 @@ import 'package:company_print/common/index.dart';
 import 'package:cascade_widget/cascade_widget.dart';
 import 'package:company_print/common/style/custom_scaffold.dart';
 import 'package:company_print/common/widgets/section_listtile.dart';
+import 'package:company_print/pages/mutiple_dish_select/mutiple_dish_select_model.dart';
 import 'package:company_print/pages/customer_order_items/customer_order_items_controller.dart';
 
 class MutipleOrderItemPage extends StatefulWidget {
@@ -32,6 +34,7 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
   List<DropDownMenuModel> selectedItems = [];
   SearchFieldListItem<DishUnit>? selectedPurchaseUnitValue;
   SearchFieldListItem<DishUnit>? selectedActualUnitValue;
+  List<DishesCategoryData> categories = [];
   @override
   void initState() {
     super.initState();
@@ -92,9 +95,11 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
                     size: 30,
                   ),
                   onPressed: () async {
-                    final result = await Get.toNamed(RoutePath.kDishSelectPage);
+                    final result = await Get.toNamed(RoutePath.kMutipleDishSelectPage, arguments: [categories]);
+                    log(result.toString());
                     if (result != null) {
-                      _itemNameController.text = result.name ?? '';
+                      categories = result;
+                      _itemNameController.text = categories.isEmpty ? '' : '已选择${categories.length}个商品';
                     }
                   },
                 ),

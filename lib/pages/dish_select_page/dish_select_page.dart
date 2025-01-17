@@ -10,7 +10,7 @@ import 'package:company_print/pages/dish_select_page/dish_item_view.dart';
 import 'package:company_print/pages/dish_select_page/dish_select_model.dart';
 import 'package:company_print/pages/dish_select_page/dish_select_controller.dart';
 
-typedef OnCategoryPressed = void Function(DishesCategoryData data);
+typedef OnDishCategoryPressed = void Function(DishesCategoryData data);
 
 class DishSelectPage extends GetView<DishSelectController> {
   const DishSelectPage({super.key});
@@ -19,7 +19,6 @@ class DishSelectPage extends GetView<DishSelectController> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("请选择商品"),
-        actions: [buildSwitchModeBtn()],
       ),
       body: Obx(() => Stack(
             children: [
@@ -44,15 +43,6 @@ class DishSelectPage extends GetView<DishSelectController> {
               ),
             ],
           )),
-    );
-  }
-
-  Widget buildSwitchModeBtn() {
-    return IconButton(
-      onPressed: () {
-        controller.handleSwitchModeBtnTap();
-      },
-      icon: const Icon(Icons.swap_horizontal_circle_sharp),
     );
   }
 

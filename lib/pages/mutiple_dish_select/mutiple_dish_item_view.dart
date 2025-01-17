@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:company_print/common/index.dart';
-import 'package:company_print/pages/dish_select_page/dish_select_page.dart';
+import 'package:company_print/pages/mutiple_dish_select/mutiple_dish_select_page.dart';
+import 'package:company_print/pages/mutiple_dish_select/mutiple_dish_select_model.dart';
 
 class MutipleDishListItemView extends StatelessWidget {
-  final OnCategoryPressed onCategoryPressed;
+  final OnMitipleDishCategoryPressed onCategoryPressed;
 
   const MutipleDishListItemView({
     super.key,
@@ -12,7 +12,7 @@ class MutipleDishListItemView extends StatelessWidget {
     required this.onCategoryPressed,
   });
 
-  final DishesCategoryData category;
+  final MutipleDishesCategoryData category;
 
   final bool isShowSeparator;
 
@@ -36,9 +36,22 @@ class MutipleDishListItemView extends StatelessWidget {
           ),
           alignment: Alignment.centerLeft,
           margin: const EdgeInsets.only(left: 16.0),
-          child: Text(
-            category.name,
-            style: const TextStyle(color: Colors.black, fontSize: 16),
+          child: Container(
+            padding: const EdgeInsets.only(right: 40.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  category.category.name,
+                  style: const TextStyle(color: Colors.black, fontSize: 16),
+                ),
+                Checkbox(
+                    value: category.selected,
+                    onChanged: (bool? value) {
+                      onCategoryPressed(category);
+                    })
+              ],
+            ),
           ),
         ),
       ),

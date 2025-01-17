@@ -138,6 +138,7 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
   /// 更新订单项
   Future updateCustomerOrderItem(
     int id,
+    int customerId,
     String itemName,
     String? itemShortName,
     String? purchaseUnit,
@@ -148,8 +149,8 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
     double? actualPrice,
   ) async {
     final entry = CustomerOrderItemsCompanion(
+      customerId: Value(customerId),
       itemName: Value(itemName),
-      customerId: Value(id),
       itemShortName: Value(itemShortName),
       purchaseUnit: Value(purchaseUnit),
       purchaseQuantity: Value(purchaseQuantity),
@@ -158,7 +159,9 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
       presetPrice: Value(presetPrice),
       actualPrice: Value(actualPrice),
     );
-    return await (update(db.customerOrderItems)..where((tbl) => tbl.id.equals(id))).write(entry);
+    await (update(db.customerOrderItems)..where((tbl) => tbl.id.equals(id))).write(entry);
+
+    // return await (update(db.customerOrderItems)..where((tbl) => tbl.id.equals(id))).write(entry);
   }
 
   /// 删除订单项

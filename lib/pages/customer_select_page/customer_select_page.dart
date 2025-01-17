@@ -19,7 +19,6 @@ class CustomerSelectPage extends GetView<CustomerSelectController> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("请选择客户"),
-        actions: [buildSwitchModeBtn()],
       ),
       body: Obx(() => Stack(
             children: [
@@ -44,15 +43,6 @@ class CustomerSelectPage extends GetView<CustomerSelectController> {
               ),
             ],
           )),
-    );
-  }
-
-  Widget buildSwitchModeBtn() {
-    return IconButton(
-      onPressed: () {
-        controller.handleSwitchModeBtnTap();
-      },
-      icon: const Icon(Icons.swap_horizontal_circle_sharp),
     );
   }
 

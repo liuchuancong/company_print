@@ -19,7 +19,6 @@ class UnitSelectPage extends GetView<UnitSelectController> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("请选择商品"),
-        actions: [buildSwitchModeBtn()],
       ),
       body: Obx(() => Stack(
             children: [
@@ -44,15 +43,6 @@ class UnitSelectPage extends GetView<UnitSelectController> {
               ),
             ],
           )),
-    );
-  }
-
-  Widget buildSwitchModeBtn() {
-    return IconButton(
-      onPressed: () {
-        controller.handleSwitchModeBtnTap();
-      },
-      icon: const Icon(Icons.swap_horizontal_circle_sharp),
     );
   }
 

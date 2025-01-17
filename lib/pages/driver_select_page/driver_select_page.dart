@@ -19,7 +19,6 @@ class DriverSelectPage extends GetView<DriverSelectController> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("请选择司机"),
-        actions: [buildSwitchModeBtn()],
       ),
       body: Obx(() => Stack(
             children: [
@@ -44,15 +43,6 @@ class DriverSelectPage extends GetView<DriverSelectController> {
               ),
             ],
           )),
-    );
-  }
-
-  Widget buildSwitchModeBtn() {
-    return IconButton(
-      onPressed: () {
-        controller.handleSwitchModeBtnTap();
-      },
-      icon: const Icon(Icons.swap_horizontal_circle_sharp),
     );
   }
 

@@ -3,7 +3,7 @@ import 'package:company_print/common/index.dart';
 import 'package:company_print/pages/dish_select_page/dish_select_page.dart';
 
 class DishListItemView extends StatelessWidget {
-  final OnCategoryPressed onCategoryPressed;
+  final OnDishCategoryPressed onCategoryPressed;
 
   const DishListItemView({
     super.key,
