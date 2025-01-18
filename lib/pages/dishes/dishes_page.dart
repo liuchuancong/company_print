@@ -31,12 +31,21 @@ class _DishesPageState extends State<DishesPage> with TickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         title: const Text('商品分类'),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          controller.showCreateCategoryDialog();
-        },
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 20.0),
+            child: FilledButton(
+              style: ButtonStyle(
+                shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+              ),
+              onPressed: () {
+                controller.showCreateCategoryDialog();
+              },
+              child: const Text('添加', style: TextStyle(fontSize: 18)),
+            ),
+          ),
+        ],
       ),
       body: Obx(
         () => controller.isLoading.value
@@ -54,7 +63,7 @@ class _DishesPageState extends State<DishesPage> with TickerProviderStateMixin {
                                 tree: node,
                                 padding: const EdgeInsets.only(left: 5.0, right: 5),
                                 alignment: Alignment.centerLeft,
-                                color: Colors.white,
+                                color: Theme.of(context).primaryColor,
                               );
                             }
 
@@ -62,7 +71,7 @@ class _DishesPageState extends State<DishesPage> with TickerProviderStateMixin {
                               tree: node,
                               padding: const EdgeInsets.only(left: 5.0, right: 5),
                               alignment: Alignment.centerLeft,
-                              color: Colors.white,
+                              color: Theme.of(context).primaryColor,
                             );
                           },
                           indentation: Indentation(
@@ -74,19 +83,19 @@ class _DishesPageState extends State<DishesPage> with TickerProviderStateMixin {
                               vertical: 2.0,
                             ),
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10.0),
-                              color: Theme.of(context).primaryColor.withAlpha(200),
-                            ),
+                                borderRadius: BorderRadius.circular(10.0),
+                                color: Theme.of(context).primaryColor.withAlpha(60),
+                                border: Border.all(color: Theme.of(context).primaryColor, width: 1.0)),
                             child: ListTile(
                               title: Container(
                                 margin: const EdgeInsets.only(left: 15.0),
                                 child: Text('商品名称: ${node.data!.data.name}',
-                                    style: const TextStyle(fontSize: 18.0, color: Colors.white)),
+                                    style: const TextStyle(fontSize: 18.0, color: Colors.black)),
                               ),
                               subtitle: Container(
                                 margin: const EdgeInsets.only(left: 15.0),
                                 child: Text('商品描述: ${node.data!.data.description}',
-                                    style: const TextStyle(fontSize: 16.0, color: Colors.white)),
+                                    style: const TextStyle(fontSize: 16.0, color: Colors.black)),
                               ),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -99,7 +108,7 @@ class _DishesPageState extends State<DishesPage> with TickerProviderStateMixin {
                                       '编辑',
                                       style: TextStyle(
                                         fontSize: 16.0,
-                                        color: Colors.white,
+                                        color: Colors.black,
                                       ),
                                     ),
                                   ),
@@ -111,7 +120,7 @@ class _DishesPageState extends State<DishesPage> with TickerProviderStateMixin {
                                       '删除',
                                       style: TextStyle(
                                         fontSize: 16.0,
-                                        color: Colors.white,
+                                        color: Colors.black,
                                       ),
                                     ),
                                   ),

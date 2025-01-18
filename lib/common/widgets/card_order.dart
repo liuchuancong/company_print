@@ -46,16 +46,16 @@ class CardOrder extends StatelessWidget {
               Stack(
                 children: [
                   Positioned(
-                    left: 4,
-                    top: 8,
+                    left: 10,
+                    top: 10,
                     child: OrderChip(
                       icon: Icons.monetization_on_outlined,
                       count: '${index + 1}',
                     ),
                   ),
                   Positioned(
-                    right: 4,
-                    top: 8,
+                    right: 10,
+                    top: 10,
                     child: GestureDetector(
                       onTap: () => complete(order),
                       child: CountChip(
@@ -247,7 +247,7 @@ class OrderChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
-      backgroundColor: Theme.of(context).primaryColor,
+      backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.9),
       child: Text(
         count,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(

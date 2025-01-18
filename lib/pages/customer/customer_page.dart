@@ -42,19 +42,25 @@ class _CustomersPageState extends State<CustomersPage> with AutomaticKeepAliveCl
               return AsyncPaginatedDataTable2(
                 header: Container(),
                 actions: [
-                  IconButton(
-                    icon: const Icon(Icons.add, color: Colors.black),
-                    tooltip: '新增',
+                  FilledButton(
+                    style: ButtonStyle(
+                      shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+                    ),
                     onPressed: () {
                       controller.showCreateCustomerDialog();
                     },
+                    child: const Text('新增', style: TextStyle(fontSize: 18)),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.refresh, color: Colors.black),
-                    tooltip: '刷新',
+                  FilledButton(
+                    style: ButtonStyle(
+                      shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+                    ),
                     onPressed: () {
                       controller.dataSource?.refreshDatasource();
                     },
+                    child: const Text('刷新', style: TextStyle(fontSize: 18)),
                   ),
                 ],
                 wrapInCard: true,
