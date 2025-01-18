@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:company_print/utils/utils.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/pages/dish_select_page/dish_select_page.dart';
 
@@ -37,7 +38,7 @@ class DishListItemView extends StatelessWidget {
           alignment: Alignment.centerLeft,
           margin: const EdgeInsets.only(left: 16.0),
           child: Text(
-            category.name,
+            Utils.concatenation(category.name, category.description),
             style: const TextStyle(color: Colors.black, fontSize: 16),
           ),
         ),

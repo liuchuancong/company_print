@@ -218,7 +218,7 @@ class EditOrCreateVehiclePageState extends State<EditOrCreateVehiclePage> {
             padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
           ),
           onPressed: () {
-            Get.back(); // 使用 SmartDialog 方法关闭对话框
+            Get.back();
           },
           child: const Text('取消', style: TextStyle(fontSize: 18)),
         ),

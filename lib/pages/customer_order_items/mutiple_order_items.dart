@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:searchfield/searchfield.dart';
 import 'package:company_print/utils/utils.dart';
 import 'package:company_print/common/index.dart';
-import 'package:cascade_widget/cascade_widget.dart';
 import 'package:company_print/common/style/custom_scaffold.dart';
 import 'package:company_print/common/widgets/section_listtile.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
@@ -24,9 +22,7 @@ class MutipleOrderItemPage extends StatefulWidget {
 
 class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
   late TextEditingController _itemNameController;
-  List<DropDownMenuModel> selectedItems = [];
-  SearchFieldListItem<DishUnit>? selectedPurchaseUnitValue;
-  SearchFieldListItem<DishUnit>? selectedActualUnitValue;
+
   List<DishesCategoryData> categories = [];
 
   List<Map<String, TextEditingController>> productsControllers = [];

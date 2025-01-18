@@ -16,6 +16,8 @@ import 'package:company_print/pages/customer_select_page/customer_select_binding
 import 'package:company_print/pages/customer_order_items/customer_order_items_page.dart';
 import 'package:company_print/pages/mutiple_dish_select/mutiple_dish_select_binding.dart';
 import 'package:company_print/pages/customer_order_items/customer_order_items_binding.dart';
+import 'package:company_print/pages/mutiple_customer_dish_select/mutiple_customer_dish_select_page.dart';
+import 'package:company_print/pages/mutiple_customer_dish_select/mutiple_customer_dish_select_binding.dart';
 
 // auth
 
@@ -63,6 +65,11 @@ class AppPages {
       name: RoutePath.kMutipleDishSelectPage,
       page: MutipleDishSelectPage.new,
       bindings: [MutipleDishSelectBinding()],
+    ),
+    GetPage(
+      name: RoutePath.kMutipleCustomerDishSelectPage,
+      page: MutipleCustomerDishSelectPage.new,
+      bindings: [MutipleCustomerDishSelectBinding()],
     ),
     GetPage(
       name: RoutePath.kUnitSelectPage,

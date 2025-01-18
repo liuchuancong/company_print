@@ -26,6 +26,8 @@ class RoutePath {
 
   // 多商品选择页
   static var kMutipleDishSelectPage = "/mutipleDishSelectPage";
+  //多商品用户选择页
+  static var kMutipleCustomerDishSelectPage = "/mutipleCustomerDishSelectPage";
   // 单位选择
   static var kUnitSelectPage = "/unitSelectPage";
 }

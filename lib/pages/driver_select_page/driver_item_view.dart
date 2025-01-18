@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:company_print/utils/utils.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/pages/driver_select_page/driver_select_page.dart';
 
@@ -37,7 +38,7 @@ class DriverListItemView extends StatelessWidget {
           alignment: Alignment.centerLeft,
           margin: const EdgeInsets.only(left: 16.0),
           child: Text(
-            driver.driverPhone!.isNotEmpty ? '${driver.driverName!}(电话: ${driver.driverPhone!})' : driver.driverName!,
+            Utils.concatenation(driver.driverName, driver.driverPhone),
             style: const TextStyle(color: Colors.black, fontSize: 16),
           ),
         ),

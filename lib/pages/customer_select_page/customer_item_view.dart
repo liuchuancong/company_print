@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:company_print/utils/utils.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/pages/customer_select_page/customer_select_page.dart';
 
@@ -37,7 +38,7 @@ class CustomerListItemView extends StatelessWidget {
           alignment: Alignment.centerLeft,
           margin: const EdgeInsets.only(left: 16.0),
           child: Text(
-            customer.name!,
+            Utils.concatenation(customer.name, customer.phone),
             style: const TextStyle(color: Colors.black, fontSize: 16),
           ),
         ),

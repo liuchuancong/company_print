@@ -4,9 +4,14 @@ import 'package:date_format/date_format.dart';
 import 'package:company_print/utils/utils.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:company_print/common/index.dart';
-import 'package:cascade_widget/cascade_widget.dart';
 import 'package:company_print/pages/dishes/dishes_controller.dart';
 import 'package:company_print/pages/sale_details/sale_details_page.dart';
+import 'package:company_print/pages/sale_details/mutiple_order_items.dart';
+
+enum DishesSelectType {
+  dishes,
+  customer,
+}
 
 class SaleDetailsController extends GetxController {
   SaleDetailsController(this.orderId);
@@ -16,7 +21,7 @@ class SaleDetailsController extends GetxController {
   final List<OrderItem> orderItems = <OrderItem>[].obs;
   var isLoading = false.obs; // 加载状态标记
   var totalSaleDetails = 0.obs;
-
+  DishesSelectType dishesSelectType = DishesSelectType.dishes;
   var rowsPerPage = PaginatedDataTable.defaultRowsPerPage.obs;
   var currentPage = 0.obs;
   var sortAscending = false.obs;
@@ -30,21 +35,21 @@ class SaleDetailsController extends GetxController {
   void onInit() {
     super.onInit();
     dataSource = SaleDetailsDataSource(this);
-    fetchCategories();
-    ggetAllDishUnits();
   }
 
   String getSortName() {
     final sortNames = [
       '',
       'itemName',
-      'itemShortName',
+      'totalPrice',
+      'advancePayment',
       'purchaseQuantity',
       'presetPrice',
       'purchaseUnit',
       'actualQuantity',
       'actualPrice',
       'actualUnit',
+      'itemShortName',
       // 如果有其他需要排序的字段，可以继续添加
     ];
     return sortNames[sortColumnIndex.value];
@@ -99,7 +104,7 @@ class SaleDetailsController extends GetxController {
     }
   }
 
-  void showPreviewCustomerDialog(OrderItem customer) {
+  void showPreviewOrderDialog(OrderItem customer) {
     Utils.showMapAlertDialog({
       '商品名称': customer.itemName!,
       '商品简介': customer.itemShortName ?? '',
@@ -113,12 +118,10 @@ class SaleDetailsController extends GetxController {
     });
   }
 
-  void showCreateCustomerDialog() {
-    SmartDialog.show(
-      builder: (context) {
-        return EditOrderItemsPage(
+  void showCreateOrderDialog() {
+    Get.to(() => EditOrderItemsPage(
           controller: this,
-          onConfirm: (orderItem) => addCustomerOrderItem(
+          onConfirm: (orderItem) => addOrderOrderItem(
             orderItem.itemName!,
             orderItem.itemShortName,
             orderItem.purchaseUnit,
@@ -130,84 +133,50 @@ class SaleDetailsController extends GetxController {
             orderItem.advancePayment!,
             orderItem.totalPrice!,
           ),
-        );
-      },
-    );
+        ));
   }
 
   void showMutipleOrderItemPage() {
+    dishesSelectType = DishesSelectType.dishes;
     Get.to(() => MutipleOrderItemPage(
         controller: this,
-        onConfirm: (orderItem, itemNames) {
-          handleMutipleOrderItem(itemNames, orderItem);
+        onConfirm: (List<OrderItem> newOrderItems) {
+          handleMutipleOrderItem(newOrderItems);
         }));
   }
 
-  void handleMutipleOrderItem(List<DropDownMenuModel> itemNames, OrderItem orderItem) async {
-    List<bool> itemNameExits = [];
-    for (var itemName in itemNames) {
-      var isExit = await database.orderItemsDao.doesItemNameExistForOrder(itemName.name, orderId);
-      itemNameExits.add(isExit);
-    }
-    var count = itemNameExits.where((element) => element == true).length;
-    if (count > 0) {
-      var result = await Utils.showAlertDialog("$count个商品名称已存在，是否重复添加？", title: "导入");
-      if (result == true) {
-        for (var itemName in itemNames) {
-          addCustomerOrderItem(
-            itemName.name,
-            orderItem.itemShortName,
-            orderItem.purchaseUnit,
-            orderItem.actualUnit,
-            orderItem.purchaseQuantity!,
-            orderItem.actualQuantity!,
-            orderItem.presetPrice!,
-            orderItem.actualPrice!,
-            orderItem.advancePayment!,
-            orderItem.totalPrice!,
-          );
-        }
-      } else if (result == false) {
-        for (var i = 0; i < itemNameExits.length; i++) {
-          if (itemNameExits[i] == false) {
-            addCustomerOrderItem(
-              itemNames[i].name,
-              orderItem.itemShortName,
-              orderItem.purchaseUnit,
-              orderItem.actualUnit,
-              orderItem.purchaseQuantity!,
-              orderItem.actualQuantity!,
-              orderItem.presetPrice!,
-              orderItem.actualPrice!,
-              orderItem.advancePayment!,
-              orderItem.totalPrice!,
-            );
-          }
-        }
-      }
-    } else {
-      for (var itemName in itemNames) {
-        addCustomerOrderItem(
-          itemName.name,
-          orderItem.itemShortName,
-          orderItem.purchaseUnit,
-          orderItem.actualUnit,
-          orderItem.purchaseQuantity!,
-          orderItem.actualQuantity!,
-          orderItem.presetPrice!,
-          orderItem.actualPrice!,
-          orderItem.advancePayment!,
-          orderItem.totalPrice!,
-        );
-      }
+  void showMutipleCustomerOrderItemPage() {
+    dishesSelectType = DishesSelectType.customer;
+    Get.to(() => MutipleOrderItemPage(
+        controller: this,
+        onConfirm: (List<OrderItem> newOrderItems) {
+          handleMutipleOrderItem(newOrderItems);
+        }));
+  }
+
+  void handleMutipleOrderItem(List<OrderItem> newOrderItems) async {
+    dishesSelectType = DishesSelectType.dishes;
+    for (var item in newOrderItems) {
+      addOrderOrderItem(
+        item.itemName!,
+        item.itemShortName,
+        item.purchaseUnit,
+        item.actualUnit,
+        item.purchaseQuantity!,
+        item.actualQuantity!,
+        item.presetPrice!,
+        item.actualPrice!,
+        item.advancePayment!,
+        item.totalPrice!,
+      );
     }
   }
 
-  void showEditCustomerDialog(OrderItem customerOrderItem) {
+  void showEditOrderDialog(OrderItem customerOrderItem) {
     Get.to(() => EditOrderItemsPage(
           controller: this,
           orderItem: customerOrderItem,
-          onConfirm: (orderItem) => updateCustomerOrderItem(
+          onConfirm: (orderItem) => updateOrderOrderItem(
             orderItem.id,
             orderItem.itemName!,
             orderItem.itemShortName,
@@ -223,7 +192,7 @@ class SaleDetailsController extends GetxController {
         ));
   }
 
-  Future<void> addCustomerOrderItem(
+  Future<void> addOrderOrderItem(
     String itemName,
     String? itemShortName,
     String? purchaseUnit,
@@ -251,7 +220,7 @@ class SaleDetailsController extends GetxController {
     dataSource?.refreshDatasource();
   }
 
-  Future<void> updateCustomerOrderItem(
+  Future<void> updateOrderOrderItem(
     int id,
     String itemName,
     String? itemShortName,
@@ -281,65 +250,15 @@ class SaleDetailsController extends GetxController {
     dataSource?.refreshDatasource();
   }
 
-  void showDeleteCustomerOrderDialog(int id) async {
+  void showDeleteOrderOrderDialog(int id) async {
     var result = await Utils.showAlertDialog("确定要删除吗？", title: "删除");
     if (result == true) {
-      deleteCustomerOrderItem(id);
+      deleteOrderOrderItem(id);
     }
   }
 
-  Future<void> deleteCustomerOrderItem(int id) async {
+  Future<void> deleteOrderOrderItem(int id) async {
     await database.orderItemsDao.deleteOrderItem(id);
     dataSource?.refreshDatasource();
-  }
-
-  List<CategoryTreeNode> buildTree(List<DishesCategoryData> data) {
-    final Map<int, CategoryTreeNode> nodeMap = {};
-    for (var item in data) {
-      nodeMap[item.id] = CategoryTreeNode(data: item);
-    }
-    final List<CategoryTreeNode> rootNodes = [];
-    for (var item in data) {
-      if (item.parentId == null) {
-        rootNodes.add(nodeMap[item.id]!);
-      } else {
-        final parentNode = nodeMap[item.parentId];
-        if (parentNode != null) {
-          parentNode.children = List.of(parentNode.children)..add(nodeMap[item.id]!);
-        }
-      }
-    }
-    return rootNodes;
-  }
-
-  List<CategoryTreeNode> collectLeafNodes(CategoryTreeNode node) {
-    if (node.children.isEmpty) {
-      return [node];
-    } else {
-      List<CategoryTreeNode> leafNodes = [];
-      for (var child in node.children) {
-        leafNodes.addAll(collectLeafNodes(child));
-      }
-      return leafNodes;
-    }
-  }
-
-// 定义一个函数来从根节点列表开始收集所有的叶子节点
-  List<CategoryTreeNode> getAllLeafNodes(List<CategoryTreeNode> rootNodes) {
-    List<CategoryTreeNode> allLeafNodes = [];
-    for (var rootNode in rootNodes) {
-      allLeafNodes.addAll(collectLeafNodes(rootNode));
-    }
-    return allLeafNodes;
-  }
-
-  Future<void> fetchCategories() async {
-    final result = await database.dishesCategoryDao.getAllCategories();
-    nodes.assignAll(getAllLeafNodes(buildTree(result)));
-  }
-
-  Future<void> ggetAllDishUnits() async {
-    final result = await database.dishUnitsDao.getAllDishUnits();
-    dishUtils.assignAll(result);
   }
 }

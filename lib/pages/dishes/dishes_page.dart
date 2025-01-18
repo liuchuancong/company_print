@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:company_print/utils/utils.dart';
 import 'package:company_print/common/index.dart';
 import 'package:animated_tree_view/animated_tree_view.dart';
 import 'package:company_print/pages/dishes/dishes_controller.dart';
@@ -171,8 +172,18 @@ class EditOrCreateCategoryPageState extends State<EditOrCreateCategoryPage> {
       description: _descriptionController.text,
       createdAt: isNew ? DateTime.now() : widget.category!.createdAt,
     );
-    widget.onConfirm(newOrUpdatedCategory);
-    Get.back();
+    checkExitsItem(newOrUpdatedCategory);
+  }
+
+  checkExitsItem(DishesCategoryData category) async {
+    final AppDatabase database = DatabaseManager.instance.appDatabase;
+    var isExit = await database.dishesCategoryDao.doesCategoryExistForOrder(category.name);
+    if (isExit) {
+      Utils.showAlertDialog("${category.name}商品已存在，请重新修改后添加!", title: "添加");
+    } else {
+      widget.onConfirm(category);
+      Get.back();
+    }
   }
 
   @override
@@ -270,7 +281,7 @@ class EditOrCreateCategoryPageState extends State<EditOrCreateCategoryPage> {
                           padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                         ),
                         onPressed: () {
-                          Get.back(); // 使用 SmartDialog 方法关闭对话框
+                          Get.back();
                         },
                         child: const Text('取消', style: TextStyle(fontSize: 18)),
                       ),
@@ -338,13 +349,13 @@ class EditOrCreateCategoryPageState extends State<EditOrCreateCategoryPage> {
                                 onTap: () {
                                   _parentIdController.text = node.data!.data.name.toString();
                                   parentId = node.data!.data.id;
-                                  SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
+                                  SmartDialog.dismiss();
                                 },
                                 trailing: ElevatedButton(
                                   onPressed: () {
                                     _parentIdController.text = node.data!.data.name.toString();
                                     parentId = node.data!.data.id;
-                                    SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
+                                    SmartDialog.dismiss();
                                   },
                                   child: const Text('选择'),
                                 ),
@@ -360,7 +371,7 @@ class EditOrCreateCategoryPageState extends State<EditOrCreateCategoryPage> {
                 alignment: Alignment.bottomRight,
                 child: ElevatedButton(
                   onPressed: () {
-                    SmartDialog.dismiss(); // 使用 SmartDialog 方法关闭对话框
+                    SmartDialog.dismiss();
                   },
                   child: const Text('关闭'),
                 ),

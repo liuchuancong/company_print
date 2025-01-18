@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:searchfield/searchfield.dart';
 import 'package:company_print/utils/utils.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/common/style/custom_scaffold.dart';
-import 'package:company_print/pages/dishes/dishes_controller.dart';
 import 'package:company_print/common/widgets/section_listtile.dart';
 import 'package:company_print/pages/customer_order_items/customer_order_items_controller.dart';
 
@@ -161,9 +159,6 @@ class EditOrderItemPageState extends State<EditOrderItemPage> {
   late TextEditingController _presetPriceController;
   late TextEditingController _actualPriceController;
 
-  SearchFieldListItem<CategoryTreeNode>? selectedCategoryValue;
-  SearchFieldListItem<DishUnit>? selectedPurchaseUnitValue;
-  SearchFieldListItem<DishUnit>? selectedActualUnitValue;
   @override
   void initState() {
     super.initState();
@@ -358,7 +353,7 @@ class EditOrderItemPageState extends State<EditOrderItemPage> {
             padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
           ),
           onPressed: () {
-            Get.back(); // 使用 SmartDialog 方法关闭对话框
+            Get.back();
           },
           child: const Text('取消', style: TextStyle(fontSize: 18)),
         ),

@@ -51,4 +51,10 @@ class DishesCategoryDao extends DatabaseAccessor<AppDatabase> with _$DishesCateg
   Future<List<DishesCategoryData>> getChildCategories(int parentId) async {
     return await (select(dishesCategory)..where((tbl) => tbl.parentId.equals(parentId))).get();
   }
+
+  Future<bool> doesCategoryExistForOrder(String itemName) async {
+    final query = select(db.dishesCategory)..where((tbl) => tbl.name.equals(itemName));
+    final result = await query.get();
+    return result.isNotEmpty;
+  }
 }
