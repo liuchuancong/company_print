@@ -4,7 +4,6 @@ import 'package:date_format/date_format.dart';
 import 'package:company_print/utils/utils.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:company_print/common/index.dart';
-import 'package:cascade_widget/cascade_widget.dart';
 import 'package:company_print/pages/customer_order_items/mutiple_order_items.dart';
 import 'package:company_print/pages/customer_order_items/customer_order_items_page.dart';
 
@@ -24,6 +23,7 @@ class CustomerOrderItemsController extends GetxController {
   var initialRow = 0.obs;
   final PaginatorController paginatorController = PaginatorController();
   CustomerOrderItemsDataSource? dataSource;
+
   @override
   void onInit() {
     super.onInit();
@@ -125,62 +125,23 @@ class CustomerOrderItemsController extends GetxController {
   void showMutipleOrderItemPage() {
     Get.to(() => MutipleOrderItemPage(
         controller: this,
-        onConfirm: (newCustomerOrderItem, itemNames) {
-          handleMutipleOrderItem(itemNames, newCustomerOrderItem);
+        onConfirm: (List<CustomerOrderItem> newCustomerOrderItems) {
+          handleMutipleOrderItem(newCustomerOrderItems);
         }));
   }
 
-  void handleMutipleOrderItem(List<DropDownMenuModel> itemNames, CustomerOrderItem newCustomerOrderItem) async {
-    List<bool> itemNameExits = [];
-    for (var itemName in itemNames) {
-      var isExit = await database.customerOrderItemsDao.doesItemNameExistForCustomer(itemName.name, customerId);
-      itemNameExits.add(isExit);
-    }
-    var count = itemNameExits.where((element) => element == true).length;
-    if (count > 0) {
-      var result = await Utils.showAlertDialog("$count个商品名称已存在，是否重复添加？", title: "导入");
-      if (result == true) {
-        for (var itemName in itemNames) {
-          addCustomerOrderItem(
-            itemName.name,
-            newCustomerOrderItem.itemShortName,
-            newCustomerOrderItem.purchaseUnit,
-            newCustomerOrderItem.purchaseQuantity,
-            newCustomerOrderItem.actualUnit,
-            newCustomerOrderItem.actualQuantity,
-            newCustomerOrderItem.presetPrice,
-            newCustomerOrderItem.actualPrice,
-          );
-        }
-      } else if (result == false) {
-        for (var i = 0; i < itemNameExits.length; i++) {
-          if (itemNameExits[i] == false) {
-            addCustomerOrderItem(
-              itemNames[i].name,
-              newCustomerOrderItem.itemShortName,
-              newCustomerOrderItem.purchaseUnit,
-              newCustomerOrderItem.purchaseQuantity,
-              newCustomerOrderItem.actualUnit,
-              newCustomerOrderItem.actualQuantity,
-              newCustomerOrderItem.presetPrice,
-              newCustomerOrderItem.actualPrice,
-            );
-          }
-        }
-      }
-    } else {
-      for (var itemName in itemNames) {
-        addCustomerOrderItem(
-          itemName.name,
-          newCustomerOrderItem.itemShortName,
-          newCustomerOrderItem.purchaseUnit,
-          newCustomerOrderItem.purchaseQuantity,
-          newCustomerOrderItem.actualUnit,
-          newCustomerOrderItem.actualQuantity,
-          newCustomerOrderItem.presetPrice,
-          newCustomerOrderItem.actualPrice,
-        );
-      }
+  void handleMutipleOrderItem(List<CustomerOrderItem> newCustomerOrderItems) async {
+    for (var item in newCustomerOrderItems) {
+      addCustomerOrderItem(
+        item.itemName,
+        item.itemShortName,
+        item.purchaseUnit,
+        item.purchaseQuantity,
+        item.actualUnit,
+        item.actualQuantity,
+        item.presetPrice,
+        item.actualPrice,
+      );
     }
   }
 

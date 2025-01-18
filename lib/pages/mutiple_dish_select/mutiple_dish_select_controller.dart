@@ -42,6 +42,8 @@ class MutipleDishSelectController extends GetxController {
       if (result == true) {
         Get.back(result: selectedCategories.value.map((e) => e.category).toList());
       }
+    } else {
+      Get.back(result: selectedCategories.value.map((e) => e.category).toList());
     }
   }
 

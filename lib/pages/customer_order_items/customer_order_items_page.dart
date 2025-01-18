@@ -210,7 +210,7 @@ class EditOrderItemPageState extends State<EditOrderItemPage> {
   Widget build(BuildContext context) {
     return CustomScaffold(
       appbar: AppBar(
-        title: Text(isNew ? '新增订单' : '编辑订单'),
+        title: Text(isNew ? '新增商品' : '编辑商品'),
       ),
       body: ListView(
         children: [

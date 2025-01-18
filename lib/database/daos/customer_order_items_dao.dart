@@ -185,4 +185,16 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
     // 如果结果非空，则说明已经存在该 itemName 对应的订单项
     return result.isNotEmpty;
   }
+
+  /// 检查是否已经存在具有指定 itemName 和 customerId 的订单
+  /// 该方法用于在更新订单项时检查是否已经存在具有相同 itemName 和 customerId 的订单
+  Future<CustomerOrderItem?> doesOrderExistForCustomer(CustomerOrderItem item, int customerId) async {
+    final query = select(db.customerOrderItems)
+      ..where((tbl) => tbl.id.equals(item.id) & tbl.customerId.equals(customerId));
+    final result = await query.get();
+    if (result.isEmpty) {
+      return null;
+    }
+    return result.first;
+  }
 }
