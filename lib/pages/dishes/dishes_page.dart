@@ -100,29 +100,30 @@ class _DishesPageState extends State<DishesPage> with TickerProviderStateMixin {
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  TextButton(
+                                  FilledButton(
+                                    style: ButtonStyle(
+                                      shape: WidgetStateProperty.all(
+                                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                                      padding: WidgetStateProperty.all(
+                                          const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+                                    ),
                                     onPressed: () {
                                       controller.showEditCategoryDialog(node.data!.data);
                                     },
-                                    child: const Text(
-                                      '编辑',
-                                      style: TextStyle(
-                                        fontSize: 16.0,
-                                        color: Colors.black,
-                                      ),
-                                    ),
+                                    child: const Text('编辑', style: TextStyle(fontSize: 18)),
                                   ),
-                                  TextButton(
+                                  const SizedBox(width: 10),
+                                  FilledButton(
+                                    style: ButtonStyle(
+                                      shape: WidgetStateProperty.all(
+                                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                                      padding: WidgetStateProperty.all(
+                                          const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+                                    ),
                                     onPressed: () {
                                       controller.deleteCategory(node.data!.data.id);
                                     },
-                                    child: const Text(
-                                      '删除',
-                                      style: TextStyle(
-                                        fontSize: 16.0,
-                                        color: Colors.black,
-                                      ),
-                                    ),
+                                    child: const Text('删除', style: TextStyle(fontSize: 16)),
                                   ),
                                 ],
                               ),
