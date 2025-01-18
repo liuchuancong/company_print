@@ -289,15 +289,26 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                     ),
                   ),
                   if (!isNew)
-                    CheckboxListTile(
-                      contentPadding: const EdgeInsets.all(0),
-                      title: const Text('已结算'),
-                      value: _isPaid,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          _isPaid = value ?? false;
-                        });
-                      },
+                    InputTextField(
+                      labelText: '已结算',
+                      gap: 10,
+                      child: SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Switch(
+                                value: _isPaid,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _isPaid = value;
+                                  });
+                                }),
+                          ],
+                        ),
+                      ),
                     ),
                   if (!isNew) const SectionTitle(title: '费用信息'),
                   if (!isNew)
