@@ -368,7 +368,8 @@ class SaleDetailsController extends GetxController {
                   pw.Expanded(
                     flex: 2, // 设置 flex 为 1 表示占据一半宽度
                     child: pw.Container(
-                      child: pw.Text("大写：${double.parse(getTotalOrderPrice.value).toSimplifiedChineseNumber()}元",
+                      child: pw.Text(
+                          "大写：${int.parse(getTotalOrderPrice.value) == 0 ? '零圆整' : double.parse(getTotalOrderPrice.value).toSimplifiedChineseNumber()}元",
                           style: const pw.TextStyle(fontSize: 12)),
                     ),
                   ),

@@ -52,12 +52,12 @@ class PrintPageState extends State<PrintPage> {
           InputTextField(
             labelText: '打印标题',
             gap: 10,
-            maxLength: 10,
+            maxLength: 100,
             child: TextField(
               controller: _printTitleController,
               textInputAction: TextInputAction.next,
               maxLines: null,
-              maxLength: 10,
+              maxLength: 100,
               decoration: const InputDecoration(
                 suffixIcon: Icon(
                   Icons.info_outline,
