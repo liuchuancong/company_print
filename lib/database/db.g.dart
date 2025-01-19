@@ -1645,6 +1645,12 @@ class $OrdersTable extends Orders with TableInfo<$OrdersTable, Order> {
   late final GeneratedColumn<double> itemCount = GeneratedColumn<double>(
       'item_count', aliasedName, true,
       type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _itemRealCountMeta =
+      const VerificationMeta('itemRealCount');
+  @override
+  late final GeneratedColumn<double> itemRealCount = GeneratedColumn<double>(
+      'item_real_count', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _shippingFeeMeta =
       const VerificationMeta('shippingFee');
   @override
@@ -1684,6 +1690,7 @@ class $OrdersTable extends Orders with TableInfo<$OrdersTable, Order> {
         advancePayment,
         totalPrice,
         itemCount,
+        itemRealCount,
         shippingFee,
         isPaid,
         createdAt
@@ -1773,6 +1780,12 @@ class $OrdersTable extends Orders with TableInfo<$OrdersTable, Order> {
       context.handle(_itemCountMeta,
           itemCount.isAcceptableOrUnknown(data['item_count']!, _itemCountMeta));
     }
+    if (data.containsKey('item_real_count')) {
+      context.handle(
+          _itemRealCountMeta,
+          itemRealCount.isAcceptableOrUnknown(
+              data['item_real_count']!, _itemRealCountMeta));
+    }
     if (data.containsKey('shipping_fee')) {
       context.handle(
           _shippingFeeMeta,
@@ -1824,6 +1837,8 @@ class $OrdersTable extends Orders with TableInfo<$OrdersTable, Order> {
           .read(DriftSqlType.double, data['${effectivePrefix}total_price']),
       itemCount: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}item_count']),
+      itemRealCount: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}item_real_count']),
       shippingFee: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}shipping_fee']),
       isPaid: attachedDatabase.typeMapping
@@ -1854,6 +1869,7 @@ class Order extends DataClass implements Insertable<Order> {
   final double? advancePayment;
   final double? totalPrice;
   final double? itemCount;
+  final double? itemRealCount;
   final double? shippingFee;
   final bool isPaid;
   final DateTime createdAt;
@@ -1872,6 +1888,7 @@ class Order extends DataClass implements Insertable<Order> {
       this.advancePayment,
       this.totalPrice,
       this.itemCount,
+      this.itemRealCount,
       this.shippingFee,
       required this.isPaid,
       required this.createdAt});
@@ -1917,6 +1934,9 @@ class Order extends DataClass implements Insertable<Order> {
     }
     if (!nullToAbsent || itemCount != null) {
       map['item_count'] = Variable<double>(itemCount);
+    }
+    if (!nullToAbsent || itemRealCount != null) {
+      map['item_real_count'] = Variable<double>(itemRealCount);
     }
     if (!nullToAbsent || shippingFee != null) {
       map['shipping_fee'] = Variable<double>(shippingFee);
@@ -1967,6 +1987,9 @@ class Order extends DataClass implements Insertable<Order> {
       itemCount: itemCount == null && nullToAbsent
           ? const Value.absent()
           : Value(itemCount),
+      itemRealCount: itemRealCount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(itemRealCount),
       shippingFee: shippingFee == null && nullToAbsent
           ? const Value.absent()
           : Value(shippingFee),
@@ -1994,6 +2017,7 @@ class Order extends DataClass implements Insertable<Order> {
       advancePayment: serializer.fromJson<double?>(json['advancePayment']),
       totalPrice: serializer.fromJson<double?>(json['totalPrice']),
       itemCount: serializer.fromJson<double?>(json['itemCount']),
+      itemRealCount: serializer.fromJson<double?>(json['itemRealCount']),
       shippingFee: serializer.fromJson<double?>(json['shippingFee']),
       isPaid: serializer.fromJson<bool>(json['isPaid']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -2017,6 +2041,7 @@ class Order extends DataClass implements Insertable<Order> {
       'advancePayment': serializer.toJson<double?>(advancePayment),
       'totalPrice': serializer.toJson<double?>(totalPrice),
       'itemCount': serializer.toJson<double?>(itemCount),
+      'itemRealCount': serializer.toJson<double?>(itemRealCount),
       'shippingFee': serializer.toJson<double?>(shippingFee),
       'isPaid': serializer.toJson<bool>(isPaid),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -2038,6 +2063,7 @@ class Order extends DataClass implements Insertable<Order> {
           Value<double?> advancePayment = const Value.absent(),
           Value<double?> totalPrice = const Value.absent(),
           Value<double?> itemCount = const Value.absent(),
+          Value<double?> itemRealCount = const Value.absent(),
           Value<double?> shippingFee = const Value.absent(),
           bool? isPaid,
           DateTime? createdAt}) =>
@@ -2063,6 +2089,8 @@ class Order extends DataClass implements Insertable<Order> {
             advancePayment.present ? advancePayment.value : this.advancePayment,
         totalPrice: totalPrice.present ? totalPrice.value : this.totalPrice,
         itemCount: itemCount.present ? itemCount.value : this.itemCount,
+        itemRealCount:
+            itemRealCount.present ? itemRealCount.value : this.itemRealCount,
         shippingFee: shippingFee.present ? shippingFee.value : this.shippingFee,
         isPaid: isPaid ?? this.isPaid,
         createdAt: createdAt ?? this.createdAt,
@@ -2098,6 +2126,9 @@ class Order extends DataClass implements Insertable<Order> {
       totalPrice:
           data.totalPrice.present ? data.totalPrice.value : this.totalPrice,
       itemCount: data.itemCount.present ? data.itemCount.value : this.itemCount,
+      itemRealCount: data.itemRealCount.present
+          ? data.itemRealCount.value
+          : this.itemRealCount,
       shippingFee:
           data.shippingFee.present ? data.shippingFee.value : this.shippingFee,
       isPaid: data.isPaid.present ? data.isPaid.value : this.isPaid,
@@ -2122,6 +2153,7 @@ class Order extends DataClass implements Insertable<Order> {
           ..write('advancePayment: $advancePayment, ')
           ..write('totalPrice: $totalPrice, ')
           ..write('itemCount: $itemCount, ')
+          ..write('itemRealCount: $itemRealCount, ')
           ..write('shippingFee: $shippingFee, ')
           ..write('isPaid: $isPaid, ')
           ..write('createdAt: $createdAt')
@@ -2145,6 +2177,7 @@ class Order extends DataClass implements Insertable<Order> {
       advancePayment,
       totalPrice,
       itemCount,
+      itemRealCount,
       shippingFee,
       isPaid,
       createdAt);
@@ -2166,6 +2199,7 @@ class Order extends DataClass implements Insertable<Order> {
           other.advancePayment == this.advancePayment &&
           other.totalPrice == this.totalPrice &&
           other.itemCount == this.itemCount &&
+          other.itemRealCount == this.itemRealCount &&
           other.shippingFee == this.shippingFee &&
           other.isPaid == this.isPaid &&
           other.createdAt == this.createdAt);
@@ -2186,6 +2220,7 @@ class OrdersCompanion extends UpdateCompanion<Order> {
   final Value<double?> advancePayment;
   final Value<double?> totalPrice;
   final Value<double?> itemCount;
+  final Value<double?> itemRealCount;
   final Value<double?> shippingFee;
   final Value<bool> isPaid;
   final Value<DateTime> createdAt;
@@ -2204,6 +2239,7 @@ class OrdersCompanion extends UpdateCompanion<Order> {
     this.advancePayment = const Value.absent(),
     this.totalPrice = const Value.absent(),
     this.itemCount = const Value.absent(),
+    this.itemRealCount = const Value.absent(),
     this.shippingFee = const Value.absent(),
     this.isPaid = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -2223,6 +2259,7 @@ class OrdersCompanion extends UpdateCompanion<Order> {
     this.advancePayment = const Value.absent(),
     this.totalPrice = const Value.absent(),
     this.itemCount = const Value.absent(),
+    this.itemRealCount = const Value.absent(),
     this.shippingFee = const Value.absent(),
     this.isPaid = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -2242,6 +2279,7 @@ class OrdersCompanion extends UpdateCompanion<Order> {
     Expression<double>? advancePayment,
     Expression<double>? totalPrice,
     Expression<double>? itemCount,
+    Expression<double>? itemRealCount,
     Expression<double>? shippingFee,
     Expression<bool>? isPaid,
     Expression<DateTime>? createdAt,
@@ -2262,6 +2300,7 @@ class OrdersCompanion extends UpdateCompanion<Order> {
       if (advancePayment != null) 'advance_payment': advancePayment,
       if (totalPrice != null) 'total_price': totalPrice,
       if (itemCount != null) 'item_count': itemCount,
+      if (itemRealCount != null) 'item_real_count': itemRealCount,
       if (shippingFee != null) 'shipping_fee': shippingFee,
       if (isPaid != null) 'is_paid': isPaid,
       if (createdAt != null) 'created_at': createdAt,
@@ -2283,6 +2322,7 @@ class OrdersCompanion extends UpdateCompanion<Order> {
       Value<double?>? advancePayment,
       Value<double?>? totalPrice,
       Value<double?>? itemCount,
+      Value<double?>? itemRealCount,
       Value<double?>? shippingFee,
       Value<bool>? isPaid,
       Value<DateTime>? createdAt}) {
@@ -2301,6 +2341,7 @@ class OrdersCompanion extends UpdateCompanion<Order> {
       advancePayment: advancePayment ?? this.advancePayment,
       totalPrice: totalPrice ?? this.totalPrice,
       itemCount: itemCount ?? this.itemCount,
+      itemRealCount: itemRealCount ?? this.itemRealCount,
       shippingFee: shippingFee ?? this.shippingFee,
       isPaid: isPaid ?? this.isPaid,
       createdAt: createdAt ?? this.createdAt,
@@ -2352,6 +2393,9 @@ class OrdersCompanion extends UpdateCompanion<Order> {
     if (itemCount.present) {
       map['item_count'] = Variable<double>(itemCount.value);
     }
+    if (itemRealCount.present) {
+      map['item_real_count'] = Variable<double>(itemRealCount.value);
+    }
     if (shippingFee.present) {
       map['shipping_fee'] = Variable<double>(shippingFee.value);
     }
@@ -2381,6 +2425,7 @@ class OrdersCompanion extends UpdateCompanion<Order> {
           ..write('advancePayment: $advancePayment, ')
           ..write('totalPrice: $totalPrice, ')
           ..write('itemCount: $itemCount, ')
+          ..write('itemRealCount: $itemRealCount, ')
           ..write('shippingFee: $shippingFee, ')
           ..write('isPaid: $isPaid, ')
           ..write('createdAt: $createdAt')
@@ -4512,6 +4557,7 @@ typedef $$OrdersTableCreateCompanionBuilder = OrdersCompanion Function({
   Value<double?> advancePayment,
   Value<double?> totalPrice,
   Value<double?> itemCount,
+  Value<double?> itemRealCount,
   Value<double?> shippingFee,
   Value<bool> isPaid,
   Value<DateTime> createdAt,
@@ -4531,6 +4577,7 @@ typedef $$OrdersTableUpdateCompanionBuilder = OrdersCompanion Function({
   Value<double?> advancePayment,
   Value<double?> totalPrice,
   Value<double?> itemCount,
+  Value<double?> itemRealCount,
   Value<double?> shippingFee,
   Value<bool> isPaid,
   Value<DateTime> createdAt,
@@ -4608,6 +4655,9 @@ class $$OrdersTableFilterComposer
 
   ColumnFilters<double> get itemCount => $composableBuilder(
       column: $table.itemCount, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get itemRealCount => $composableBuilder(
+      column: $table.itemRealCount, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<double> get shippingFee => $composableBuilder(
       column: $table.shippingFee, builder: (column) => ColumnFilters(column));
@@ -4696,6 +4746,10 @@ class $$OrdersTableOrderingComposer
   ColumnOrderings<double> get itemCount => $composableBuilder(
       column: $table.itemCount, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<double> get itemRealCount => $composableBuilder(
+      column: $table.itemRealCount,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<double> get shippingFee => $composableBuilder(
       column: $table.shippingFee, builder: (column) => ColumnOrderings(column));
 
@@ -4756,6 +4810,9 @@ class $$OrdersTableAnnotationComposer
 
   GeneratedColumn<double> get itemCount =>
       $composableBuilder(column: $table.itemCount, builder: (column) => column);
+
+  GeneratedColumn<double> get itemRealCount => $composableBuilder(
+      column: $table.itemRealCount, builder: (column) => column);
 
   GeneratedColumn<double> get shippingFee => $composableBuilder(
       column: $table.shippingFee, builder: (column) => column);
@@ -4825,6 +4882,7 @@ class $$OrdersTableTableManager extends RootTableManager<
             Value<double?> advancePayment = const Value.absent(),
             Value<double?> totalPrice = const Value.absent(),
             Value<double?> itemCount = const Value.absent(),
+            Value<double?> itemRealCount = const Value.absent(),
             Value<double?> shippingFee = const Value.absent(),
             Value<bool> isPaid = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
@@ -4844,6 +4902,7 @@ class $$OrdersTableTableManager extends RootTableManager<
             advancePayment: advancePayment,
             totalPrice: totalPrice,
             itemCount: itemCount,
+            itemRealCount: itemRealCount,
             shippingFee: shippingFee,
             isPaid: isPaid,
             createdAt: createdAt,
@@ -4863,6 +4922,7 @@ class $$OrdersTableTableManager extends RootTableManager<
             Value<double?> advancePayment = const Value.absent(),
             Value<double?> totalPrice = const Value.absent(),
             Value<double?> itemCount = const Value.absent(),
+            Value<double?> itemRealCount = const Value.absent(),
             Value<double?> shippingFee = const Value.absent(),
             Value<bool> isPaid = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
@@ -4882,6 +4942,7 @@ class $$OrdersTableTableManager extends RootTableManager<
             advancePayment: advancePayment,
             totalPrice: totalPrice,
             itemCount: itemCount,
+            itemRealCount: itemRealCount,
             shippingFee: shippingFee,
             isPaid: isPaid,
             createdAt: createdAt,

@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:company_print/utils/utils.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:company_print/common/index.dart';
+import 'package:company_print/utils/event_bus.dart';
 import 'package:company_print/common/base/base_controller.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:company_print/pages/sales/add_or_edit_order.dart';
@@ -20,6 +22,8 @@ class SalesController extends BasePageController {
   TextEditingController searchController = TextEditingController();
   List<DateTime> currentDates = [];
   FocusNode searchFocusNode = FocusNode();
+
+  StreamSubscription<dynamic>? orderRefreshSubscription;
   final refreshController = EasyRefreshController(
     controlFinishRefresh: true,
     controlFinishLoad: true,
@@ -28,12 +32,18 @@ class SalesController extends BasePageController {
   @override
   void onInit() {
     super.onInit();
-    fetchOrderNames();
-    fetchCustomerNames();
-    fetchVehicles();
-    fetchCustomers();
     initCurrentDate();
     loadData();
+
+    orderRefreshSubscription = EventBus.instance.listen('refreshOrderList', (data) {
+      refreshData();
+    });
+  }
+
+  @override
+  void onClose() {
+    super.onClose();
+    orderRefreshSubscription?.cancel();
   }
 
   onEditOrder(Order order) {
@@ -179,26 +189,6 @@ class SalesController extends BasePageController {
     return orders;
   }
 
-  Future<void> fetchOrderNames() async {
-    final orderNamesList = await database.ordersDao.getDistinctOrderNames();
-    orderNames.assignAll(orderNamesList);
-  }
-
-  Future<void> fetchCustomerNames() async {
-    final customersList = await database.ordersDao.getDistinctCustomerNames();
-    customerNames.assignAll(customersList);
-  }
-
-  Future<void> fetchVehicles() async {
-    final vehiclesList = await database.vehicleDao.getAllVehicles();
-    vehicles.assignAll(vehiclesList);
-  }
-
-  Future<void> fetchCustomers() async {
-    final customersList = await database.customerDao.getAllCustomers();
-    customers.assignAll(customersList);
-  }
-
   void showAddOrEditOrderPage({Order? order}) {
     Get.to(() => AddOrEditOrderPage(
           controller: this,
@@ -243,7 +233,6 @@ class SalesController extends BasePageController {
               );
             }
             refreshData();
-            fetchCustomerNames();
           },
         ));
   }

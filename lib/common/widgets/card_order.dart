@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:date_format/date_format.dart';
+import 'package:company_print/utils/utils.dart';
 import 'package:company_print/database/db.dart';
 
 class CardOrder extends StatelessWidget {
@@ -51,6 +52,21 @@ class CardOrder extends StatelessWidget {
                     child: OrderChip(
                       icon: Icons.monetization_on_outlined,
                       count: '${index + 1}',
+                    ),
+                  ),
+                  Positioned(
+                    left: 80,
+                    top: 13,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor.withValues(alpha: 0.9),
+                        borderRadius: BorderRadius.circular(0),
+                      ),
+                      child: Text(
+                        '${Utils.getDoubleStringRound(order.itemCount)}件商品',
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.white),
+                      ),
                     ),
                   ),
                   Positioned(

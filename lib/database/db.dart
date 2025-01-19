@@ -24,7 +24,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(openConnection());
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration {
@@ -33,12 +33,7 @@ class AppDatabase extends _$AppDatabase {
         await m.createAll();
       },
       onUpgrade: (m, from, to) async {
-        await m.createTable(customers);
-        await m.createTable(customerOrderItems);
-        await m.createTable(orders);
-        await m.createTable(orderItems);
-        await m.createTable(vehicles);
-        await m.addColumn(orders, orders.customerId);
+        await m.addColumn(orders, orders.itemRealCount);
       },
     );
   }

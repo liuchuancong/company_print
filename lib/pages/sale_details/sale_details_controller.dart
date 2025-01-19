@@ -4,6 +4,8 @@ import 'package:date_format/date_format.dart';
 import 'package:company_print/utils/utils.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:company_print/common/index.dart';
+import 'package:company_print/utils/event_bus.dart';
+import 'package:company_print/database/models/sales_order.dart';
 import 'package:company_print/pages/dishes/dishes_controller.dart';
 import 'package:company_print/pages/sale_details/sale_details_page.dart';
 import 'package:company_print/pages/sale_details/mutiple_order_items.dart';
@@ -31,6 +33,8 @@ class SaleDetailsController extends GetxController {
   var dishUtils = <DishUnit>[].obs;
   final PaginatorController paginatorController = PaginatorController();
   SaleDetailsDataSource? dataSource;
+
+  var salesOrderCalculationType = SalesOrderCalculationType.round.obs;
   @override
   void onInit() {
     super.onInit();
@@ -121,18 +125,7 @@ class SaleDetailsController extends GetxController {
   void showCreateOrderDialog() {
     Get.to(() => EditOrderItemsPage(
           controller: this,
-          onConfirm: (orderItem) => addOrderOrderItem(
-            orderItem.itemName!,
-            orderItem.itemShortName,
-            orderItem.purchaseUnit,
-            orderItem.actualUnit,
-            orderItem.purchaseQuantity!,
-            orderItem.actualQuantity!,
-            orderItem.presetPrice!,
-            orderItem.actualPrice!,
-            orderItem.advancePayment!,
-            orderItem.totalPrice!,
-          ),
+          onConfirm: (orderItem) => addOrderOrderItem(orderItem),
         ));
   }
 
@@ -156,19 +149,8 @@ class SaleDetailsController extends GetxController {
 
   void handleMutipleOrderItem(List<OrderItem> newOrderItems) async {
     dishesSelectType = DishesSelectType.dishes;
-    for (var item in newOrderItems) {
-      addOrderOrderItem(
-        item.itemName!,
-        item.itemShortName,
-        item.purchaseUnit,
-        item.actualUnit,
-        item.purchaseQuantity!,
-        item.actualQuantity!,
-        item.presetPrice!,
-        item.actualPrice!,
-        item.advancePayment!,
-        item.totalPrice!,
-      );
+    for (var orderItem in newOrderItems) {
+      addOrderOrderItem(orderItem);
     }
   }
 
@@ -176,78 +158,18 @@ class SaleDetailsController extends GetxController {
     Get.to(() => EditOrderItemsPage(
           controller: this,
           orderItem: customerOrderItem,
-          onConfirm: (orderItem) => updateOrderOrderItem(
-            orderItem.id,
-            orderItem.itemName!,
-            orderItem.itemShortName,
-            orderItem.purchaseUnit,
-            orderItem.actualUnit,
-            orderItem.purchaseQuantity!,
-            orderItem.actualQuantity!,
-            orderItem.presetPrice!,
-            orderItem.actualPrice!,
-            orderItem.advancePayment!,
-            orderItem.totalPrice!,
-          ),
+          onConfirm: (orderItem) => updateOrderOrderItem(orderItem),
         ));
   }
 
-  Future<void> addOrderOrderItem(
-    String itemName,
-    String? itemShortName,
-    String? purchaseUnit,
-    String? actualUnit,
-    double purchaseQuantity,
-    double actualQuantity,
-    double presetPrice,
-    double actualPrice,
-    double advancePayment,
-    double totalPrice,
-  ) async {
-    await database.orderItemsDao.insertOrderItem(
-      orderId,
-      itemName,
-      itemShortName,
-      purchaseUnit,
-      actualUnit,
-      purchaseQuantity,
-      actualQuantity,
-      presetPrice,
-      actualPrice,
-      advancePayment,
-      totalPrice,
-    );
-    dataSource?.refreshDatasource();
+  Future<void> addOrderOrderItem(OrderItem order) async {
+    await database.orderItemsDao.insertOrderItem(order);
+    setOrderCalculationType(salesOrderCalculationType.value.index);
   }
 
-  Future<void> updateOrderOrderItem(
-    int id,
-    String itemName,
-    String? itemShortName,
-    String? purchaseUnit,
-    String? actualUnit,
-    double purchaseQuantity,
-    double actualQuantity,
-    double presetPrice,
-    double actualPrice,
-    double advancePayment,
-    double totalPrice,
-  ) async {
-    await database.orderItemsDao.updateOrderItem(
-      id,
-      orderId,
-      itemName,
-      itemShortName,
-      purchaseUnit,
-      actualUnit,
-      purchaseQuantity,
-      actualQuantity,
-      presetPrice,
-      actualPrice,
-      advancePayment,
-      totalPrice,
-    );
-    dataSource?.refreshDatasource();
+  Future<void> updateOrderOrderItem(OrderItem order) async {
+    await database.orderItemsDao.updateOrderItem(order);
+    setOrderCalculationType(salesOrderCalculationType.value.index);
   }
 
   void showDeleteOrderOrderDialog(int id) async {
@@ -259,6 +181,17 @@ class SaleDetailsController extends GetxController {
 
   Future<void> deleteOrderOrderItem(int id) async {
     await database.orderItemsDao.deleteOrderItem(id);
+    setOrderCalculationType(salesOrderCalculationType.value.index);
+  }
+
+  void setOrderCalculationType(int index) async {
+    if (index == 0) {
+      salesOrderCalculationType.value = SalesOrderCalculationType.round;
+    } else {
+      salesOrderCalculationType.value = SalesOrderCalculationType.decimal;
+    }
+    await database.orderItemsDao.updateAllOrderOrderPrice(orderId, salesOrderCalculationType.value);
     dataSource?.refreshDatasource();
+    EventBus.instance.emit('refreshOrderList', true);
   }
 }

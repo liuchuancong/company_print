@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:date_format/date_format.dart';
 import 'package:searchfield/searchfield.dart';
+import 'package:company_print/utils/utils.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/common/style/app_style.dart';
 import 'package:company_print/pages/sales/sales_controller.dart';
@@ -31,7 +32,7 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
   final TextEditingController _vehiclePlateNumberController = TextEditingController();
   final TextEditingController _advancePaymentController = TextEditingController(text: '0.0');
   final TextEditingController _totalPriceController = TextEditingController(text: '0.0');
-  final TextEditingController _itemCountController = TextEditingController(text: '0.0');
+  final TextEditingController _itemCountController = TextEditingController(text: '0');
   final TextEditingController _shippingFeeController = TextEditingController(text: '0.0');
   final TextEditingController _dateController = TextEditingController();
   SearchFieldListItem<Customer>? selectedCustomerValue;
@@ -58,7 +59,7 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
       _vehiclePlateNumberController.text = order.vehiclePlateNumber ?? '';
       _advancePaymentController.text = order.advancePayment.toString();
       _totalPriceController.text = order.totalPrice.toString();
-      _itemCountController.text = order.itemCount.toString();
+      _itemCountController.text = Utils.getDoubleStringRound(order.itemCount);
       _shippingFeeController.text = order.shippingFee.toString();
       _isPaid = order.isPaid;
       customerId = order.customerId ?? 0;
@@ -255,6 +256,7 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                       gap: 10,
                       child: TextField(
                         controller: _itemCountController,
+                        readOnly: true,
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         textInputAction: TextInputAction.next,
                       ),
@@ -294,9 +296,14 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                     InputTextField(
                       labelText: '已结算',
                       gap: 10,
-                      child: SizedBox(
+                      child: Container(
                         height: 50,
                         width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColor.withAlpha(15),
+                          borderRadius:
+                              const BorderRadius.only(topRight: Radius.circular(5), bottomRight: Radius.circular(5)),
+                        ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -312,13 +319,14 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                         ),
                       ),
                     ),
-                  if (!isNew) const SectionTitle(title: '费用信息'),
+                  if (!isNew) const SectionTitle(title: '支付信息'),
                   if (!isNew)
                     InputTextField(
                       labelText: '总价',
                       gap: 10,
                       child: TextField(
                         controller: _totalPriceController,
+                        readOnly: true,
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         textInputAction: TextInputAction.next,
                         inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))],

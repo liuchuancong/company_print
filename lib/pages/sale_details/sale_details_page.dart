@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:company_print/utils/utils.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:company_print/common/index.dart';
+import 'package:company_print/database/models/sales_order.dart';
 import 'package:company_print/common/style/custom_scaffold.dart';
 import 'package:company_print/common/widgets/section_listtile.dart';
 import 'package:company_print/pages/sale_details/sale_details_controller.dart';
@@ -43,6 +44,64 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
               return AsyncPaginatedDataTable2(
                 header: Container(),
                 actions: [
+                  PopupMenuButton(
+                    tooltip: '计价方式',
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    offset: const Offset(12, 0),
+                    position: PopupMenuPosition.under,
+                    icon: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Obx(() => Text(
+                            controller.salesOrderCalculationType.value == SalesOrderCalculationType.round
+                                ? '四舍五入'
+                                : '保留两位小数',
+                            style: const TextStyle(color: Colors.white),
+                          )),
+                    ),
+                    onSelected: (int index) {
+                      controller.setOrderCalculationType(index);
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 0,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Obx(() => Text(
+                              '四舍五入',
+                              style: TextStyle(
+                                color: controller.salesOrderCalculationType.value == SalesOrderCalculationType.round
+                                    ? Theme.of(context).primaryColor
+                                    : Colors.black,
+                                fontWeight:
+                                    controller.salesOrderCalculationType.value == SalesOrderCalculationType.round
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                              ),
+                            )),
+                      ),
+                      PopupMenuItem(
+                        value: 1,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Obx(() => Text(
+                              '保留两位小数',
+                              style: TextStyle(
+                                color: controller.salesOrderCalculationType.value == SalesOrderCalculationType.decimal
+                                    ? Theme.of(context).primaryColor
+                                    : Colors.black,
+                                fontWeight:
+                                    controller.salesOrderCalculationType.value == SalesOrderCalculationType.decimal
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                              ),
+                            )),
+                      ),
+                    ],
+                  ),
                   FilledButton(
                     style: ButtonStyle(
                       shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
@@ -235,7 +294,12 @@ class EditOrderItemsPageState extends State<EditOrderItemsPage> {
         actualPrice: double.tryParse(_actualPriceController.text) ?? 0,
         createdAt: isNew ? DateTime.now() : widget.orderItem!.createdAt,
       );
-      checkExitsItem(newOrUpdatedOrderItem);
+      if (isNew) {
+        checkExitsItem(newOrUpdatedOrderItem);
+      } else {
+        widget.onConfirm(newOrUpdatedOrderItem);
+        Get.back();
+      }
     }
   }
 
@@ -292,6 +356,7 @@ class EditOrderItemsPageState extends State<EditOrderItemsPage> {
             gap: 10,
             child: TextField(
               controller: _totalPriceController,
+              readOnly: true,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               textInputAction: TextInputAction.next,
               inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))],
@@ -508,8 +573,12 @@ class SaleDetailsDataSource extends AsyncDataTableSource {
                 ),
               ),
               DataCell(Text(orderItem.itemName!)),
-              DataCell(Text((orderItem.totalPrice ?? '0.0').toString())),
-              DataCell(Text((orderItem.advancePayment ?? '0.0').toString())),
+              DataCell(Text(controller.salesOrderCalculationType.value == SalesOrderCalculationType.decimal
+                  ? Utils.getDoubleStringDecimal(orderItem.totalPrice)
+                  : Utils.getDoubleStringRound(orderItem.totalPrice))),
+              DataCell(Text(controller.salesOrderCalculationType.value == SalesOrderCalculationType.decimal
+                  ? Utils.getDoubleStringDecimal(orderItem.advancePayment)
+                  : Utils.getDoubleStringRound(orderItem.advancePayment))),
               DataCell(Text(Utils.concatenation(orderItem.purchaseQuantity, orderItem.purchaseUnit))),
               DataCell(Text(orderItem.presetPrice.toString())),
               DataCell(Text(Utils.concatenation(orderItem.actualQuantity, orderItem.actualUnit))),

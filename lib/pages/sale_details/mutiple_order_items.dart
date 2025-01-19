@@ -554,6 +554,7 @@ class ProductInputSection extends StatelessWidget {
               child: TextField(
                 controller: totalPriceController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                readOnly: true,
                 textInputAction: TextInputAction.next,
                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))],
                 maxLines: null,

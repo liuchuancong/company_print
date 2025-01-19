@@ -1,5 +1,7 @@
 import 'package:drift/drift.dart';
+import 'package:company_print/utils/utils.dart';
 import 'package:company_print/database/db.dart';
+import 'package:company_print/database/models/sales_order.dart';
 import 'package:company_print/database/models/order_items.dart';
 
 part 'order_items_dao.g.dart';
@@ -11,31 +13,19 @@ class OrderItemsDao extends DatabaseAccessor<AppDatabase> with _$OrderItemsDaoMi
   OrderItemsDao(this.db) : super(db);
 
   /// 插入新的订单项
-  Future<int> insertOrderItem(
-    int orderId,
-    String itemName,
-    String? itemShortName,
-    String? purchaseUnit,
-    String? actualUnit,
-    double purchaseQuantity,
-    double actualQuantity,
-    double presetPrice,
-    double actualPrice,
-    double advancePayment,
-    double totalPrice,
-  ) async {
+  Future<int> insertOrderItem(OrderItem order) async {
     final entry = OrderItemsCompanion.insert(
-      orderId: orderId,
-      itemName: Value(itemName),
-      itemShortName: Value(itemShortName),
-      purchaseUnit: Value(purchaseUnit),
-      purchaseQuantity: Value(purchaseQuantity),
-      actualUnit: Value(actualUnit),
-      actualQuantity: Value(actualQuantity),
-      presetPrice: Value(presetPrice),
-      actualPrice: Value(actualPrice),
-      advancePayment: Value(advancePayment),
-      totalPrice: Value(totalPrice),
+      orderId: order.orderId,
+      itemName: Value(order.itemName),
+      itemShortName: Value(order.itemShortName),
+      purchaseUnit: Value(order.purchaseUnit),
+      purchaseQuantity: Value(order.purchaseQuantity),
+      actualUnit: Value(order.actualUnit),
+      actualQuantity: Value(order.actualQuantity),
+      presetPrice: Value(order.presetPrice),
+      actualPrice: Value(order.actualPrice),
+      advancePayment: Value(order.advancePayment),
+      totalPrice: Value(order.totalPrice),
     );
     return await into(db.orderItems).insert(entry);
   }
@@ -100,34 +90,21 @@ class OrderItemsDao extends DatabaseAccessor<AppDatabase> with _$OrderItemsDaoMi
   }
 
   /// 更新订单项
-  Future<void> updateOrderItem(
-    int id,
-    int orderId,
-    String itemName,
-    String? itemShortName,
-    String? purchaseUnit,
-    String? actualUnit,
-    double purchaseQuantity,
-    double actualQuantity,
-    double presetPrice,
-    double actualPrice,
-    double advancePayment,
-    double totalPrice,
-  ) async {
+  Future<void> updateOrderItem(OrderItem order) async {
     final entry = OrderItemsCompanion(
-      orderId: Value(orderId),
-      itemName: Value(itemName),
-      itemShortName: Value(itemShortName),
-      purchaseUnit: Value(purchaseUnit),
-      purchaseQuantity: Value(purchaseQuantity),
-      actualUnit: Value(actualUnit),
-      actualQuantity: Value(actualQuantity),
-      presetPrice: Value(presetPrice),
-      actualPrice: Value(actualPrice),
-      advancePayment: Value(advancePayment),
-      totalPrice: Value(totalPrice),
+      orderId: Value(order.orderId),
+      itemName: Value(order.itemName),
+      itemShortName: Value(order.itemShortName),
+      purchaseUnit: Value(order.purchaseUnit),
+      purchaseQuantity: Value(order.purchaseQuantity),
+      actualUnit: Value(order.actualUnit),
+      actualQuantity: Value(order.actualQuantity),
+      presetPrice: Value(order.presetPrice),
+      actualPrice: Value(order.actualPrice),
+      advancePayment: Value(order.advancePayment),
+      totalPrice: Value(order.totalPrice),
     );
-    await (update(db.orderItems)..where((tbl) => tbl.id.equals(id))).write(entry);
+    await (update(db.orderItems)..where((tbl) => tbl.id.equals(order.id))).write(entry);
   }
 
   /// 删除订单项
@@ -163,5 +140,36 @@ class OrderItemsDao extends DatabaseAccessor<AppDatabase> with _$OrderItemsDaoMi
     final query = select(db.orderItems)..where((tbl) => tbl.id.equals(id));
     final result = await query.get();
     return result.first;
+  }
+
+  Future<void> updateAllOrderOrderPrice(int orderId, SalesOrderCalculationType calculationType) async {
+    List<OrderItem> orderItems = await getAllOrderItemsByOrderId(orderId);
+    double totalOrderPrice = 0;
+    double advanceOrderPayment = 0;
+    for (OrderItem item in orderItems) {
+      double totalPrice = 0;
+      double advancePayment = 0;
+      if (calculationType == SalesOrderCalculationType.decimal) {
+        totalPrice = Utils.getDoubleDecimal(
+            Utils.getDoubleDecimal(item.actualPrice) * Utils.getDoubleDecimal(item.actualQuantity));
+        advancePayment = Utils.getDoubleDecimal(item.advancePayment);
+      } else if (calculationType == SalesOrderCalculationType.round) {
+        totalPrice = Utils.getDoubleRound(
+            Utils.getDoubleDecimal(item.actualPrice) * Utils.getDoubleDecimal(item.actualQuantity));
+        advancePayment = Utils.getDoubleRound(item.advancePayment);
+      }
+      totalOrderPrice += totalPrice;
+      advanceOrderPayment += advancePayment;
+      final entry = OrderItemsCompanion(
+        totalPrice: Value(totalPrice),
+        advancePayment: Value(advancePayment),
+      );
+      await (update(db.orderItems)..where((tbl) => tbl.id.equals(item.id))).write(entry);
+    }
+    await (update(db.orders)..where((tbl) => tbl.id.equals(orderId))).write(OrdersCompanion(
+      totalPrice: Value(totalOrderPrice),
+      advancePayment: Value(advanceOrderPayment),
+      itemCount: Value(double.parse(orderItems.length.toString())),
+    ));
   }
 }

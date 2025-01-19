@@ -182,7 +182,12 @@ class EditOrCreateCategoryPageState extends State<EditOrCreateCategoryPage> {
       description: _descriptionController.text,
       createdAt: isNew ? DateTime.now() : widget.category!.createdAt,
     );
-    checkExitsItem(newOrUpdatedCategory);
+    if (isNew) {
+      checkExitsItem(newOrUpdatedCategory);
+    } else {
+      widget.onConfirm(newOrUpdatedCategory);
+      Get.back();
+    }
   }
 
   checkExitsItem(DishesCategoryData category) async {

@@ -20,6 +20,7 @@ class Orders extends Table {
   RealColumn get advancePayment => real().nullable()(); // 垫付，默认值为0.0
   RealColumn get totalPrice => real().nullable()(); // 总价，默认值为0.0
   RealColumn get itemCount => real().nullable()();
+  RealColumn get itemRealCount => real().nullable()();
   RealColumn get shippingFee => real().nullable()(); // 运费，默认值为0.0
 
   BoolColumn get isPaid => boolean().withDefault(const Constant(false))(); // 是否已支付，默认值为false

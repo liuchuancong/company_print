@@ -204,6 +204,54 @@ class Utils {
     }
     return '${str1.toString().trim()} (${str2.toString().trim()})';
   }
+
+  static double getDouble(dynamic value) {
+    if (value == null) {
+      return 0.0;
+    }
+    if (value is double) {
+      return value;
+    }
+    if (value is int) {
+      return value.toDouble();
+    }
+    if (value is String) {
+      return double.parse(value.replaceAll(',', ''));
+    }
+    return 0.0;
+  }
+
+  static int getInt(dynamic value) {
+    if (value == null) {
+      return 0;
+    }
+    if (value is int) {
+      return value;
+    }
+    if (value is double) {
+      return value.toInt();
+    }
+    if (value is String) {
+      return int.parse(value.replaceAll(',', ''));
+    }
+    return 0;
+  }
+
+  static double getDoubleDecimal(dynamic value) {
+    return double.parse(getDouble(value).toStringAsFixed(2));
+  }
+
+  static double getDoubleRound(dynamic value) {
+    return double.parse(getInt(value).toString());
+  }
+
+  static String getDoubleStringDecimal(dynamic number) {
+    return getDouble(number).toStringAsFixed(2); // "1.00"
+  }
+
+  static String getDoubleStringRound(dynamic number) {
+    return getInt(getDouble(number)).toString(); // "1"
+  }
 }
 
 class TwoDigitDecimalFormatter extends TextInputFormatter {

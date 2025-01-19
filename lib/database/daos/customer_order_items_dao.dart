@@ -160,8 +160,6 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
       actualPrice: Value(actualPrice),
     );
     await (update(db.customerOrderItems)..where((tbl) => tbl.id.equals(id))).write(entry);
-
-    // return await (update(db.customerOrderItems)..where((tbl) => tbl.id.equals(id))).write(entry);
   }
 
   /// 删除订单项

@@ -1,0 +1,4 @@
+enum SalesOrderCalculationType {
+  round,
+  decimal,
+}
