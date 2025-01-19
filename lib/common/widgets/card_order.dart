@@ -61,7 +61,7 @@ class CardOrder extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
                         color: Theme.of(context).primaryColor.withValues(alpha: 0.9),
-                        borderRadius: BorderRadius.circular(0),
+                        borderRadius: const BorderRadius.all(Radius.circular(5.0)),
                       ),
                       child: Text(
                         '${Utils.getDoubleStringRound(order.itemCount)}件商品',

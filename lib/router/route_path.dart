@@ -32,4 +32,6 @@ class RoutePath {
   static var kUnitSelectPage = "/unitSelectPage";
 
   static var kMinePage = "/minePage";
+
+  static var kPrintPage = "/printPage";
 }

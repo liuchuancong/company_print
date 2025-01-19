@@ -76,7 +76,7 @@ class MinePageState extends State<MinePage> {
             ),
           ),
           InputTextField(
-            labelText: '地址',
+            labelText: '店铺地址',
             gap: 10,
             maxLength: 100,
             child: TextField(

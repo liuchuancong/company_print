@@ -1,6 +1,7 @@
 import 'package:company_print/common/index.dart';
 import 'package:company_print/pages/mine/mine.dart';
 import 'package:company_print/pages/home/home_page.dart';
+import 'package:company_print/pages/print/print_page.dart';
 import 'package:company_print/pages/settings/settings_page.dart';
 import 'package:company_print/pages/settings/settings_binding.dart';
 import 'package:company_print/pages/sale_details/sale_details_page.dart';
@@ -85,6 +86,10 @@ class AppPages {
     GetPage(
       name: RoutePath.kMinePage,
       page: MinePage.new,
+    ),
+    GetPage(
+      name: RoutePath.kPrintPage,
+      page: PrintPage.new,
     ),
 
     // UnitSelectPage

@@ -207,7 +207,7 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
                 borderRadius: const BorderRadius.all(Radius.circular(5.0)),
                 color: i == currentPage ? Theme.of(context).primaryColor : Colors.white,
               ),
-              padding: const EdgeInsets.only(top: 10, bottom: 10, left: 8, right: 8),
+              padding: const EdgeInsets.only(top: 4, bottom: 4, left: 8, right: 8),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [

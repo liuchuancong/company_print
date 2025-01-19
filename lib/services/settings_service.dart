@@ -25,6 +25,26 @@ class SettingsService extends GetxController {
     myAddress.listen((value) {
       PrefUtil.setString('myAddress', value);
     });
+
+    printTitle.listen((value) {
+      PrefUtil.setString('printTitle', value);
+    });
+
+    printIsShowCustomerInfo.listen((value) {
+      PrefUtil.setBool('printIsShowCustomerInfo', value);
+    });
+
+    printIsShowDriverInfo.listen((value) {
+      PrefUtil.setBool('printIsShowDriverInfo', value);
+    });
+
+    printIsShowOwnerInfo.listen((value) {
+      PrefUtil.setBool('printIsShowOwnerInfo', value);
+    });
+
+    printIsShowPriceInfo.listen((value) {
+      PrefUtil.setBool('printIsShowPriceInfo', value);
+    });
   }
 
   // Theme settings
@@ -40,6 +60,16 @@ class SettingsService extends GetxController {
   final myPhone = (PrefUtil.getString('myPhone') ?? '').obs;
 
   final myAddress = (PrefUtil.getString('myAddress') ?? '').obs;
+
+  final printTitle = (PrefUtil.getString('printTitle') ?? '').obs;
+
+  final printIsShowCustomerInfo = (PrefUtil.getBool('printIsShowCustomerInfo') ?? true).obs;
+
+  final printIsShowDriverInfo = (PrefUtil.getBool('printIsShowDriverInfo') ?? true).obs;
+
+  final printIsShowOwnerInfo = (PrefUtil.getBool('printIsShowOwnerInfo') ?? true).obs;
+
+  final printIsShowPriceInfo = (PrefUtil.getBool('printIsShowPriceInfo') ?? true).obs;
 
   get themeMode => SettingsService.themeModes[themeModeName.value]!;
 

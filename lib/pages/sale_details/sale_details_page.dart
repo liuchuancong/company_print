@@ -133,7 +133,7 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                       padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                     ),
                     onPressed: () {
-                      controller.showMutipleCustomerOrderItemPage();
+                      controller.showPreferResolutionSelectorDialog();
                     },
                     child: const Text('打印', style: TextStyle(fontSize: 18)),
                   ),
@@ -276,7 +276,7 @@ class EditOrderItemsPageState extends State<EditOrderItemsPage> {
     if (_itemNameController.text.isNotEmpty) {
       final newOrUpdatedOrderItem = OrderItem(
         id: isNew ? DateTime.now().millisecondsSinceEpoch : widget.orderItem!.id,
-        orderId: widget.orderItem?.orderId ?? 0, // 确保提供有效的 customer ID
+        orderId: widget.controller.orderId, // 确保提供有效的 customer ID
         itemName: _itemNameController.text,
         totalPrice: double.tryParse(_totalPriceController.text) ?? 0,
         advancePayment: double.tryParse(_advancePaymentController.text) ?? 0,
