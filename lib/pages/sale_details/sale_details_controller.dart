@@ -281,7 +281,7 @@ class SaleDetailsController extends GetxController {
               child: pw.Text(
                 settings.printTitle.value,
                 style: pw.TextStyle(
-                  fontSize: 18,
+                  fontSize: 15,
                   font: ttf,
                   fontWeight: pw.FontWeight.bold,
                   decoration: pw.TextDecoration.none,
@@ -294,7 +294,7 @@ class SaleDetailsController extends GetxController {
                 pw.Text(
                   "录单日期：${formatDate(DateTime.now(), [yyyy, '-', mm, '-', dd])}",
                   style: pw.TextStyle(
-                    fontSize: 14,
+                    fontSize: 13,
                     font: ttf,
                     fontWeight: pw.FontWeight.bold,
                     decoration: pw.TextDecoration.none,
@@ -309,13 +309,13 @@ class SaleDetailsController extends GetxController {
                   pw.Expanded(
                     flex: 1, // 设置 flex 为 1 表示占据一半宽度
                     child: pw.Container(
-                      child: pw.Text("购买单位：${order.customerName}", style: const pw.TextStyle(fontSize: 14)),
+                      child: pw.Text("购买单位：${order.customerName}", style: const pw.TextStyle(fontSize: 12)),
                     ),
                   ),
                   pw.Expanded(
                     flex: 1, // 设置 flex 为 1 表示占据一半宽度
                     child: pw.Container(
-                      child: pw.Text("电话：${order.customerPhone}", style: const pw.TextStyle(fontSize: 14)),
+                      child: pw.Text("电话：${order.customerPhone}", style: const pw.TextStyle(fontSize: 12)),
                     ),
                   ),
                 ],
@@ -325,7 +325,7 @@ class SaleDetailsController extends GetxController {
               pw.Text(
                 "地址：${order.customerAddress}",
                 style: pw.TextStyle(
-                  fontSize: 14,
+                  fontSize: 12,
                   font: ttf,
                 ),
               ),
@@ -337,19 +337,19 @@ class SaleDetailsController extends GetxController {
                   pw.Expanded(
                     flex: 1, // 设置 flex 为 1 表示占据一半宽度
                     child: pw.Container(
-                      child: pw.Text("承运人：${order.driverName}", style: const pw.TextStyle(fontSize: 14)),
+                      child: pw.Text("承运人：${order.driverName}", style: const pw.TextStyle(fontSize: 12)),
                     ),
                   ),
                   pw.Expanded(
                     flex: 2, // 设置 flex 为 1 表示占据一半宽度
                     child: pw.Container(
-                      child: pw.Text("承运人电话：${order.driverPhone}", style: const pw.TextStyle(fontSize: 14)),
+                      child: pw.Text("承运人电话：${order.driverPhone}", style: const pw.TextStyle(fontSize: 12)),
                     ),
                   ),
                   pw.Expanded(
                     flex: 2, // 设置 flex 为 1 表示占据一半宽度
                     child: pw.Container(
-                      child: pw.Text("承运人车牌号：${order.vehiclePlateNumber}", style: const pw.TextStyle(fontSize: 14)),
+                      child: pw.Text("承运人车牌号：${order.vehiclePlateNumber}", style: const pw.TextStyle(fontSize: 12)),
                     ),
                   ),
                 ],
@@ -362,14 +362,14 @@ class SaleDetailsController extends GetxController {
                   pw.Expanded(
                     flex: 1, // 设置 flex 为 1 表示占据一半宽度
                     child: pw.Container(
-                      child: pw.Text("合计: ${getTotalOrderPrice.value} 元", style: const pw.TextStyle(fontSize: 14)),
+                      child: pw.Text("合计: ${getTotalOrderPrice.value} 元", style: const pw.TextStyle(fontSize: 12)),
                     ),
                   ),
                   pw.Expanded(
                     flex: 2, // 设置 flex 为 1 表示占据一半宽度
                     child: pw.Container(
                       child: pw.Text("大写：${double.parse(getTotalOrderPrice.value).toSimplifiedChineseNumber()}元",
-                          style: const pw.TextStyle(fontSize: 14)),
+                          style: const pw.TextStyle(fontSize: 12)),
                     ),
                   ),
                 ],
@@ -390,8 +390,9 @@ class SaleDetailsController extends GetxController {
                   product.itemShortName,
                 ];
               }),
-              headerStyle: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, font: ttf),
+              headerStyle: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, font: ttf),
               cellStyle: pw.TextStyle(fontSize: 10, font: ttf),
+              cellPadding: const pw.EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               columnWidths: {
                 0: const pw.FlexColumnWidth(1),
                 1: const pw.FlexColumnWidth(2),
@@ -415,7 +416,7 @@ class SaleDetailsController extends GetxController {
               return pw.Container(
                 alignment: pw.Alignment.centerRight,
                 child:
-                    pw.Text('第${context.pageNumber}页，共${context.pagesCount}页', style: const pw.TextStyle(fontSize: 14)),
+                    pw.Text('第${context.pageNumber}页，共${context.pagesCount}页', style: const pw.TextStyle(fontSize: 12)),
               );
             }
             return pw.Container(
@@ -424,7 +425,7 @@ class SaleDetailsController extends GetxController {
                 pw.Row(
                   children: [
                     pw.Container(
-                      child: pw.Text("店面地址：${settings.myAddress}", style: const pw.TextStyle(fontSize: 14)),
+                      child: pw.Text("店面地址：${settings.myAddress}", style: const pw.TextStyle(fontSize: 12)),
                     )
                   ],
                 ),
@@ -433,13 +434,13 @@ class SaleDetailsController extends GetxController {
                     pw.Expanded(
                       flex: 3, // 设置 flex 为 1 表示占据一半宽度
                       child: pw.Container(
-                        child: pw.Text("电话：${settings.myPhone}", style: const pw.TextStyle(fontSize: 14)),
+                        child: pw.Text("电话：${settings.myPhone}", style: const pw.TextStyle(fontSize: 12)),
                       ),
                     ),
                     pw.Expanded(
                       flex: 3, // 设置 flex 为 1 表示占据一半宽度
                       child: pw.Container(
-                        child: pw.Text("联系人：${settings.myName}", style: const pw.TextStyle(fontSize: 14)),
+                        child: pw.Text("联系人：${settings.myName}", style: const pw.TextStyle(fontSize: 12)),
                       ),
                     ),
                     pw.Expanded(
@@ -447,7 +448,7 @@ class SaleDetailsController extends GetxController {
                       child: pw.Container(
                         alignment: pw.Alignment.centerRight,
                         child: pw.Text('第${context.pageNumber}页，共${context.pagesCount}页',
-                            style: const pw.TextStyle(fontSize: 14)),
+                            style: const pw.TextStyle(fontSize: 12)),
                       ),
                     ),
                   ],
