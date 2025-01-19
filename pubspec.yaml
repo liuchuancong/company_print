@@ -74,6 +74,7 @@ dependencies:
   file_picker: ^8.1.4
   permission_handler: ^11.0.1
   intl: ^0.19.0
+  flutter_launcher_icons: "^0.14.3"
   syncfusion_flutter_charts: ^28.1.39
   flutter_localizations:
     sdk: flutter
@@ -84,6 +85,14 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^4.0.0
+
+# flutter pub run flutter_launcher_icons
+flutter_icons:
+  android: "ic_launcher"
+  image_path: assets/icons/icon.png
+  adaptive_icon_background: "#FFFFFF"
+  min_sdk_android: 21 
+
 flutter:
   uses-material-design: true
 
