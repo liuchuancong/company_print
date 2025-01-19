@@ -246,6 +246,10 @@ class SaleDetailsController extends GetxController {
       SmartDialog.showToast("请先设置打印标题");
       return;
     }
+    if (products.isEmpty) {
+      SmartDialog.showToast("请选择商品");
+      return;
+    }
     if (order != null) {
       final fontData = await rootBundle.load('assets/fonts/NotoSansSC-Regular.ttf');
       final ttf = pw.Font.ttf(fontData);
@@ -373,8 +377,8 @@ class SaleDetailsController extends GetxController {
             pw.Padding(padding: const pw.EdgeInsets.all(2)),
             pw.TableHelper.fromTextArray(
               headers: ['序号', '商品名称', '数量', '单价', '总价', '备注'],
-              data: List.generate(100, (index) {
-                final product = pageProducts[0];
+              data: List.generate(pageProducts.length, (index) {
+                final product = pageProducts[index];
                 // 计算全局序号（基于整个列表）
                 final globalIndex = i + index + 1;
                 return [
