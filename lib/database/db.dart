@@ -24,17 +24,5 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(openConnection());
 
   @override
-  int get schemaVersion => 11;
-
-  @override
-  MigrationStrategy get migration {
-    return MigrationStrategy(
-      onCreate: (m) async {
-        await m.createAll();
-      },
-      onUpgrade: (m, from, to) async {
-        await m.addColumn(orders, orders.itemRealCount);
-      },
-    );
-  }
+  int get schemaVersion => 1;
 }
