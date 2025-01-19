@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:company_print/utils/utils.dart';
 import 'package:company_print/common/index.dart';
 import 'package:animated_tree_view/animated_tree_view.dart';
+import 'package:company_print/common/widgets/menu_button.dart';
 import 'package:company_print/pages/dishes/dishes_controller.dart';
 import 'package:company_print/common/widgets/section_listtile.dart';
 
@@ -31,6 +32,7 @@ class _DishesPageState extends State<DishesPage> with TickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         title: const Text('商品分类'),
+        leading: Get.width > 680 ? null : MenuButton(),
         actions: [
           Container(
             margin: const EdgeInsets.only(right: 20.0),

@@ -63,16 +63,6 @@ class _CustomerOrderItemsPageState extends State<CustomerOrderItemsPage> {
                     },
                     child: const Text('新增', style: TextStyle(fontSize: 18)),
                   ),
-                  FilledButton(
-                    style: ButtonStyle(
-                      shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
-                    ),
-                    onPressed: () {
-                      controller.dataSource?.refreshDatasource();
-                    },
-                    child: const Text('刷新', style: TextStyle(fontSize: 18)),
-                  ),
                 ],
                 checkboxHorizontalMargin: 10,
                 wrapInCard: true,

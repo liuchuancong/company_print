@@ -150,14 +150,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.1.8"
-  cascade_widget:
-    dependency: "direct main"
-    description:
-      name: cascade_widget
-      sha256: fdc3555c167f9ad2bd4db2281a862266151af79c48cba3b2e1124fca5dd114dc
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.0.5"
   characters:
     dependency: transitive
     description:
@@ -498,14 +490,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.3.2"
-  group_button:
-    dependency: "direct main"
-    description:
-      name: group_button
-      sha256: "0610fcf28ed122bfb4b410fce161a390f7f2531d55d1d65c5375982001415940"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "5.3.4"
   http:
     dependency: transitive
     description:
@@ -794,6 +778,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.11.1"
+  pdf_widget_wrapper:
+    dependency: transitive
+    description:
+      name: pdf_widget_wrapper
+      sha256: c930860d987213a3d58c7ec3b7ecf8085c3897f773e8dc23da9cae60a5d6d0f5
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.0.4"
   petitparser:
     dependency: transitive
     description:
@@ -834,6 +826,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.5.1"
+  printing:
+    dependency: "direct main"
+    description:
+      name: printing
+      sha256: b535d177fc6e8f8908e19b0ff5c1d4a87e3c4d0bf675e05aa2562af1b7853906
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "5.13.4"
   pub_semver:
     dependency: transitive
     description:
@@ -946,14 +946,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.3.1"
-  searchfield:
-    dependency: "direct main"
-    description:
-      name: searchfield
-      sha256: "4feb30fb730010cce3bd53c065cc9acc2cd1833a4ab8263ba9575293f09a1e3f"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.2.2"
   share_plus:
     dependency: "direct main"
     description:

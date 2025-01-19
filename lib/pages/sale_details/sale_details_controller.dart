@@ -34,11 +34,16 @@ class SaleDetailsController extends GetxController {
   final PaginatorController paginatorController = PaginatorController();
   SaleDetailsDataSource? dataSource;
 
+  var getTotalOrderPrice = '0'.obs;
+  var getAdvancePayment = '0'.obs;
+  var getOrderCount = '0'.obs;
+
   var salesOrderCalculationType = SalesOrderCalculationType.round.obs;
   @override
   void onInit() {
     super.onInit();
     dataSource = SaleDetailsDataSource(this);
+    getOrderDetetail();
   }
 
   String getSortName() {
@@ -125,7 +130,10 @@ class SaleDetailsController extends GetxController {
   void showCreateOrderDialog() {
     Get.to(() => EditOrderItemsPage(
           controller: this,
-          onConfirm: (orderItem) => addOrderOrderItem(orderItem),
+          onConfirm: (orderItem) async {
+            await addOrderOrderItem(orderItem);
+            setOrderCalculationType(salesOrderCalculationType.value.index);
+          },
         ));
   }
 
@@ -150,21 +158,23 @@ class SaleDetailsController extends GetxController {
   void handleMutipleOrderItem(List<OrderItem> newOrderItems) async {
     dishesSelectType = DishesSelectType.dishes;
     for (var orderItem in newOrderItems) {
-      addOrderOrderItem(orderItem);
+      await addOrderOrderItem(orderItem);
     }
+    setOrderCalculationType(salesOrderCalculationType.value.index);
   }
 
   void showEditOrderDialog(OrderItem customerOrderItem) {
     Get.to(() => EditOrderItemsPage(
           controller: this,
           orderItem: customerOrderItem,
-          onConfirm: (orderItem) => updateOrderOrderItem(orderItem),
+          onConfirm: (orderItem) async {
+            await updateOrderOrderItem(orderItem);
+          },
         ));
   }
 
   Future<void> addOrderOrderItem(OrderItem order) async {
     await database.orderItemsDao.insertOrderItem(order);
-    setOrderCalculationType(salesOrderCalculationType.value.index);
   }
 
   Future<void> updateOrderOrderItem(OrderItem order) async {
@@ -184,7 +194,7 @@ class SaleDetailsController extends GetxController {
     setOrderCalculationType(salesOrderCalculationType.value.index);
   }
 
-  void setOrderCalculationType(int index) async {
+  Future<void> setOrderCalculationType(int index) async {
     if (index == 0) {
       salesOrderCalculationType.value = SalesOrderCalculationType.round;
     } else {
@@ -193,5 +203,20 @@ class SaleDetailsController extends GetxController {
     await database.orderItemsDao.updateAllOrderOrderPrice(orderId, salesOrderCalculationType.value);
     dataSource?.refreshDatasource();
     EventBus.instance.emit('refreshOrderList', true);
+    getOrderDetetail();
+  }
+
+  void getOrderDetetail() async {
+    final getTotalOrderPriceResult = await database.orderItemsDao.getTotalOrderPrice(orderId);
+    final getAdvancePaymentResult = await database.orderItemsDao.getAdvancePayment(orderId);
+    final getOrderCountResult = await database.orderItemsDao.getItemCount(orderId);
+    if (salesOrderCalculationType.value == SalesOrderCalculationType.round) {
+      getTotalOrderPrice.value = Utils.getDoubleStringRound(getTotalOrderPriceResult);
+      getAdvancePayment.value = Utils.getDoubleStringRound(getAdvancePaymentResult);
+    } else {
+      getTotalOrderPrice.value = Utils.getDoubleStringDecimal(getTotalOrderPriceResult);
+      getAdvancePayment.value = Utils.getDoubleStringDecimal(getAdvancePaymentResult);
+    }
+    getOrderCount.value = Utils.getDoubleStringRound(getOrderCountResult);
   }
 }

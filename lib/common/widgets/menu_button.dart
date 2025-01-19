@@ -5,6 +5,7 @@ class MenuButton extends GetView {
   MenuButton({super.key});
 
   final menuRoutes = [
+    RoutePath.kMinePage,
     RoutePath.kSettings,
   ];
 
@@ -26,10 +27,18 @@ class MenuButton extends GetView {
           value: 0,
           padding: EdgeInsets.symmetric(horizontal: 12),
           child: MenuListTile(
+            leading: Icon(Icons.account_circle_rounded),
+            text: '我的',
+          ),
+        ),
+        const PopupMenuItem(
+          value: 0,
+          padding: EdgeInsets.symmetric(horizontal: 12),
+          child: MenuListTile(
             leading: Icon(Icons.settings_rounded),
             text: '设置',
           ),
-        )
+        ),
       ],
     );
   }

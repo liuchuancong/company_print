@@ -172,4 +172,25 @@ class OrderItemsDao extends DatabaseAccessor<AppDatabase> with _$OrderItemsDaoMi
       itemCount: Value(double.parse(orderItems.length.toString())),
     ));
   }
+
+  Future<double?> getTotalOrderPrice(int orderId) async {
+    final query = selectOnly(db.orders)..addColumns([db.orders.totalPrice]);
+    query.where(db.orders.id.equals(orderId));
+    final result = await query.map((row) => row.read<double>(db.orders.totalPrice)).getSingle();
+    return result;
+  }
+
+  Future<double?> getAdvancePayment(int orderId) async {
+    final query = selectOnly(db.orders)..addColumns([db.orders.advancePayment]);
+    query.where(db.orders.id.equals(orderId));
+    final result = await query.map((row) => row.read<double>(db.orders.advancePayment)).getSingle();
+    return result;
+  }
+
+  Future<double?> getItemCount(int orderId) async {
+    final query = selectOnly(db.orders)..addColumns([db.orders.itemCount]);
+    query.where(db.orders.id.equals(orderId));
+    final result = await query.map((row) => row.read<double>(db.orders.itemCount)).getSingle();
+    return result;
+  }
 }

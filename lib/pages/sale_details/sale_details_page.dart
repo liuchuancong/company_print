@@ -41,66 +41,61 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
               if (controller.isLoading.value) {
                 return const Center(child: CircularProgressIndicator());
               }
+              // '合计：${controller.getOrderCount.value}件,共 ${controller.getTotalOrderPrice.value} 元，垫付：${controller.getAdvancePayment.value} 元',
               return AsyncPaginatedDataTable2(
-                header: Container(),
+                header: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Obx(() => Text.rich(TextSpan(
+                              text: '合计：',
+                              style: const TextStyle(fontSize: 15),
+                              children: [
+                                TextSpan(
+                                  text: controller.getOrderCount.value,
+                                  style: TextStyle(
+                                      fontSize: 15, color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold),
+                                ),
+                                const TextSpan(text: '件'),
+                                const TextSpan(text: '，'),
+                                const TextSpan(text: '总价 '),
+                                TextSpan(
+                                  text: controller.getTotalOrderPrice.value,
+                                  style: TextStyle(
+                                      fontSize: 15, color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold),
+                                ),
+                                const TextSpan(text: ' 元'),
+                                const TextSpan(text: '，'),
+                                const TextSpan(text: '垫付：'),
+                                TextSpan(
+                                  text: controller.getAdvancePayment.value,
+                                  style: TextStyle(
+                                      fontSize: 15, color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold),
+                                ),
+                                const TextSpan(text: ' 元'),
+                              ],
+                            ))),
+                      ],
+                    )),
                 actions: [
-                  PopupMenuButton(
-                    tooltip: '计价方式',
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                  FilledButton(
+                    style: ButtonStyle(
+                      shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                     ),
-                    offset: const Offset(12, 0),
-                    position: PopupMenuPosition.under,
-                    icon: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Obx(() => Text(
-                            controller.salesOrderCalculationType.value == SalesOrderCalculationType.round
-                                ? '四舍五入'
-                                : '保留两位小数',
-                            style: const TextStyle(color: Colors.white),
-                          )),
-                    ),
-                    onSelected: (int index) {
-                      controller.setOrderCalculationType(index);
+                    onPressed: () {
+                      controller.setOrderCalculationType(
+                          controller.salesOrderCalculationType.value == SalesOrderCalculationType.round ? 1 : 0);
                     },
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Obx(() => Text(
-                              '四舍五入',
-                              style: TextStyle(
-                                color: controller.salesOrderCalculationType.value == SalesOrderCalculationType.round
-                                    ? Theme.of(context).primaryColor
-                                    : Colors.black,
-                                fontWeight:
-                                    controller.salesOrderCalculationType.value == SalesOrderCalculationType.round
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                              ),
-                            )),
+                    child: Obx(
+                      () => Text(
+                        controller.salesOrderCalculationType.value == SalesOrderCalculationType.round
+                            ? '计价-整数'
+                            : '计价-两位小数',
+                        style: const TextStyle(fontSize: 18),
                       ),
-                      PopupMenuItem(
-                        value: 1,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Obx(() => Text(
-                              '保留两位小数',
-                              style: TextStyle(
-                                color: controller.salesOrderCalculationType.value == SalesOrderCalculationType.decimal
-                                    ? Theme.of(context).primaryColor
-                                    : Colors.black,
-                                fontWeight:
-                                    controller.salesOrderCalculationType.value == SalesOrderCalculationType.decimal
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                              ),
-                            )),
-                      ),
-                    ],
+                    ),
                   ),
                   FilledButton(
                     style: ButtonStyle(
@@ -110,7 +105,7 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                     onPressed: () {
                       controller.showMutipleOrderItemPage();
                     },
-                    child: const Text('批量导入', style: TextStyle(fontSize: 18)),
+                    child: const Text('批量添加', style: TextStyle(fontSize: 18)),
                   ),
                   FilledButton(
                     style: ButtonStyle(
@@ -120,7 +115,7 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                     onPressed: () {
                       controller.showCreateOrderDialog();
                     },
-                    child: const Text('新增商品', style: TextStyle(fontSize: 18)),
+                    child: const Text('添加', style: TextStyle(fontSize: 18)),
                   ),
                   FilledButton(
                     style: ButtonStyle(
@@ -130,7 +125,7 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                     onPressed: () {
                       controller.showMutipleCustomerOrderItemPage();
                     },
-                    child: const Text('从客户常用商品导入', style: TextStyle(fontSize: 18)),
+                    child: const Text('客户商品导入', style: TextStyle(fontSize: 18)),
                   ),
                   FilledButton(
                     style: ButtonStyle(
@@ -138,9 +133,9 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                       padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                     ),
                     onPressed: () {
-                      controller.dataSource?.refreshDatasource();
+                      controller.showMutipleCustomerOrderItemPage();
                     },
-                    child: const Text('刷新', style: TextStyle(fontSize: 18)),
+                    child: const Text('打印', style: TextStyle(fontSize: 18)),
                   ),
                 ],
                 checkboxHorizontalMargin: 10,

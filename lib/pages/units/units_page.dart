@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:date_format/date_format.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:company_print/common/index.dart';
+import 'package:company_print/common/widgets/menu_button.dart';
 import 'package:company_print/common/style/custom_scaffold.dart';
 import 'package:company_print/pages/units/units_controller.dart';
 import 'package:company_print/common/widgets/section_listtile.dart';
@@ -31,6 +32,7 @@ class _UnitsPageState extends State<UnitsPage> {
     final controller = Get.find<UnitsController>();
     return Scaffold(
       appBar: AppBar(
+        leading: Get.width > 680 ? null : MenuButton(),
         title: const Text('商品单位'),
       ),
       body: Column(
@@ -55,16 +57,6 @@ class _UnitsPageState extends State<UnitsPage> {
                       controller.showCreateDishUnitPage();
                     },
                     child: const Text('新增', style: TextStyle(fontSize: 18)),
-                  ),
-                  FilledButton(
-                    style: ButtonStyle(
-                      shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
-                    ),
-                    onPressed: () {
-                      controller.dataSource?.refreshDatasource();
-                    },
-                    child: const Text('刷新', style: TextStyle(fontSize: 18)),
                   ),
                 ],
                 checkboxHorizontalMargin: 12,

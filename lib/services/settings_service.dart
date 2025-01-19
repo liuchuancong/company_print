@@ -13,6 +13,18 @@ class SettingsService extends GetxController {
     backupDirectory.listen((String value) {
       PrefUtil.setString('backupDirectory', value);
     });
+
+    myName.listen((value) {
+      PrefUtil.setString('myName', value);
+    });
+
+    myPhone.listen((value) {
+      PrefUtil.setString('myPhone', value);
+    });
+
+    myAddress.listen((value) {
+      PrefUtil.setString('myAddress', value);
+    });
   }
 
   // Theme settings
@@ -22,6 +34,12 @@ class SettingsService extends GetxController {
     "明亮": ThemeMode.light,
   };
   final themeModeName = (PrefUtil.getString('themeMode') ?? "系统").obs;
+
+  final myName = (PrefUtil.getString('myName') ?? '').obs;
+
+  final myPhone = (PrefUtil.getString('myPhone') ?? '').obs;
+
+  final myAddress = (PrefUtil.getString('myAddress') ?? '').obs;
 
   get themeMode => SettingsService.themeModes[themeModeName.value]!;
 
@@ -93,6 +111,9 @@ class SettingsService extends GetxController {
     Map<String, dynamic> json = {};
     json['themeMode'] = themeModeName.value;
     json['themeColorSwitch'] = themeColorSwitch.value;
+    json['myName'] = myName.value;
+    json['myPhone'] = myPhone.value;
+    json['myAddress'] = myAddress.value;
     return json;
   }
 
@@ -100,6 +121,9 @@ class SettingsService extends GetxController {
     Map<String, dynamic> json = {
       "themeMode": "Light",
       "themeColorSwitch": Colors.blue.hex,
+      "myName": "",
+      "myPhone": "",
+      "myAddress": "",
     };
     return json;
   }

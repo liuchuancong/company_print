@@ -1,4 +1,5 @@
 import 'package:company_print/common/index.dart';
+import 'package:company_print/pages/mine/mine.dart';
 import 'package:company_print/pages/home/home_page.dart';
 import 'package:company_print/pages/settings/settings_page.dart';
 import 'package:company_print/pages/settings/settings_binding.dart';
@@ -75,6 +76,15 @@ class AppPages {
       name: RoutePath.kUnitSelectPage,
       page: UnitSelectPage.new,
       bindings: [UnitSelectBinding()],
+    ),
+    GetPage(
+      name: RoutePath.kUnitSelectPage,
+      page: UnitSelectPage.new,
+      bindings: [UnitSelectBinding()],
+    ),
+    GetPage(
+      name: RoutePath.kMinePage,
+      page: MinePage.new,
     ),
 
     // UnitSelectPage

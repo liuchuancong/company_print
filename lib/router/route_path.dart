@@ -30,4 +30,6 @@ class RoutePath {
   static var kMutipleCustomerDishSelectPage = "/mutipleCustomerDishSelectPage";
   // 单位选择
   static var kUnitSelectPage = "/unitSelectPage";
+
+  static var kMinePage = "/minePage";
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:date_format/date_format.dart';
-import 'package:searchfield/searchfield.dart';
 import 'package:company_print/utils/utils.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/common/style/app_style.dart';
@@ -35,8 +34,6 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
   final TextEditingController _itemCountController = TextEditingController(text: '0');
   final TextEditingController _shippingFeeController = TextEditingController(text: '0.0');
   final TextEditingController _dateController = TextEditingController();
-  SearchFieldListItem<Customer>? selectedCustomerValue;
-  SearchFieldListItem<Vehicle>? selectedVehicleValue;
   bool _isPaid = false;
   int customerId = 0;
 

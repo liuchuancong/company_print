@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:searchfield/searchfield.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/common/style/app_style.dart';
 import 'package:company_print/common/widgets/menu_button.dart';
@@ -16,7 +15,6 @@ class SalesPage extends StatefulWidget {
 class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixin {
   late SalesController controller;
 
-  SearchFieldListItem<String>? searchFieldListItem;
   @override
   void initState() {
     super.initState();
@@ -35,7 +33,7 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
     super.build(context);
     return Scaffold(
       appBar: AppBar(
-        leading: MenuButton(),
+        leading: Get.width > 680 ? null : MenuButton(),
         automaticallyImplyLeading: false,
         title: TextField(
           controller: controller.searchController,
