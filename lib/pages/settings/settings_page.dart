@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/utils/file_recover_utils.dart';
@@ -76,10 +77,12 @@ class SettingsPage extends GetView<SettingsService> {
                 subtitle:
                     Text(controller.backupDirectory.value.isNotEmpty ? controller.backupDirectory.value : '未选择保存目录'),
                 onTap: () async {
-                  final selectedDirectory =
-                      await FileRecoverUtils().selectBackupDirectory(controller.backupDirectory.value);
-                  if (selectedDirectory != null) {
-                    controller.backupDirectory.value = selectedDirectory;
+                  if (!Platform.isAndroid) {
+                    final selectedDirectory =
+                        await FileRecoverUtils().selectBackupDirectory(controller.backupDirectory.value);
+                    if (selectedDirectory != null) {
+                      controller.backupDirectory.value = selectedDirectory;
+                    }
                   }
                 },
               )),

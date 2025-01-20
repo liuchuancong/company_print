@@ -16,6 +16,7 @@ import 'package:company_print/utils/event_bus.dart';
 import 'package:company_print/utils/snackbar_util.dart';
 import 'package:company_print/pages/pdf_view/pdf_view.dart';
 import 'package:company_print/utils/file_recover_utils.dart';
+import 'package:flutter_media_store/flutter_media_store.dart';
 import 'package:company_print/database/models/sales_order.dart';
 import 'package:company_print/pages/dishes/dishes_controller.dart';
 import 'package:company_print/pages/sale_details/sale_details_page.dart';
@@ -260,6 +261,39 @@ class SaleDetailsController extends GetxController {
     return result;
   }
 
+  /// Save file to MediaStore
+  Future<void> saveFile({
+    required Uint8List fileData,
+    required String rootFolderName,
+    required String folderName,
+    required String fileName,
+  }) async {
+    final flutterMediaStorePlugin = FlutterMediaStore();
+    try {
+      // Save the file using the plugin and handle success/error via callbacks
+      await flutterMediaStorePlugin.saveFile(
+        fileData: fileData,
+        mimeType: 'application/pdf',
+        rootFolderName: rootFolderName,
+        folderName: folderName,
+        fileName: fileName,
+        onSuccess: (String uri, String filePath) {
+          Get.to(() => PdfView(
+                path: filePath,
+              ));
+
+          SnackBarUtil.success('文件已保存到$filePath');
+        },
+        onError: (String error) {
+          SnackBarUtil.error('文件保存失败: $error');
+        },
+      );
+    } catch (e) {
+      log(e.toString(), name: 'saveFile');
+      SnackBarUtil.error('文件保存失败');
+    }
+  }
+
   Future<void> generateAndPrintPdf() async {
     try {
       final List<OrderItem> products = await database.orderItemsDao.getAllOrderItemsByOrderId(orderId);
@@ -483,11 +517,13 @@ class SaleDetailsController extends GetxController {
           ));
         }
 
-        final DateFormat formatter = DateFormat("yyyy'年'MM'月'dd'日'HH'时'mm'分'ss'秒'");
+        final DateFormat formatter = DateFormat("yyyy'年'MM'月'dd'日'HH'点'");
+        final DateFormat dirFormatter = DateFormat("yyyy'年'MM'月'dd'日'");
+
         final dateStr = formatter.format(DateTime.now());
         Uint8List bytes = await pdf.save();
         if (printSelected == 1) {
-          await Printing.sharePdf(bytes: bytes, filename: '${order.customerName}_$dateStr.pdf');
+          await Printing.sharePdf(bytes: bytes, filename: '${order.customerName}.pdf');
         } else if (printSelected == 0) {
           try {
             Directory? downloadsDir;
@@ -497,12 +533,24 @@ class SaleDetailsController extends GetxController {
             } else {
               downloadsDir = await getDownloadsDirectory();
             }
-            final file = File('${downloadsDir?.path}/${order.customerName}_$dateStr.pdf');
-            await file.writeAsBytes(bytes);
-            Get.to(() => PdfView(
-                  path: file.path,
-                ));
-            SnackBarUtil.success('文件已保存到${downloadsDir?.path}');
+            final file = File(
+                '${downloadsDir?.path}${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}${order.customerName}.pdf');
+
+            if (Platform.isAndroid) {
+              saveFile(
+                fileData: bytes,
+                rootFolderName: '小柳打印',
+                folderName: dirFormatter.format(DateTime.now()),
+                fileName: '${order.customerName}_$dateStr.pdf',
+              );
+            } else {
+              await file.writeAsBytes(bytes);
+              Get.to(() => PdfView(
+                    path: file.path,
+                  ));
+
+              SnackBarUtil.success('文件已保存到${downloadsDir?.path}');
+            }
           } catch (e) {
             SnackBarUtil.error('error: $e');
           }
