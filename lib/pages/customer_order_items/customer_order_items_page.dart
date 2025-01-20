@@ -73,6 +73,8 @@ class _CustomerOrderItemsPageState extends State<CustomerOrderItemsPage> {
                 minWidth: 1500,
                 isHorizontalScrollBarVisible: true,
                 columnSpacing: 20,
+                fixedColumnsColor: Theme.of(context).highlightColor,
+                fixedCornerColor: Theme.of(context).highlightColor,
                 fixedLeftColumns: 1,
                 columns: [
                   const DataColumn2(

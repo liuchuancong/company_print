@@ -64,6 +64,8 @@ class _VehiclesPageState extends State<VehiclesPage> with AutomaticKeepAliveClie
                 sortAscending: controller.sortAscending.value,
                 minWidth: 600,
                 columnSpacing: 20,
+                fixedColumnsColor: Theme.of(context).highlightColor,
+                fixedCornerColor: Theme.of(context).highlightColor,
                 fixedLeftColumns: 1,
                 isHorizontalScrollBarVisible: true,
                 columns: [

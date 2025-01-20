@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:company_print/utils/utils.dart';
 import 'package:company_print/common/index.dart';

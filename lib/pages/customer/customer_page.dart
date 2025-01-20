@@ -62,6 +62,8 @@ class _CustomersPageState extends State<CustomersPage> with AutomaticKeepAliveCl
                 sortColumnIndex: controller.sortColumnIndex.value,
                 sortAscending: controller.sortAscending.value,
                 columnSpacing: 20,
+                fixedColumnsColor: Theme.of(context).highlightColor,
+                fixedCornerColor: Theme.of(context).highlightColor,
                 minWidth: 1000,
                 isHorizontalScrollBarVisible: true,
                 isVerticalScrollBarVisible: true,

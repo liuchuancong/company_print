@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/common/style/custom_scaffold.dart';
-import 'package:company_print/common/widgets/input_text_filed.dart';
 
 class ViewDetail extends StatefulWidget {
   const ViewDetail({super.key, required this.contentMap});

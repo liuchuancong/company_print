@@ -41,7 +41,6 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
               if (controller.isLoading.value) {
                 return const Center(child: CircularProgressIndicator());
               }
-              // '合计：${controller.getOrderCount.value}件,共 ${controller.getTotalOrderPrice.value} 元，垫付：${controller.getAdvancePayment.value} 元',
               return AsyncPaginatedDataTable2(
                 header: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -54,24 +53,21 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                               children: [
                                 TextSpan(
                                   text: controller.getOrderCount.value,
-                                  style: TextStyle(
-                                      fontSize: 15, color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(fontSize: 15, color: Colors.red, fontWeight: FontWeight.bold),
                                 ),
                                 const TextSpan(text: ' 件'),
                                 const TextSpan(text: '，'),
                                 const TextSpan(text: '总价 '),
                                 TextSpan(
                                   text: controller.getTotalOrderPrice.value,
-                                  style: TextStyle(
-                                      fontSize: 15, color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(fontSize: 15, color: Colors.red, fontWeight: FontWeight.bold),
                                 ),
                                 const TextSpan(text: ' 元'),
                                 const TextSpan(text: '，'),
                                 const TextSpan(text: '垫付：'),
                                 TextSpan(
                                   text: controller.getAdvancePayment.value,
-                                  style: TextStyle(
-                                      fontSize: 15, color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(fontSize: 15, color: Colors.red, fontWeight: FontWeight.bold),
                                 ),
                                 const TextSpan(text: ' 元'),
                               ],
@@ -147,9 +143,9 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                 minWidth: 1600,
                 isHorizontalScrollBarVisible: true,
                 columnSpacing: 20,
+                fixedColumnsColor: Theme.of(context).highlightColor,
+                fixedCornerColor: Theme.of(context).highlightColor,
                 fixedLeftColumns: 1,
-                fixedColumnsColor: Theme.of(context).focusColor,
-                fixedCornerColor: Theme.of(context).focusColor,
                 columns: [
                   const DataColumn2(
                     label: Text('操作'),
