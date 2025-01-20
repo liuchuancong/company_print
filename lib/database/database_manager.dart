@@ -3,7 +3,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:logger/logger.dart';
 import 'package:path/path.dart' as p;
-import 'package:company_print/database/db.dart';
+import 'package:company_print/common/index.dart';
 import 'package:path_provider/path_provider.dart';
 
 class DatabaseManager {
@@ -24,6 +24,8 @@ LazyDatabase openConnection() {
     final folderDir = '${dbFolder.path}${Platform.pathSeparator}company_print';
     final file = File(p.join(folderDir, 'app_database.db'));
     // 确保数据库文件所在的目录存在
+    final settings = Get.find<SettingsService>();
+    settings.dbPath.value = file.path;
     await dbFolder.create(recursive: true);
     Logger().i('Opening db $file');
     return NativeDatabase(file);

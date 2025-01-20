@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:company_print/common/index.dart';
+import 'package:company_print/utils/event_bus.dart';
 import 'package:company_print/utils/file_recover_utils.dart';
 import 'package:company_print/common/widgets/section_listtile.dart';
 
@@ -41,10 +42,40 @@ class SettingsPage extends GetView<SettingsService> {
                 )),
             onTap: colorPickerDialog,
           ),
-          const SectionTitle(title: "备份目录"),
+          const SectionTitle(title: "系统"),
+          ListTile(
+              leading: const Icon(Icons.file_copy_outlined, size: 32),
+              title: const Text('数据保存路径'),
+              subtitle: Text(controller.dbPath.value)),
+          Obx(
+            () => SwitchListTile(
+              title: const Row(
+                children: [
+                  Icon(Icons.stop_circle_outlined, size: 32), // 使用 Row 来在左侧添加图标
+                  SizedBox(width: 16), // 添加一些间距
+                  Expanded(child: Text('防止休眠')), // Expanded 确保文本可以占满剩余空间
+                ],
+              ),
+              subtitle: const Row(
+                children: [
+                  SizedBox(width: 48), // 添加一些间距
+                  Text('在使用软件时，防止手机进入休眠状态。'),
+                ],
+              ),
+              value: controller.enableScreenKeepOn.value,
+              activeColor: Theme.of(context).colorScheme.primary,
+              onChanged: (bool value) {
+                controller.enableScreenKeepOn.value = value;
+                // EventBus.instance.emit('enableScreenKeepOn', value); // 如果需要的话，可以解注释
+              },
+            ),
+          ),
+          const SectionTitle(title: "PDF 文档保存目录"),
           Obx(() => ListTile(
-                title: const Text("备份目录"),
-                subtitle: Text(controller.backupDirectory.value),
+                leading: const Icon(Icons.folder_outlined, size: 32),
+                title: const Text("保存目录"),
+                subtitle:
+                    Text(controller.backupDirectory.value.isNotEmpty ? controller.backupDirectory.value : '未选择保存目录'),
                 onTap: () async {
                   final selectedDirectory =
                       await FileRecoverUtils().selectBackupDirectory(controller.backupDirectory.value);

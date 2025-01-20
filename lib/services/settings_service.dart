@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:company_print/common/index.dart';
+import 'package:company_print/utils/event_bus.dart';
 
 class SettingsService extends GetxController {
   SettingsService() {
@@ -44,6 +45,14 @@ class SettingsService extends GetxController {
 
     printIsShowPriceInfo.listen((value) {
       PrefUtil.setBool('printIsShowPriceInfo', value);
+    });
+
+    enableScreenKeepOn.listen((value) {
+      PrefUtil.setBool('enableScreenKeepOn', value);
+    });
+
+    dbPath.listen((value) {
+      PrefUtil.setString('dbPath', value);
     });
   }
 
@@ -110,7 +119,9 @@ class SettingsService extends GetxController {
   // Backup & recover storage
   final backupDirectory = (PrefUtil.getString('backupDirectory') ?? '').obs;
 
-  final m3uDirectory = (PrefUtil.getString('m3uDirectory') ?? 'm3uDirectory').obs;
+  final dbPath = (PrefUtil.getString('dbPath') ?? '').obs;
+
+  final enableScreenKeepOn = (PrefUtil.getBool('enableScreenKeepOn') ?? false).obs;
 
   bool backup(File file) {
     try {
@@ -144,6 +155,9 @@ class SettingsService extends GetxController {
     printIsShowOwnerInfo.value = json['printIsShowOwnerInfo'];
     printIsShowPriceInfo.value = json['printIsShowPriceInfo'];
     backupDirectory.value = json['backupDirectory'];
+    enableScreenKeepOn.value = json['enableScreenKeepOn'];
+    dbPath.value = json['dbPath'];
+    EventBus.instance.emit('enableScreenKeepOn', enableScreenKeepOn.value);
   }
 
   Map<String, dynamic> toJson() {
@@ -159,6 +173,8 @@ class SettingsService extends GetxController {
     json['printIsShowOwnerInfo'] = printIsShowOwnerInfo.value;
     json['printIsShowPriceInfo'] = printIsShowPriceInfo.value;
     json['backupDirectory'] = backupDirectory.value;
+    json['enableScreenKeepOn'] = enableScreenKeepOn.value;
+    json['dbPath'] = dbPath.value;
     return json;
   }
 
@@ -175,6 +191,8 @@ class SettingsService extends GetxController {
       "printIsShowOwnerInfo": true,
       "printIsShowPriceInfo": true,
       "backupDirectory": "",
+      "enableScreenKeepOn": false,
+      "dbPath": "",
     };
     return json;
   }

@@ -348,21 +348,21 @@ class SaleDetailsController extends GetxController {
                 mainAxisAlignment: pw.MainAxisAlignment.start,
                 children: [
                   pw.Expanded(
-                    flex: 1, // 设置 flex 为 1 表示占据一半宽度
+                    flex: 2, // 设置 flex 为 1 表示占据一半宽度
                     child: pw.Container(
-                      child: pw.Text("承运人：${order.driverName}", style: const pw.TextStyle(fontSize: 12)),
+                      child: pw.Text("司机：${order.driverName}", style: const pw.TextStyle(fontSize: 12)),
                     ),
                   ),
                   pw.Expanded(
                     flex: 2, // 设置 flex 为 1 表示占据一半宽度
                     child: pw.Container(
-                      child: pw.Text("承运人电话：${order.driverPhone}", style: const pw.TextStyle(fontSize: 12)),
+                      child: pw.Text("电话：${order.driverPhone}", style: const pw.TextStyle(fontSize: 12)),
                     ),
                   ),
                   pw.Expanded(
                     flex: 2, // 设置 flex 为 1 表示占据一半宽度
                     child: pw.Container(
-                      child: pw.Text("承运人车牌号：${order.vehiclePlateNumber}", style: const pw.TextStyle(fontSize: 12)),
+                      child: pw.Text("车牌号：${order.vehiclePlateNumber}", style: const pw.TextStyle(fontSize: 12)),
                     ),
                   ),
                 ],

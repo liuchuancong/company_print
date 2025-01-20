@@ -1,12 +1,16 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:company_print/common/index.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:company_print/utils/event_bus.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 Future<void> initSystem() async {
   WidgetsFlutterBinding.ensureInitialized();
+  WakelockPlus.enable();
   PrefUtil.prefs = await SharedPreferences.getInstance();
   await ScreenUtil.ensureScreenSize(); // 确保屏幕大小被正确设置
   initService();
@@ -35,6 +39,29 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  StreamSubscription<dynamic>? wakelockPlusSubscription;
+  @override
+  void initState() {
+    super.initState();
+    setInitScreen();
+    listenWakelock();
+  }
+
+  listenWakelock() {
+    wakelockPlusSubscription = EventBus.instance.listen('enableScreenKeepOn', (data) {
+      if (data == true) {
+        WakelockPlus.toggle(enable: true);
+      } else {
+        WakelockPlus.toggle(enable: false);
+      }
+    });
+  }
+
+  setInitScreen() {
+    final settings = Get.find<SettingsService>();
+    WakelockPlus.toggle(enable: settings.enableScreenKeepOn.value);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Obx(() {
