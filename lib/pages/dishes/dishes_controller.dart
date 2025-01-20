@@ -23,7 +23,6 @@ class DishesController extends GetxController {
     final result = await database.dishesCategoryDao.getAllCategories();
     categories.assignAll(result);
     nodes.assignAll(generateTreeNodes(buildTree(result)));
-    log(result.toString());
     await Future.delayed(const Duration(milliseconds: 20));
     isLoading(false);
   }
