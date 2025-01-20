@@ -26,109 +26,124 @@ class _CustomerOrderItemsPageState extends State<CustomerOrderItemsPage> {
     Get.delete<CustomerOrderItemsController>();
   }
 
+  Future<bool> onWillPop() async {
+    try {
+      var exit = await Utils.showAlertDialog('是否退出当前页面？', title: '提示');
+      if (exit == true) {
+        Navigator.of(Get.context!).pop();
+      }
+    } catch (e) {
+      Navigator.of(Get.context!).pop();
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<CustomerOrderItemsController>();
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('客户商品管理'),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Obx(() {
-              if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              return AsyncPaginatedDataTable2(
-                header: Container(),
-                actions: [
-                  FilledButton(
-                    style: ButtonStyle(
-                      shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+    return BackButtonListener(
+      onBackButtonPressed: onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('客户商品管理'),
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return AsyncPaginatedDataTable2(
+                  header: Container(),
+                  actions: [
+                    FilledButton(
+                      style: ButtonStyle(
+                        shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                        padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+                      ),
+                      onPressed: () {
+                        controller.showMutipleOrderItemPage();
+                      },
+                      child: const Text('批量导入', style: TextStyle(fontSize: 18)),
                     ),
-                    onPressed: () {
-                      controller.showMutipleOrderItemPage();
-                    },
-                    child: const Text('批量导入', style: TextStyle(fontSize: 18)),
-                  ),
-                  FilledButton(
-                    style: ButtonStyle(
-                      shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+                    FilledButton(
+                      style: ButtonStyle(
+                        shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                        padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+                      ),
+                      onPressed: () {
+                        controller.showCreateCustomerPage();
+                      },
+                      child: const Text('新增', style: TextStyle(fontSize: 18)),
                     ),
-                    onPressed: () {
-                      controller.showCreateCustomerPage();
-                    },
-                    child: const Text('新增', style: TextStyle(fontSize: 18)),
+                  ],
+                  checkboxHorizontalMargin: 10,
+                  wrapInCard: true,
+                  rowsPerPage: controller.rowsPerPage.value,
+                  onRowsPerPageChanged: controller.handleRowsPerPageChanged,
+                  sortColumnIndex: controller.sortColumnIndex.value,
+                  sortAscending: controller.sortAscending.value,
+                  minWidth: 1500,
+                  isHorizontalScrollBarVisible: true,
+                  columnSpacing: 20,
+                  fixedColumnsColor: Theme.of(context).highlightColor,
+                  fixedCornerColor: Theme.of(context).highlightColor,
+                  fixedLeftColumns: 1,
+                  columns: [
+                    const DataColumn2(
+                      label: Text('操作'),
+                      fixedWidth: 160,
+                    ),
+                    DataColumn2(
+                      label: const Text('商品名称'),
+                      fixedWidth: 150,
+                      onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
+                    ),
+                    DataColumn2(
+                      label: const Text('购买数量'),
+                      fixedWidth: 160,
+                      onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
+                    ),
+                    DataColumn2(
+                      label: const Text('购买单价'),
+                      fixedWidth: 160,
+                      onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
+                    ),
+                    DataColumn2(
+                      label: const Text('实际数量'),
+                      fixedWidth: 160,
+                      onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
+                    ),
+                    DataColumn2(
+                      label: const Text('实际单价'),
+                      fixedWidth: 160,
+                      onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
+                    ),
+                    DataColumn2(
+                      label: const Text('备注'),
+                      onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
+                    ),
+                  ],
+                  fit: FlexFit.tight,
+                  border: const TableBorder(
+                    top: BorderSide(color: Colors.black),
+                    bottom: BorderSide(color: Colors.black),
+                    left: BorderSide(color: Colors.black),
+                    right: BorderSide(color: Colors.black),
+                    verticalInside: BorderSide(color: Colors.black),
+                    horizontalInside: BorderSide(color: Colors.black),
                   ),
-                ],
-                checkboxHorizontalMargin: 10,
-                wrapInCard: true,
-                rowsPerPage: controller.rowsPerPage.value,
-                onRowsPerPageChanged: controller.handleRowsPerPageChanged,
-                sortColumnIndex: controller.sortColumnIndex.value,
-                sortAscending: controller.sortAscending.value,
-                minWidth: 1500,
-                isHorizontalScrollBarVisible: true,
-                columnSpacing: 20,
-                fixedColumnsColor: Theme.of(context).highlightColor,
-                fixedCornerColor: Theme.of(context).highlightColor,
-                fixedLeftColumns: 1,
-                columns: [
-                  const DataColumn2(
-                    label: Text('操作'),
-                    fixedWidth: 160,
-                  ),
-                  DataColumn2(
-                    label: const Text('商品名称'),
-                    fixedWidth: 150,
-                    onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
-                  ),
-                  DataColumn2(
-                    label: const Text('购买数量'),
-                    fixedWidth: 160,
-                    onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
-                  ),
-                  DataColumn2(
-                    label: const Text('购买单价'),
-                    fixedWidth: 160,
-                    onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
-                  ),
-                  DataColumn2(
-                    label: const Text('实际数量'),
-                    fixedWidth: 160,
-                    onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
-                  ),
-                  DataColumn2(
-                    label: const Text('实际单价'),
-                    fixedWidth: 160,
-                    onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
-                  ),
-                  DataColumn2(
-                    label: const Text('备注'),
-                    onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
-                  ),
-                ],
-                fit: FlexFit.tight,
-                border: const TableBorder(
-                  top: BorderSide(color: Colors.black),
-                  bottom: BorderSide(color: Colors.black),
-                  left: BorderSide(color: Colors.black),
-                  right: BorderSide(color: Colors.black),
-                  verticalInside: BorderSide(color: Colors.black),
-                  horizontalInside: BorderSide(color: Colors.black),
-                ),
-                source: controller.dataSource!,
-                sortArrowIcon: Icons.keyboard_arrow_up,
-                initialFirstRowIndex: controller.initialRow.value,
-                showCheckboxColumn: false,
-                controller: controller.paginatorController,
-              );
-            }),
-          ),
-        ],
+                  source: controller.dataSource!,
+                  sortArrowIcon: Icons.keyboard_arrow_up,
+                  initialFirstRowIndex: controller.initialRow.value,
+                  showCheckboxColumn: false,
+                  controller: controller.paginatorController,
+                );
+              }),
+            ),
+          ],
+        ),
       ),
     );
   }

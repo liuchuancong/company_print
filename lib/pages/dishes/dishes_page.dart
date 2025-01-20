@@ -203,125 +203,140 @@ class EditOrCreateCategoryPageState extends State<EditOrCreateCategoryPage> {
     }
   }
 
+  Future<bool> onWillPop() async {
+    try {
+      var exit = await Utils.showAlertDialog('是否退出当前页面？', title: '提示');
+      if (exit == true) {
+        Navigator.of(Get.context!).pop();
+      }
+    } catch (e) {
+      Navigator.of(Get.context!).pop();
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(isNew ? '新增' : '编辑'),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-              child: ListView(
-                children: [
-                  const SectionTitle(title: '商品信息'),
-                  InputTextField(
-                    labelText: '商品名称',
-                    maxLength: 100,
-                    gap: 10,
-                    child: TextField(
-                      controller: _nameController,
-                      textInputAction: TextInputAction.next,
-                      maxLength: 100,
-                      maxLines: null,
-                      decoration: const InputDecoration(
-                        suffixIcon: Icon(
-                          Icons.info_outline,
-                          size: 30,
-                          color: Colors.redAccent,
-                        ),
-                      ),
-                    ),
-                  ),
-                  InputTextField(
-                    labelText: '商品描述',
-                    gap: 10,
-                    maxLength: 100,
-                    child: TextField(
-                      controller: _descriptionController,
-                      textInputAction: TextInputAction.done,
-                      maxLines: null,
-                      maxLength: 100,
-                    ),
-                  ),
-                  if (isNew)
+    return BackButtonListener(
+      onBackButtonPressed: onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(isNew ? '新增' : '编辑'),
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+                child: ListView(
+                  children: [
+                    const SectionTitle(title: '商品信息'),
                     InputTextField(
-                      labelText: '父级分类',
+                      labelText: '商品名称',
+                      maxLength: 100,
                       gap: 10,
                       child: TextField(
-                        readOnly: true,
-                        controller: _parentIdController,
-                        textInputAction: TextInputAction.done,
-                        decoration: InputDecoration(
-                          suffixIcon: IconButton(
-                            icon: const Icon(
-                              Icons.chevron_right_outlined,
-                              size: 30,
-                            ),
-                            onPressed: () async {
-                              final result = await Get.toNamed(RoutePath.kDishSelectPage);
-                              if (result != null) {
-                                _parentIdController.text = result.name.toString();
-                                parentId = result.id;
-                              }
-                            },
+                        controller: _nameController,
+                        textInputAction: TextInputAction.next,
+                        maxLength: 100,
+                        maxLines: null,
+                        decoration: const InputDecoration(
+                          suffixIcon: Icon(
+                            Icons.info_outline,
+                            size: 30,
+                            color: Colors.redAccent,
                           ),
                         ),
                       ),
                     ),
-                ],
-              ),
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(10.0),
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(color: Theme.of(context).primaryColor, width: 0.5),
-              ),
-            ),
-            child: SizedBox(
-              height: 50,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      FilledButton(
-                        style: ButtonStyle(
-                          shape:
-                              WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                          padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
-                        ),
-                        onPressed: () async {
-                          var result = await Utils.showAlertDialog("是否确认退出？", title: "提示");
-                          if (result == true) {
-                            Get.back();
-                          }
-                        },
-                        child: const Text('取消', style: TextStyle(fontSize: 18)),
+                    InputTextField(
+                      labelText: '商品描述',
+                      gap: 10,
+                      maxLength: 100,
+                      child: TextField(
+                        controller: _descriptionController,
+                        textInputAction: TextInputAction.done,
+                        maxLines: null,
+                        maxLength: 100,
                       ),
-                      const SizedBox(width: 10),
-                      FilledButton(
-                        style: ButtonStyle(
-                          shape:
-                              WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                          padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+                    ),
+                    if (isNew)
+                      InputTextField(
+                        labelText: '父级分类',
+                        gap: 10,
+                        child: TextField(
+                          readOnly: true,
+                          controller: _parentIdController,
+                          textInputAction: TextInputAction.done,
+                          decoration: InputDecoration(
+                            suffixIcon: IconButton(
+                              icon: const Icon(
+                                Icons.chevron_right_outlined,
+                                size: 30,
+                              ),
+                              onPressed: () async {
+                                final result = await Get.toNamed(RoutePath.kDishSelectPage);
+                                if (result != null) {
+                                  _parentIdController.text = result.name.toString();
+                                  parentId = result.id;
+                                }
+                              },
+                            ),
+                          ),
                         ),
-                        onPressed: _submitForm,
-                        child: Text(isNew ? '新增' : '保存', style: const TextStyle(fontSize: 18)),
                       ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          )
-        ],
+            Container(
+              padding: const EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Theme.of(context).primaryColor, width: 0.5),
+                ),
+              ),
+              child: SizedBox(
+                height: 50,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        FilledButton(
+                          style: ButtonStyle(
+                            shape: WidgetStateProperty.all(
+                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+                          ),
+                          onPressed: () async {
+                            var result = await Utils.showAlertDialog("是否确认退出？", title: "提示");
+                            if (result == true) {
+                              Get.back();
+                            }
+                          },
+                          child: const Text('取消', style: TextStyle(fontSize: 18)),
+                        ),
+                        const SizedBox(width: 10),
+                        FilledButton(
+                          style: ButtonStyle(
+                            shape: WidgetStateProperty.all(
+                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+                          ),
+                          onPressed: _submitForm,
+                          child: Text(isNew ? '新增' : '保存', style: const TextStyle(fontSize: 18)),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
