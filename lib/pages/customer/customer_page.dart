@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:company_print/utils/utils.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/common/widgets/menu_button.dart';
@@ -232,8 +233,11 @@ class EditOrCreateCustomerPageState extends State<EditOrCreateCustomerPage> {
             shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
             padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
           ),
-          onPressed: () {
-            Get.back();
+          onPressed: () async {
+            var result = await Utils.showAlertDialog("是否确认退出？", title: "提示");
+            if (result == true) {
+              Get.back();
+            }
           },
           child: const Text('取消', style: TextStyle(fontSize: 18)),
         ),
