@@ -5,7 +5,7 @@ class SnackBarUtil {
     Get.snackbar(
       'Success',
       text,
-      duration: const Duration(seconds: 5),
+      duration: const Duration(seconds: 3),
       backgroundColor: Get.theme.colorScheme.surfaceContainerHighest,
       colorText: Get.theme.colorScheme.onSurfaceVariant,
       snackPosition: SnackPosition.bottom,
@@ -16,7 +16,7 @@ class SnackBarUtil {
     Get.snackbar(
       'Error',
       text,
-      duration: const Duration(seconds: 4),
+      duration: const Duration(seconds: 3),
       backgroundColor: Get.theme.colorScheme.errorContainer,
       colorText: Get.theme.colorScheme.onErrorContainer,
       snackPosition: SnackPosition.bottom,

@@ -483,11 +483,11 @@ class SaleDetailsController extends GetxController {
           ));
         }
 
-        final DateFormat formatter = DateFormat("yyyy'年'MM'月'dd'日'THH'时'mm'分'ss'秒'");
+        final DateFormat formatter = DateFormat("yyyy'年'MM'月'dd'日'HH'时'mm'分'ss'秒'");
         final dateStr = formatter.format(DateTime.now());
         Uint8List bytes = await pdf.save();
         if (printSelected == 1) {
-          await Printing.sharePdf(bytes: bytes, filename: '${settings.printTitle.value}_$dateStr.pdf');
+          await Printing.sharePdf(bytes: bytes, filename: '${order.customerName}_$dateStr.pdf');
         } else if (printSelected == 0) {
           try {
             Directory? downloadsDir;
@@ -497,7 +497,7 @@ class SaleDetailsController extends GetxController {
             } else {
               downloadsDir = await getDownloadsDirectory();
             }
-            final file = File('${downloadsDir?.path}/${settings.printTitle.value}_$dateStr.pdf');
+            final file = File('${downloadsDir?.path}/${order.customerName}_$dateStr.pdf');
             await file.writeAsBytes(bytes);
             Get.to(() => PdfView(
                   path: file.path,
@@ -527,7 +527,7 @@ class SaleDetailsController extends GetxController {
             activeColor: Theme.of(context).colorScheme.primary,
             groupValue: printSelected,
             value: 0,
-            title: const Text('保存到本地'),
+            title: const Text('保存并预览'),
             onChanged: (value) {
               printSelected = 0;
               generateAndPrintPdf();

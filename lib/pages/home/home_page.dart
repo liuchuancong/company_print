@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:company_print/common/index.dart';
+import 'package:move_to_desktop/move_to_desktop.dart';
 import 'package:company_print/pages/home/mobile_view.dart';
 import 'package:company_print/pages/home/tablet_view.dart';
 import 'package:company_print/pages/sales/sales_page.dart';
@@ -31,16 +33,27 @@ class _HomePageState extends State<HomePage> {
     setState(() => selectedTab = index);
   }
 
+  void onBackButtonPressed(canPop, _) async {
+    if (canPop) {
+      final moveToDesktopPlugin = MoveToDesktop();
+      moveToDesktopPlugin.moveToDesktop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraint) => constraint.maxWidth <= 680
-          ? HomeMobileView(body: bodys[selectedTab], index: selectedTab, onDestinationSelected: onDestinationSelected)
-          : HomeTabletView(
-              body: bodys[selectedTab],
-              index: selectedTab,
-              onDestinationSelected: onDestinationSelected,
-            ),
+    return PopScope(
+      canPop: Get.currentRoute == RoutePath.kInitial,
+      onPopInvokedWithResult: onBackButtonPressed,
+      child: LayoutBuilder(
+        builder: (context, constraint) => constraint.maxWidth <= 680
+            ? HomeMobileView(body: bodys[selectedTab], index: selectedTab, onDestinationSelected: onDestinationSelected)
+            : HomeTabletView(
+                body: bodys[selectedTab],
+                index: selectedTab,
+                onDestinationSelected: onDestinationSelected,
+              ),
+      ),
     );
   }
 // #enddocregion Example
