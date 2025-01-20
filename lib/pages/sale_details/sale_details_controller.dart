@@ -14,6 +14,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:chinese_number/chinese_number.dart';
 import 'package:company_print/utils/event_bus.dart';
 import 'package:company_print/utils/snackbar_util.dart';
+import 'package:company_print/pages/pdf_view/pdf_view.dart';
 import 'package:company_print/utils/file_recover_utils.dart';
 import 'package:company_print/database/models/sales_order.dart';
 import 'package:company_print/pages/dishes/dishes_controller.dart';
@@ -488,6 +489,9 @@ class SaleDetailsController extends GetxController {
           }
           final file = File('${downloadsDir?.path}/${settings.printTitle.value}_$dateStr.pdf');
           await file.writeAsBytes(bytes);
+          Get.to(() => PdfView(
+                path: file.path,
+              ));
           SnackBarUtil.success('文件已保存到${downloadsDir?.path}');
         } catch (e) {
           SnackBarUtil.error('error: $e');
