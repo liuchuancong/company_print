@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:company_print/common/index.dart';
-import 'package:company_print/utils/snackbar_util.dart';
 import 'package:company_print/common/style/app_style.dart';
-import 'package:company_print/utils/file_recover_utils.dart';
 import 'package:company_print/common/widgets/menu_button.dart';
 import 'package:company_print/pages/sales/order_grid_view.dart';
 import 'package:company_print/pages/sales/sales_controller.dart';
@@ -22,14 +20,6 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
     super.initState();
     Get.put(SalesController());
     controller = Get.find<SalesController>();
-    getPermission();
-  }
-
-  getPermission() async {
-    final result = await FileRecoverUtils().requestStoragePermission();
-    if (!result) {
-      SnackBarUtil.error('请先授予读写文件权限');
-    }
   }
 
   @override

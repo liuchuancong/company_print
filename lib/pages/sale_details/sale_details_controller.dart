@@ -14,6 +14,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:chinese_number/chinese_number.dart';
 import 'package:company_print/utils/event_bus.dart';
 import 'package:company_print/utils/snackbar_util.dart';
+import 'package:company_print/utils/file_recover_utils.dart';
 import 'package:company_print/database/models/sales_order.dart';
 import 'package:company_print/pages/dishes/dishes_controller.dart';
 import 'package:company_print/pages/sale_details/sale_details_page.dart';
@@ -236,6 +237,17 @@ class SaleDetailsController extends GetxController {
     } else {
       return Utils.getDoubleStringDecimal(price);
     }
+  }
+
+  Future<bool> getPermission() async {
+    if (!Platform.isAndroid) {
+      return true;
+    }
+    final result = await FileRecoverUtils().requestStoragePermission();
+    if (!result) {
+      SnackBarUtil.error('请先授予读写文件权限');
+    }
+    return result;
   }
 
   Future<void> generateAndPrintPdf() async {
@@ -478,7 +490,11 @@ class SaleDetailsController extends GetxController {
     }
   }
 
-  void showPreferResolutionSelectorDialog() {
+  void showPreferResolutionSelectorDialog() async {
+    final hasPermission = await getPermission();
+    if (!hasPermission) {
+      return;
+    }
     printSelected = 3;
     showDialog(
       context: Get.context!,
