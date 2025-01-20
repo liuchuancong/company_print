@@ -92,6 +92,10 @@ flutter_icons:
   image_path: assets/icons/icon.png
   adaptive_icon_background: "#FFFFFF"
   min_sdk_android: 21 
+  windows:
+    generate: true
+    image_path: assets/icons/icon.png
+    icon_size: 48 # min:48, max:256, default: 48
 
 flutter:
   uses-material-design: true
