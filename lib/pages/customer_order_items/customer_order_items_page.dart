@@ -262,6 +262,9 @@ class EditOrderItemPageState extends State<EditOrderItemPage> {
                     final result = await Get.toNamed(RoutePath.kUnitSelectPage);
                     if (result != null) {
                       _purchaseUnitController.text = result.name ?? '';
+                      if (_actualUnitController.text.isEmpty) {
+                        _actualUnitController.text = result.name ?? '';
+                      }
                     }
                   },
                 ),

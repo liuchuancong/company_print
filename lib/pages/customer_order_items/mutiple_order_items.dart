@@ -406,6 +406,9 @@ class ProductInputSection extends StatelessWidget {
                       final result = await Get.toNamed(RoutePath.kUnitSelectPage);
                       if (result != null) {
                         purchaseUnitController.text = result.name ?? '';
+                        if (actualUnitController.text.isEmpty) {
+                          actualUnitController.text = result.name ?? '';
+                        }
                       }
                     },
                   ),
