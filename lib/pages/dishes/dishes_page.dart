@@ -86,8 +86,8 @@ class _DishesPageState extends State<DishesPage> with TickerProviderStateMixin {
                             ),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10.0),
-                                color: Theme.of(context).primaryColor.withAlpha(60),
-                                border: Border.all(color: Theme.of(context).primaryColor, width: 1.0)),
+                                color: Theme.of(context).primaryColor.withAlpha(8),
+                                border: Border.all(color: Theme.of(context).primaryColor, width: 2.0)),
                             child: ListTile(
                               title: Container(
                                 margin: const EdgeInsets.only(left: 15.0),

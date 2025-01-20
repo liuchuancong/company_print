@@ -155,12 +155,21 @@ class CardOrder extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text(
-                                '合计: ${order.totalPrice} 元',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                ),
+                              // '合计: ${order.totalPrice} 元',
+                              //   style: const TextStyle(
+                              //     fontSize: 14,
+                              //     fontWeight: FontWeight.w400,
+                              //   ),
+                              Text.rich(
+                                TextSpan(children: [
+                                  TextSpan(text: "合计：", style: Theme.of(context).textTheme.titleSmall),
+                                  TextSpan(
+                                    text: "${order.totalPrice}",
+                                    style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.red),
+                                  ),
+                                  TextSpan(text: " 元", style: Theme.of(context).textTheme.titleSmall),
+                                ]),
+                                textAlign: TextAlign.center,
                               ),
                               Expanded(
                                   child: Row(
@@ -224,20 +233,20 @@ class CountChip extends StatelessWidget {
       shadowColor: Colors.transparent,
       elevation: 0,
       child: Padding(
-        padding: const EdgeInsets.only(left: 8, right: 8, top: 3, bottom: 3),
+        padding: const EdgeInsets.only(left: 8, right: 8, top: 5, bottom: 5),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               icon,
-              color: Colors.white.withValues(alpha: 0.8),
+              color: Colors.white,
               size: 16,
             ),
             Text(
               count,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: Colors.white,
                     fontSize: 15,
                   ),
             ),

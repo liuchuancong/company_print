@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:company_print/common/index.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -60,7 +61,9 @@ class StatisticsPageState extends State<StatisticsPage> {
         child: Obx(() => controller.loading.value
             ? const Center(child: CircularProgressIndicator())
             : SfCartesianChart(
-                primaryXAxis: const DateTimeAxis(),
+                primaryXAxis: DateTimeAxis(
+                  dateFormat: DateFormat('HH:mm', 'zh_CN'),
+                ),
                 primaryYAxis: const NumericAxis(),
                 series: <CartesianSeries<SalesData, DateTime>>[
                   // 修改这里
