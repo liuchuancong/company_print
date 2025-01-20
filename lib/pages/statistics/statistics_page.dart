@@ -54,6 +54,7 @@ class StatisticsPageState extends State<StatisticsPage> {
               controller.getAllOrders();
             },
           ),
+          const SizedBox(width: 10),
         ],
       ),
       body: Padding(
