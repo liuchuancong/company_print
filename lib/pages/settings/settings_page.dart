@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:company_print/common/index.dart';
+import 'package:company_print/utils/file_recover_utils.dart';
 import 'package:company_print/common/widgets/section_listtile.dart';
 
 class SettingsPage extends GetView<SettingsService> {
@@ -40,6 +41,18 @@ class SettingsPage extends GetView<SettingsService> {
                 )),
             onTap: colorPickerDialog,
           ),
+          const SectionTitle(title: "备份目录"),
+          Obx(() => ListTile(
+                title: const Text("备份目录"),
+                subtitle: Text(controller.backupDirectory.value),
+                onTap: () async {
+                  final selectedDirectory =
+                      await FileRecoverUtils().selectBackupDirectory(controller.backupDirectory.value);
+                  if (selectedDirectory != null) {
+                    controller.backupDirectory.value = selectedDirectory;
+                  }
+                },
+              )),
         ],
       ),
     );

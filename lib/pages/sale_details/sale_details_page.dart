@@ -57,7 +57,7 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                                   style: TextStyle(
                                       fontSize: 15, color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold),
                                 ),
-                                const TextSpan(text: '件'),
+                                const TextSpan(text: ' 件'),
                                 const TextSpan(text: '，'),
                                 const TextSpan(text: '总价 '),
                                 TextSpan(

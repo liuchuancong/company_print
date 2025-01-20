@@ -240,7 +240,7 @@ class SaleDetailsController extends GetxController {
   }
 
   Future<bool> getPermission() async {
-    if (!Platform.isAndroid) {
+    if (Platform.isWindows) {
       return true;
     }
     final result = await FileRecoverUtils().requestStoragePermission();
@@ -479,10 +479,16 @@ class SaleDetailsController extends GetxController {
         await Printing.sharePdf(bytes: bytes, filename: '${settings.printTitle.value}_$dateStr.pdf');
       } else if (printSelected == 0) {
         try {
-          final output = await getExternalStorageDirectory();
-          final file = File('${output?.path}/${settings.printTitle.value}_$dateStr.pdf');
+          Directory? downloadsDir;
+          final settings = Get.find<SettingsService>();
+          if (settings.backupDirectory.value.isNotEmpty) {
+            downloadsDir = Directory(settings.backupDirectory.value);
+          } else {
+            downloadsDir = await getDownloadsDirectory();
+          }
+          final file = File('${downloadsDir?.path}/${settings.printTitle.value}_$dateStr.pdf');
           await file.writeAsBytes(bytes);
-          SnackBarUtil.success('文件已保存到${output?.path}');
+          SnackBarUtil.success('文件已保存到${downloadsDir?.path}');
         } catch (e) {
           SnackBarUtil.error('error: $e');
         }

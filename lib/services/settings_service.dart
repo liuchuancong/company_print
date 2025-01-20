@@ -135,6 +135,15 @@ class SettingsService extends GetxController {
   void fromJson(Map<String, dynamic> json) {
     changeThemeMode(themeModeName.value);
     changeThemeColorSwitch(themeColorSwitch.value);
+    myName.value = json['myName'];
+    myPhone.value = json['myPhone'];
+    myAddress.value = json['myAddress'];
+    printTitle.value = json['printTitle'];
+    printIsShowCustomerInfo.value = json['printIsShowCustomerInfo'];
+    printIsShowDriverInfo.value = json['printIsShowDriverInfo'];
+    printIsShowOwnerInfo.value = json['printIsShowOwnerInfo'];
+    printIsShowPriceInfo.value = json['printIsShowPriceInfo'];
+    backupDirectory.value = json['backupDirectory'];
   }
 
   Map<String, dynamic> toJson() {
@@ -144,6 +153,12 @@ class SettingsService extends GetxController {
     json['myName'] = myName.value;
     json['myPhone'] = myPhone.value;
     json['myAddress'] = myAddress.value;
+    json['printTitle'] = printTitle.value;
+    json['printIsShowCustomerInfo'] = printIsShowCustomerInfo.value;
+    json['printIsShowDriverInfo'] = printIsShowDriverInfo.value;
+    json['printIsShowOwnerInfo'] = printIsShowOwnerInfo.value;
+    json['printIsShowPriceInfo'] = printIsShowPriceInfo.value;
+    json['backupDirectory'] = backupDirectory.value;
     return json;
   }
 
@@ -154,6 +169,12 @@ class SettingsService extends GetxController {
       "myName": "",
       "myPhone": "",
       "myAddress": "",
+      "printTitle": "",
+      "printIsShowCustomerInfo": true,
+      "printIsShowDriverInfo": true,
+      "printIsShowOwnerInfo": true,
+      "printIsShowPriceInfo": true,
+      "backupDirectory": "",
     };
     return json;
   }
