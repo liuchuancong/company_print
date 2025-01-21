@@ -438,7 +438,6 @@ class CustomerOrderItemsDataSource extends AsyncDataTableSource {
                       icon: const Icon(Icons.copy_rounded),
                       tooltip: '复制',
                       onPressed: () {
-                        // var text = '姓名：${vehicle.driverName}\n电话：${vehicle.driverPhone!}\n车牌号：${vehicle.plateNumber!}';
                         var text =
                             '商品名称：${orderItem.itemName}\n单价：${orderItem.actualPrice}元/${orderItem.actualUnit}\n备注：${orderItem.itemShortName ?? ''}';
                         Utils.clipboard(text);

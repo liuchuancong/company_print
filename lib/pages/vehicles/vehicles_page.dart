@@ -70,7 +70,7 @@ class _VehiclesPageState extends State<VehiclesPage> with AutomaticKeepAliveClie
                 columns: [
                   const DataColumn2(
                     label: Text('操作'),
-                    fixedWidth: 200,
+                    fixedWidth: 220,
                   ),
                   DataColumn2(
                     label: const Text('司机姓名'),

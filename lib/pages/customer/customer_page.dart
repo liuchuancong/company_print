@@ -69,8 +69,9 @@ class _CustomersPageState extends State<CustomersPage> with AutomaticKeepAliveCl
                 fixedLeftColumns: 1,
                 columns: [
                   const DataColumn2(
+                    headingRowAlignment: MainAxisAlignment.start,
                     label: Text('操作'),
-                    fixedWidth: 220,
+                    fixedWidth: 250,
                   ),
                   DataColumn2(
                     label: const Text('姓名'),
