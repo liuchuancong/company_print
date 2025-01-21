@@ -29,29 +29,6 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
 
   var currentPage = 0;
 
-  // if (widget.controller.dishesSelectType == DishesSelectType.customer) {
-  //   List<OrderItem> orderItems =
-  //       await widget.controller.database.orderItemsDao.getAllOrderItemsByOrderId(widget.controller.orderId);
-  //   var query = await widget.controller.database.ordersDao.getOrderById(widget.controller.orderId);
-  //   if (query != null) {
-  //     for (var orderItem in orderItems) {
-  //       selectedOrderItems.add(CustomerOrderItem(
-  //         id: orderItem.id,
-  //         customerId: query.customerId!,
-  //         itemName: orderItem.itemName!,
-  //         itemShortName: orderItem.itemShortName,
-  //         purchaseUnit: orderItem.purchaseUnit,
-  //         actualUnit: orderItem.actualUnit,
-  //         purchaseQuantity: orderItem.purchaseQuantity,
-  //         actualQuantity: orderItem.actualQuantity,
-  //         presetPrice: orderItem.presetPrice,
-  //         actualPrice: orderItem.actualPrice,
-  //         createdAt: orderItem.createdAt,
-  //       ));
-  //     }
-  //   }
-  // }
-
   setGroupTextEditingController() {
     if (widget.controller.dishesSelectType == DishesSelectType.dishes) {
       productsControllers = List.generate(
@@ -284,7 +261,7 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
                         if (selectedOrderItems.isEmpty) {
                           _itemNameController.text = '';
                         } else {
-                          _itemNameController.text = '已选择${categories.length}个商品';
+                          _itemNameController.text = '已选择${selectedOrderItems.length}个商品';
                         }
                       });
                     },
@@ -335,7 +312,6 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
                       }
                     } else {
                       var query = await widget.controller.database.ordersDao.getOrderById(widget.controller.orderId);
-                      log(query.toString());
                       if (query != null) {
                         final result = await Get.toNamed(RoutePath.kMutipleCustomerDishSelectPage,
                             arguments: [selectedOrderItems, query.customerId]);

@@ -203,7 +203,6 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
                       categories = result;
                       carouselController.jumpToPage(0);
                       setGroupTextEditingController();
-
                       _itemNameController.text = categories.isEmpty ? '' : '已选择${categories.length}个商品';
                     }
                   },
