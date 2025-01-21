@@ -14,7 +14,6 @@ class CustomerOrderItemsController extends GetxController {
   final AppDatabase database = DatabaseManager.instance.appDatabase;
   final List<CustomerOrderItem> customerOrderItems = <CustomerOrderItem>[].obs;
   var isLoading = false.obs; // 加载状态标记
-  final AppDatabase _database = DatabaseManager.instance.appDatabase;
   var totalCustomerOrderItems = 0.obs;
   var rowsPerPage = PaginatedDataTable.defaultRowsPerPage.obs;
   var currentPage = 0.obs;
@@ -47,7 +46,7 @@ class CustomerOrderItemsController extends GetxController {
     isLoading(true);
     final offset = currentPage.value * rowsPerPage.value;
     try {
-      final results = await _database.customerOrderItemsDao.getPaginatedOrderItemsByCustomerId(
+      final results = await database.customerOrderItemsDao.getPaginatedOrderItemsByCustomerId(
         customerId,
         offset,
         rowsPerPage.value,
@@ -64,7 +63,7 @@ class CustomerOrderItemsController extends GetxController {
   Future<void> loadTotalData() async {
     isLoading(true);
     try {
-      final count = await _database.customerOrderItemsDao.getAllOrderItemsByCustomerId(customerId);
+      final count = await database.customerOrderItemsDao.getAllOrderItemsByCustomerId(customerId);
       totalCustomerOrderItems.value = count.length;
     } catch (e) {
       log(e.toString(), name: 'loadTotalData');
