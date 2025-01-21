@@ -273,7 +273,8 @@ class VehiclesDataSource extends AsyncDataTableSource {
                       icon: const Icon(Icons.copy_rounded),
                       tooltip: '复制',
                       onPressed: () {
-                        var text = '姓名：${vehicle.driverName}\n电话：${vehicle.driverPhone!}\n车牌号：${vehicle.plateNumber!}';
+                        var text =
+                            '姓名：${Utils.getString(vehicle.driverName)}\n电话：${Utils.getString(vehicle.driverPhone)}\n车牌号：${Utils.getString(vehicle.plateNumber)}';
                         Utils.clipboard(text);
                       },
                     ),

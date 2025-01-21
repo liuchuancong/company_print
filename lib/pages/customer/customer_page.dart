@@ -292,7 +292,7 @@ class CustomersDataSource extends AsyncDataTableSource {
                       tooltip: '复制',
                       onPressed: () {
                         var text =
-                            '姓名：${custom.name!}\n电话：${custom.phone!}\n地址：${custom.address!}\n备注：${custom.additionalInfo!}';
+                            '姓名：${Utils.getString(custom.name)}\n电话：${Utils.getString(custom.phone)}\n地址：${Utils.getString(custom.address)}\n备注：${Utils.getString(custom.additionalInfo)}';
                         Utils.clipboard(text);
                       },
                     ),

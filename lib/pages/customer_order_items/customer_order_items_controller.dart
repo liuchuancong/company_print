@@ -126,7 +126,7 @@ class CustomerOrderItemsController extends GetxController {
     for (var i = 0; i < products.length; i++) {
       final product = products[i];
       text +=
-          '商品名称：${product.itemName} 单价：${product.actualPrice}元/${product.actualUnit} 备注：${product.itemShortName ?? ''}\n';
+          '商品名称：${Utils.getString(product.itemName)} 单价：${Utils.getString(product.actualPrice)}元/${Utils.getString(product.actualUnit)} 备注：${Utils.getString(product.itemShortName)}\n';
     }
 
     Utils.clipboard(text);

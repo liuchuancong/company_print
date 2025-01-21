@@ -439,7 +439,7 @@ class CustomerOrderItemsDataSource extends AsyncDataTableSource {
                       tooltip: '复制',
                       onPressed: () {
                         var text =
-                            '商品名称：${orderItem.itemName}\n单价：${orderItem.actualPrice}元/${orderItem.actualUnit}\n备注：${orderItem.itemShortName ?? ''}';
+                            '商品名称：${Utils.getString(orderItem.itemName)}\n单价：${Utils.getString(orderItem.actualPrice)}元/${Utils.getString(orderItem.actualUnit)}\n备注：${Utils.getString(orderItem.itemShortName)}';
                         Utils.clipboard(text);
                       },
                     ),

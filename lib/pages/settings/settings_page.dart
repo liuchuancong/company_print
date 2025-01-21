@@ -47,7 +47,7 @@ class SettingsPage extends GetView<SettingsService> {
             leading: const Icon(Icons.file_copy_outlined, size: 32),
             title: const Text('数据保存路径'),
             subtitle: Text(controller.dbPath.value),
-            onTap: () => Utils.clipboard(controller.dbPath.value),
+            onTap: () => Utils.clipboard(Utils.getString(controller.dbPath.value)),
           ),
           Obx(
             () => SwitchListTile(

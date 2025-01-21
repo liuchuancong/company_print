@@ -159,6 +159,16 @@ class Utils {
     );
   }
 
+  static getString(dynamic str1) {
+    if (str1 == null) {
+      return '';
+    }
+    if (str1 is String) {
+      return str1.trim().isEmpty ? '' : str1.trim();
+    }
+    return str1.toString().trim().isEmpty ? '' : str1.toString().trim();
+  }
+
   static String concatenation(dynamic str1, dynamic str2) {
     if (str1 == null && str2 == null) {
       return '';
@@ -224,6 +234,9 @@ class Utils {
   }
 
   static void clipboard(String text) {
+    if (text.isEmpty) {
+      return;
+    }
     Clipboard.setData(ClipboardData(text: text)).then((value) => {SmartDialog.showToast('已复制')});
   }
 }
