@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:company_print/utils/utils.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/utils/event_bus.dart';

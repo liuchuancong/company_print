@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:company_print/utils/utils.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/pages/customer_select_page/customer_select_page.dart';
 

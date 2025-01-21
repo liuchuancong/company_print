@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'package:pinyin/pinyin.dart';
 import 'package:flutter/material.dart';
-import 'package:company_print/utils/utils.dart';
 import 'package:company_print/common/index.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:company_print/pages/dishes/dishes_controller.dart';

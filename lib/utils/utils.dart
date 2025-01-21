@@ -222,6 +222,10 @@ class Utils {
   static String getDoubleStringRound(dynamic number) {
     return getInt(getDouble(number)).toString(); // "1"
   }
+
+  static void clipboard(String text) {
+    Clipboard.setData(ClipboardData(text: text)).then((value) => {SmartDialog.showToast('已复制')});
+  }
 }
 
 class TwoDigitDecimalFormatter extends TextInputFormatter {

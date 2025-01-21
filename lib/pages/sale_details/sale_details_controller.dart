@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:date_format/date_format.dart';
-import 'package:company_print/utils/utils.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:company_print/common/index.dart';
 import 'package:path_provider/path_provider.dart';

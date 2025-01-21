@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:date_format/date_format.dart';
-import 'package:company_print/utils/utils.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/common/style/app_style.dart';
 import 'package:company_print/pages/sales/sales_controller.dart';

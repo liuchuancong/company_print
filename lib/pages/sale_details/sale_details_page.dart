@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:company_print/utils/utils.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/database/models/sales_order.dart';

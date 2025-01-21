@@ -1,9 +1,7 @@
 import 'dart:io';
 import 'dart:math';
-import 'package:path/path.dart' as p;
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:company_print/utils/utils.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/utils/snackbar_util.dart';
 import 'package:permission_handler/permission_handler.dart';
