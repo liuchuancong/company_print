@@ -425,8 +425,7 @@ class SaleDetailsController extends GetxController {
                     pw.Expanded(
                       flex: 2, // 设置 flex 为 1 表示占据一半宽度
                       child: pw.Container(
-                        child: pw.Text(
-                            "大写：${int.parse(getTotalOrderPrice.value) == 0 ? '零圆整' : double.parse(getTotalOrderPrice.value).toSimplifiedChineseNumber()}元",
+                        child: pw.Text("大写：${double.parse(getTotalOrderPrice.value).toSimplifiedChineseNumber()}元",
                             style: const pw.TextStyle(fontSize: 12)),
                       ),
                     ),
@@ -534,7 +533,7 @@ class SaleDetailsController extends GetxController {
               downloadsDir = await getDownloadsDirectory();
             }
             final file = File(
-                '${downloadsDir?.path}${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}${order.customerName}.pdf');
+                '${downloadsDir?.path}${Platform.pathSeparator}小柳打印${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}${Platform.pathSeparator}${order.customerName}.pdf');
 
             if (Platform.isAndroid) {
               saveFile(
@@ -544,14 +543,15 @@ class SaleDetailsController extends GetxController {
                 fileName: '${order.customerName}_$dateStr.pdf',
               );
             } else {
+              log('${downloadsDir?.path}${Platform.pathSeparator}小柳打印${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}',
+                  name: 'generateAndPrintPdf');
+              file.createSync(recursive: true);
               await file.writeAsBytes(bytes);
-              Get.to(() => PdfView(
-                    path: file.path,
-                  ));
-
-              SnackBarUtil.success('文件已保存到${downloadsDir?.path}');
+              SnackBarUtil.success(
+                  '文件已保存到${downloadsDir?.path}${Platform.pathSeparator}小柳打印${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}');
             }
           } catch (e) {
+            log(e.toString(), name: 'generateAndPrintPdf');
             SnackBarUtil.error('error: $e');
           }
         }
