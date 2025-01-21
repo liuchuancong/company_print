@@ -3,6 +3,7 @@ import 'package:company_print/pages/mine/mine.dart';
 import 'package:company_print/pages/home/home_page.dart';
 import 'package:company_print/pages/print/print_page.dart';
 import 'package:company_print/pages/settings/settings_page.dart';
+import 'package:company_print/pages/set_db_page/set_db_path.dart';
 import 'package:company_print/pages/settings/settings_binding.dart';
 import 'package:company_print/pages/sale_details/sale_details_page.dart';
 import 'package:company_print/pages/dish_select_page/dish_select_page.dart';
@@ -91,7 +92,9 @@ class AppPages {
       name: RoutePath.kPrintPage,
       page: PrintPage.new,
     ),
-
-    // UnitSelectPage
+    GetPage(
+      name: RoutePath.kSetDbPathPage,
+      page: SetDbPathPage.new,
+    ),
   ];
 }

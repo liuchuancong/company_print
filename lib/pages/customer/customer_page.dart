@@ -170,7 +170,7 @@ class EditOrCreateCustomerPageState extends State<EditOrCreateCustomerPage> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      appbar: AppBar(
+      appBar: AppBar(
         title: Text(isNew ? '新增客户' : '编辑客户'),
       ),
       body: ListView(

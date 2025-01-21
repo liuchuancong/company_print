@@ -304,7 +304,7 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      appbar: AppBar(
+      appBar: AppBar(
         title: const Text('批量导入'),
       ),
       body: ListView(

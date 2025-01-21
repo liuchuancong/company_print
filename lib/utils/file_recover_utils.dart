@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'dart:math';
-import 'package:date_format/date_format.dart';
+import 'package:path/path.dart' as p;
+import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:company_print/utils/utils.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/utils/snackbar_util.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -51,7 +53,11 @@ class FileRecoverUtils {
     return true;
   }
 
-  Future<String?> createBackup(String backupDirectory) async {
+  Future<bool?> onFileExistsPop() async {
+    return await Utils.showAlertDialog('备份文件已存在，是否覆盖？', title: '提示');
+  }
+
+  Future<String?> createBackup() async {
     final settings = Get.find<SettingsService>();
     if (Platform.isAndroid || Platform.isIOS) {
       final granted = await requestStoragePermission();
@@ -61,27 +67,37 @@ class FileRecoverUtils {
       }
     }
 
-    String? selectedDirectory = await FilePicker.platform.getDirectoryPath(
-      initialDirectory: backupDirectory.isEmpty ? '/' : backupDirectory,
-    );
+    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
     if (selectedDirectory == null) return null;
-
-    final dateStr = formatDate(
-      DateTime.now(),
-      [yyyy, '-', mm, '-', dd, 'T', HH, '_', nn, '_', ss],
-    );
-    final file = File('$selectedDirectory/bilibilimusic_backup_$dateStr.txt');
-    if (settings.backup(file)) {
-      SnackBarUtil.success("创建备份成功");
-      // 首次同步备份目录
-      if (settings.backupDirectory.isEmpty) {
-        settings.backupDirectory.value = selectedDirectory;
-      }
-      return selectedDirectory;
-    } else {
-      SnackBarUtil.error("创建备份失败");
-      return null;
+    debugPrint('file path: $selectedDirectory');
+    String dbFolder = '${Platform.pathSeparator}xiao_liu_da_yin';
+    String dbPath = '${Platform.pathSeparator}xiao_liu_da_yin${Platform.pathSeparator}app_database.db';
+    debugPrint('file path: $dbPath');
+    final dbFolderFile = Directory(selectedDirectory + dbFolder);
+    if (!dbFolderFile.existsSync()) {
+      dbFolderFile.createSync();
     }
+    final file = File(selectedDirectory + dbPath);
+    debugPrint('file path: ${file.path}');
+    if (file.existsSync()) {
+      final result = await onFileExistsPop();
+      if (result == true) {
+        file.deleteSync();
+        file.createSync();
+        SnackBarUtil.success("设置成功");
+        // 首次同步备份目录
+        settings.dbPath.value = file.path;
+      } else if (result == false) {
+        SnackBarUtil.success("设置成功");
+        // 首次同步备份目录
+        settings.dbPath.value = file.path;
+      }
+    } else {
+      file.createSync();
+      SnackBarUtil.success("设置成功");
+      settings.dbPath.value = file.path;
+    }
+    return selectedDirectory;
   }
 
   void recoverBackup() async {

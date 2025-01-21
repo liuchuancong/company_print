@@ -44,7 +44,7 @@ class PrintPageState extends State<PrintPage> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      appbar: AppBar(
+      appBar: AppBar(
         title: const Text('打印设置'),
       ),
       body: ListView(

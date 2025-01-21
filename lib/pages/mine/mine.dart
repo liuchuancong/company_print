@@ -41,7 +41,7 @@ class MinePageState extends State<MinePage> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      appbar: AppBar(
+      appBar: AppBar(
         title: const Text('我的信息'),
       ),
       body: ListView(

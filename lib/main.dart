@@ -79,7 +79,7 @@ class _MyAppState extends State<MyApp> {
           theme: lightTheme.useSystemChineseFont(Brightness.light),
           darkTheme: darkTheme.useSystemChineseFont(Brightness.dark),
           navigatorObservers: [FlutterSmartDialog.observer],
-          initialRoute: RoutePath.kInitial,
+          initialRoute: RoutePath.kSetDbPathPage,
           defaultTransition: Transition.native,
           getPages: AppPages.routes,
           debugShowCheckedModeBanner: false,

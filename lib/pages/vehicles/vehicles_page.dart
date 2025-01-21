@@ -162,7 +162,7 @@ class EditOrCreateVehiclePageState extends State<EditOrCreateVehiclePage> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      appbar: AppBar(
+      appBar: AppBar(
         title: Text(isNew ? '新增司机' : '编辑司机'),
       ),
       body: ListView(

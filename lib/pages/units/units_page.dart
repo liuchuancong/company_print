@@ -214,7 +214,7 @@ class EditOrCreateDishUnitPageState extends State<EditOrCreateDishUnitPage> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      appbar: AppBar(
+      appBar: AppBar(
         title: Text(isNew ? '新增单位' : '编辑单位'),
       ),
       body: ListView(

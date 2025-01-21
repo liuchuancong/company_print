@@ -15,7 +15,6 @@ import 'package:chinese_number/chinese_number.dart';
 import 'package:company_print/utils/event_bus.dart';
 import 'package:company_print/utils/snackbar_util.dart';
 import 'package:company_print/pages/pdf_view/pdf_view.dart';
-import 'package:company_print/utils/file_recover_utils.dart';
 import 'package:flutter_media_store/flutter_media_store.dart';
 import 'package:company_print/database/models/sales_order.dart';
 import 'package:company_print/pages/dishes/dishes_controller.dart';
@@ -248,17 +247,6 @@ class SaleDetailsController extends GetxController {
     } else {
       return Utils.getDoubleStringDecimal(price);
     }
-  }
-
-  Future<bool> getPermission() async {
-    if (Platform.isWindows) {
-      return true;
-    }
-    final result = await FileRecoverUtils().requestStoragePermission();
-    if (!result) {
-      SnackBarUtil.error('请先授予读写文件权限');
-    }
-    return result;
   }
 
   /// Save file to MediaStore
@@ -562,10 +550,6 @@ class SaleDetailsController extends GetxController {
   }
 
   void showPreferResolutionSelectorDialog() async {
-    final hasPermission = await getPermission();
-    if (!hasPermission) {
-      return;
-    }
     printSelected = 3;
     showDialog(
       context: Get.context!,

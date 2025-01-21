@@ -220,7 +220,7 @@ class EditOrderItemPageState extends State<EditOrderItemPage> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      appbar: AppBar(
+      appBar: AppBar(
         title: Text(isNew ? '新增商品' : '编辑商品'),
       ),
       body: ListView(

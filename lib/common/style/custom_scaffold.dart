@@ -3,8 +3,8 @@ import 'package:company_print/utils/utils.dart';
 import 'package:company_print/common/index.dart';
 
 class CustomScaffold extends StatefulWidget {
-  const CustomScaffold({super.key, this.appbar, this.actions, required this.body, this.needExits = true});
-  final PreferredSizeWidget? appbar;
+  const CustomScaffold({super.key, this.appBar, this.actions, required this.body, this.needExits = true});
+  final PreferredSizeWidget? appBar;
   final List<Widget>? actions;
   final Widget body;
   final bool needExits;
@@ -31,7 +31,7 @@ class _CustomScaffoldState extends State<CustomScaffold> {
     return BackButtonListener(
       onBackButtonPressed: onWillPop,
       child: Scaffold(
-        appBar: widget.appbar,
+        appBar: widget.appBar,
         body: Column(
           children: [
             Expanded(
