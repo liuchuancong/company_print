@@ -128,6 +128,16 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                       padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                     ),
                     onPressed: () {
+                      controller.copyTextToClipboard();
+                    },
+                    child: const Text('复制', style: TextStyle(fontSize: 18)),
+                  ),
+                  FilledButton(
+                    style: ButtonStyle(
+                      shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+                    ),
+                    onPressed: () {
                       controller.showPreferResolutionSelectorDialog();
                     },
                     child: const Text('打印', style: TextStyle(fontSize: 18)),

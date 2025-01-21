@@ -549,6 +549,18 @@ class SaleDetailsController extends GetxController {
     }
   }
 
+  void copyTextToClipboard() async {
+    String text = '总价: ${getTotalOrderPrice.value}元';
+    final List<OrderItem> products = await database.orderItemsDao.getAllOrderItemsByOrderId(orderId);
+
+    for (var i = 0; i < products.length; i++) {
+      final product = products[i];
+      text +=
+          '\n${product.itemName!} 数量: ${product.actualQuantity} 单价: ${Utils.concatenation(product.actualPrice, product.actualUnit)} 总价: ${getOrderCalculationType(product.totalPrice)} 备注: ${product.itemShortName!}';
+    }
+    Utils.clipboard(text);
+  }
+
   void showPreferResolutionSelectorDialog() async {
     printSelected = 3;
     showDialog(
