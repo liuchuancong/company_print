@@ -102,7 +102,7 @@ class _CustomerOrderItemsPageState extends State<CustomerOrderItemsPage> {
                   columns: [
                     const DataColumn2(
                       label: Text('操作'),
-                      fixedWidth: 180,
+                      fixedWidth: 220,
                     ),
                     DataColumn2(
                       label: const Text('商品名称'),
