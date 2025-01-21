@@ -287,6 +287,15 @@ class CustomersDataSource extends AsyncDataTableSource {
                 Row(
                   children: [
                     IconButton(
+                      icon: const Icon(Icons.copy_rounded),
+                      tooltip: '复制',
+                      onPressed: () {
+                        var text =
+                            '姓名：${custom.name!}\n电话：${custom.phone!}\n地址：${custom.address!}\n备注：${custom.additionalInfo!}';
+                        Utils.clipboard(text);
+                      },
+                    ),
+                    IconButton(
                       icon: const Icon(Icons.remove_red_eye),
                       tooltip: '查看',
                       onPressed: () {
