@@ -120,6 +120,18 @@ class CustomerOrderItemsController extends GetxController {
         ));
   }
 
+  void copyTextToClipboard() async {
+    String text = '';
+    final List<CustomerOrderItem> products = await database.customerOrderItemsDao.getOrderItemById(customerId);
+    for (var i = 0; i < products.length; i++) {
+      final product = products[i];
+      text +=
+          '商品名称：${product.itemName} 单价：${product.actualPrice}元/${product.actualUnit} 备注：${product.itemShortName ?? ''}\n';
+    }
+
+    Utils.clipboard(text);
+  }
+
   void showMutipleOrderItemPage() {
     Get.to(() => MutipleOrderItemPage(
         controller: this,

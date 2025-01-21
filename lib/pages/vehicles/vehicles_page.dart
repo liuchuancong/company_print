@@ -61,7 +61,7 @@ class _VehiclesPageState extends State<VehiclesPage> with AutomaticKeepAliveClie
                 onRowsPerPageChanged: controller.handleRowsPerPageChanged,
                 sortColumnIndex: controller.sortColumnIndex.value,
                 sortAscending: controller.sortAscending.value,
-                minWidth: 600,
+                minWidth: 700,
                 columnSpacing: 20,
                 fixedColumnsColor: Theme.of(context).highlightColor,
                 fixedCornerColor: Theme.of(context).highlightColor,
@@ -70,7 +70,7 @@ class _VehiclesPageState extends State<VehiclesPage> with AutomaticKeepAliveClie
                 columns: [
                   const DataColumn2(
                     label: Text('操作'),
-                    fixedWidth: 160,
+                    fixedWidth: 200,
                   ),
                   DataColumn2(
                     label: const Text('司机姓名'),
@@ -269,6 +269,14 @@ class VehiclesDataSource extends AsyncDataTableSource {
               DataCell(
                 Row(
                   children: [
+                    IconButton(
+                      icon: const Icon(Icons.copy_rounded),
+                      tooltip: '复制',
+                      onPressed: () {
+                        var text = '姓名：${vehicle.driverName}\n电话：${vehicle.driverPhone!}\n车牌号：${vehicle.plateNumber!}';
+                        Utils.clipboard(text);
+                      },
+                    ),
                     IconButton(
                       icon: const Icon(Icons.remove_red_eye),
                       tooltip: '查看',

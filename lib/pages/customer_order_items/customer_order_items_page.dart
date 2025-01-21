@@ -62,6 +62,16 @@ class _CustomerOrderItemsPageState extends State<CustomerOrderItemsPage> {
                         padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                       ),
                       onPressed: () {
+                        controller.copyTextToClipboard();
+                      },
+                      child: const Text('复制', style: TextStyle(fontSize: 18)),
+                    ),
+                    FilledButton(
+                      style: ButtonStyle(
+                        shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                        padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+                      ),
+                      onPressed: () {
                         controller.showMutipleOrderItemPage();
                       },
                       child: const Text('批量导入', style: TextStyle(fontSize: 18)),
@@ -92,7 +102,7 @@ class _CustomerOrderItemsPageState extends State<CustomerOrderItemsPage> {
                   columns: [
                     const DataColumn2(
                       label: Text('操作'),
-                      fixedWidth: 160,
+                      fixedWidth: 180,
                     ),
                     DataColumn2(
                       label: const Text('商品名称'),
@@ -424,6 +434,16 @@ class CustomerOrderItemsDataSource extends AsyncDataTableSource {
               DataCell(
                 Row(
                   children: [
+                    IconButton(
+                      icon: const Icon(Icons.copy_rounded),
+                      tooltip: '复制',
+                      onPressed: () {
+                        // var text = '姓名：${vehicle.driverName}\n电话：${vehicle.driverPhone!}\n车牌号：${vehicle.plateNumber!}';
+                        var text =
+                            '商品名称：${orderItem.itemName}\n单价：${orderItem.actualPrice}元/${orderItem.actualUnit}\n备注：${orderItem.itemShortName ?? ''}';
+                        Utils.clipboard(text);
+                      },
+                    ),
                     IconButton(
                       icon: const Icon(
                         Icons.remove_red_eye,

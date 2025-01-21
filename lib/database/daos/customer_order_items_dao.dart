@@ -195,4 +195,11 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
     }
     return result.first;
   }
+
+  /// 获取特定订单项
+  Future<List<CustomerOrderItem>> getOrderItemById(int id) async {
+    final query = select(db.customerOrderItems)..where((tbl) => tbl.customerId.equals(id));
+    final result = await query.get();
+    return result;
+  }
 }
