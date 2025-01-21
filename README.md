@@ -6,7 +6,6 @@
   <br>
 </h1>
 <h4 align="center">商品管理系统</h4>
-<h4 align="center">A Third-party Live Stream Player</h4>
 <p align="center">
   <h4 align="center">本软件仅供学习交流使用  请勿用于其他用途，禁止商用</h4>
 	<h4 align="center">下载后请在24小时内删除</h4>
