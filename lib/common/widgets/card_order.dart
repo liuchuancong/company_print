@@ -47,25 +47,23 @@ class CardOrder extends StatelessWidget {
               Stack(
                 children: [
                   Positioned(
-                    left: 10,
-                    top: 10,
-                    child: OrderChip(
-                      icon: Icons.monetization_on_outlined,
-                      count: '${index + 1}',
-                    ),
-                  ),
-                  Positioned(
-                    left: 80,
-                    top: 13,
+                    left: 15,
+                    top: 15,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
                         color: Theme.of(context).primaryColor.withValues(alpha: 0.9),
                         borderRadius: const BorderRadius.all(Radius.circular(5.0)),
                       ),
-                      child: Text(
-                        '${Utils.getDoubleStringRound(order.itemCount)}件商品',
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.white),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            child: Text(
+                              '${Utils.getDoubleStringRound(order.itemCount)}件商品',
+                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.white),
+                            ),
+                          )
+                        ],
                       ),
                     ),
                   ),
@@ -272,11 +270,11 @@ class OrderChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
-      backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.9),
+      backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
       child: Text(
         count,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Colors.white.withValues(alpha: 0.8),
+              color: Colors.white,
               fontSize: 15,
             ),
       ),
