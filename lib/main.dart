@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -69,6 +70,7 @@ class _MyAppState extends State<MyApp> {
       var themeColor = HexColor(settings.themeColorSwitch.value);
       ThemeData lightTheme = MyTheme(primaryColor: themeColor).lightThemeData;
       ThemeData darkTheme = MyTheme(primaryColor: themeColor).darkThemeData;
+      final isExits = settings.dbPath.value.isEmpty || !File(settings.dbPath.value).existsSync();
       return ScreenUtilInit(
         designSize: const Size(1280, 800),
         minTextAdapt: true,
@@ -79,7 +81,7 @@ class _MyAppState extends State<MyApp> {
           theme: lightTheme.useSystemChineseFont(Brightness.light),
           darkTheme: darkTheme.useSystemChineseFont(Brightness.dark),
           navigatorObservers: [FlutterSmartDialog.observer],
-          initialRoute: settings.dbPath.value.isEmpty ? RoutePath.kSetDbPathPage : RoutePath.kInitial,
+          initialRoute: isExits ? RoutePath.kSetDbPathPage : RoutePath.kInitial,
           defaultTransition: Transition.native,
           getPages: AppPages.routes,
           debugShowCheckedModeBanner: false,

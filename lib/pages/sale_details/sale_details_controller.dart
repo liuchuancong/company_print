@@ -520,22 +520,23 @@ class SaleDetailsController extends GetxController {
               downloadsDir = await getDownloadsDirectory();
             }
             final file = File(
-                '${downloadsDir?.path}${Platform.pathSeparator}小柳打印${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}${Platform.pathSeparator}${order.customerName}.pdf');
+                '${downloadsDir?.path}${Platform.pathSeparator}xiao_liu_da_yin${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}${Platform.pathSeparator}${order.customerName}.pdf');
 
             if (Platform.isAndroid) {
               saveFile(
                 fileData: bytes,
-                rootFolderName: '小柳打印',
+                rootFolderName: 'xiao_liu_da_yin',
                 folderName: dirFormatter.format(DateTime.now()),
                 fileName: '${order.customerName}_$dateStr.pdf',
               );
             } else {
-              log('${downloadsDir?.path}${Platform.pathSeparator}小柳打印${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}',
+              log('${downloadsDir?.path}${Platform.pathSeparator}xiao_liu_da_yin${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}',
                   name: 'generateAndPrintPdf');
               file.createSync(recursive: true);
               await file.writeAsBytes(bytes);
               SnackBarUtil.success(
-                  '文件已保存到${downloadsDir?.path}${Platform.pathSeparator}小柳打印${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}');
+                  '文件已保存到${downloadsDir?.path}${Platform.pathSeparator}xiao_liu_da_yin${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}');
+              settings.backupDirectory.value = '${downloadsDir?.path}${Platform.pathSeparator}xiao_liu_da_yin';
             }
           } catch (e) {
             log(e.toString(), name: 'generateAndPrintPdf');

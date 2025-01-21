@@ -44,9 +44,11 @@ class SettingsPage extends GetView<SettingsService> {
           ),
           const SectionTitle(title: "系统"),
           ListTile(
-              leading: const Icon(Icons.file_copy_outlined, size: 32),
-              title: const Text('数据保存路径'),
-              subtitle: Text(controller.dbPath.value)),
+            leading: const Icon(Icons.file_copy_outlined, size: 32),
+            title: const Text('数据保存路径'),
+            subtitle: Text(controller.dbPath.value),
+            onTap: () => Utils.clipboard(controller.dbPath.value),
+          ),
           Obx(
             () => SwitchListTile(
               title: const Row(
