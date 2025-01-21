@@ -21,7 +21,9 @@ LazyDatabase openConnection() {
     final settings = Get.find<SettingsService>();
     final file = File(settings.dbPath.value);
     // 确保数据库文件所在的目录存在
-    await file.create(recursive: true);
+    if (!file.existsSync()) {
+      await file.create(recursive: true);
+    }
     Logger().i('Opening db $file');
     return NativeDatabase(file);
   });
