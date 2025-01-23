@@ -84,9 +84,9 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
                   alignment: Alignment.centerLeft,
                   child: Container(
                     margin: const EdgeInsets.only(left: 10),
-                    child: const Text(
+                    child: Text(
                       '选择客户',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
+                      style: TextStyle(fontSize: Get.width > 680 ? 18 : 15, color: Colors.white),
                     ),
                   ),
                 ),

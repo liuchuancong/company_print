@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:company_print/common/index.dart';
 
 class InputTextField extends StatelessWidget {
   final String labelText;
@@ -17,7 +18,7 @@ class InputTextField extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Flexible(
-                flex: 1,
+                flex: Get.width > 680 ? 1 : 2,
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(minHeight: 50),
                   child: Container(
@@ -29,20 +30,14 @@ class InputTextField extends StatelessWidget {
                     child: Align(
                       alignment: Alignment.topLeft,
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
+                        padding: EdgeInsets.only(left: 20, right: 20, top: Get.width > 680 ? 10 : 15),
                         child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
-                              labelText,
-                              style: const TextStyle(color: Colors.white, fontSize: 18, letterSpacing: 2),
+                              '$labelText：',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: Get.width > 680 ? 18 : 15, letterSpacing: 2),
                             ),
-                            const SizedBox(width: 5),
-                            const Text(
-                              ':',
-                              style: TextStyle(color: Colors.white, fontSize: 18),
-                            )
                           ],
                         ),
                       ),

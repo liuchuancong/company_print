@@ -32,6 +32,69 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('订单详情'),
+        actions: Get.width <= 680
+            ? [
+                PopupMenuButton(
+                  itemBuilder: (context) {
+                    return [
+                      PopupMenuItem(
+                        value: 0,
+                        child: Obx(
+                          () => Text(
+                            controller.salesOrderCalculationType.value == SalesOrderCalculationType.round
+                                ? '计价-整数'
+                                : '计价-两位小数',
+                          ),
+                        ),
+                      ),
+                      const PopupMenuItem(
+                        value: 1,
+                        child: Text('添加'),
+                      ),
+                      const PopupMenuItem(
+                        value: 2,
+                        child: Text('批量添加'),
+                      ),
+                      const PopupMenuItem(
+                        value: 3,
+                        child: Text('客户商品添加'),
+                      ),
+                      const PopupMenuItem(
+                        value: 4,
+                        child: Text('复制'),
+                      ),
+                      const PopupMenuItem(
+                        value: 5,
+                        child: Text('打印'),
+                      ),
+                    ];
+                  },
+                  onSelected: (value) {
+                    switch (value) {
+                      case 0:
+                        controller.setOrderCalculationType(
+                            controller.salesOrderCalculationType.value == SalesOrderCalculationType.round ? 1 : 0);
+                        break;
+                      case 1:
+                        controller.showCreateOrderDialog();
+                        break;
+                      case 2:
+                        controller.showMutipleOrderItemPage();
+                        break;
+                      case 3:
+                        controller.showMutipleCustomerOrderItemPage();
+                        break;
+                      case 4:
+                        controller.copyTextToClipboard();
+                        break;
+                      case 5:
+                        controller.showPreferResolutionSelectorDialog();
+                        break;
+                    }
+                  },
+                )
+              ]
+            : [],
       ),
       body: Column(
         children: [
@@ -42,107 +105,116 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
               }
               return AsyncPaginatedDataTable2(
                 header: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Obx(() => Text.rich(TextSpan(
-                              text: '合计：',
-                              style: const TextStyle(fontSize: 15),
-                              children: [
-                                TextSpan(
-                                  text: controller.getOrderCount.value,
-                                  style: const TextStyle(fontSize: 15, color: Colors.red, fontWeight: FontWeight.bold),
-                                ),
-                                const TextSpan(text: ' 件'),
-                                const TextSpan(text: '，'),
-                                const TextSpan(text: '总价 '),
-                                TextSpan(
-                                  text: controller.getTotalOrderPrice.value,
-                                  style: const TextStyle(fontSize: 15, color: Colors.red, fontWeight: FontWeight.bold),
-                                ),
-                                const TextSpan(text: ' 元'),
-                                const TextSpan(text: '，'),
-                                const TextSpan(text: '垫付：'),
-                                TextSpan(
-                                  text: controller.getAdvancePayment.value,
-                                  style: const TextStyle(fontSize: 15, color: Colors.red, fontWeight: FontWeight.bold),
-                                ),
-                                const TextSpan(text: ' 元'),
-                              ],
-                            ))),
-                      ],
-                    )),
-                actions: [
-                  FilledButton(
-                    style: ButtonStyle(
-                      shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
-                    ),
-                    onPressed: () {
-                      controller.setOrderCalculationType(
-                          controller.salesOrderCalculationType.value == SalesOrderCalculationType.round ? 1 : 0);
-                    },
-                    child: Obx(
-                      () => Text(
-                        controller.salesOrderCalculationType.value == SalesOrderCalculationType.round
-                            ? '计价-整数'
-                            : '计价-两位小数',
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                    ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Obx(() => Text.rich(TextSpan(
+                            text: '合计：',
+                            style: const TextStyle(fontSize: 15),
+                            children: [
+                              TextSpan(
+                                text: controller.getOrderCount.value,
+                                style: const TextStyle(fontSize: 15, color: Colors.red, fontWeight: FontWeight.bold),
+                              ),
+                              const TextSpan(text: ' 件'),
+                              const TextSpan(text: '，'),
+                              const TextSpan(text: '总价 '),
+                              TextSpan(
+                                text: controller.getTotalOrderPrice.value,
+                                style: const TextStyle(fontSize: 15, color: Colors.red, fontWeight: FontWeight.bold),
+                              ),
+                              const TextSpan(text: ' 元'),
+                              const TextSpan(text: '，'),
+                              const TextSpan(text: '垫付：'),
+                              TextSpan(
+                                text: controller.getAdvancePayment.value,
+                                style: const TextStyle(fontSize: 15, color: Colors.red, fontWeight: FontWeight.bold),
+                              ),
+                              const TextSpan(text: ' 元'),
+                            ],
+                          ))),
+                    ],
                   ),
-                  FilledButton(
-                    style: ButtonStyle(
-                      shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
-                    ),
-                    onPressed: () {
-                      controller.showCreateOrderDialog();
-                    },
-                    child: const Text('添加', style: TextStyle(fontSize: 18)),
-                  ),
-                  FilledButton(
-                    style: ButtonStyle(
-                      shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
-                    ),
-                    onPressed: () {
-                      controller.showMutipleOrderItemPage();
-                    },
-                    child: const Text('批量添加', style: TextStyle(fontSize: 18)),
-                  ),
-                  FilledButton(
-                    style: ButtonStyle(
-                      shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
-                    ),
-                    onPressed: () {
-                      controller.showMutipleCustomerOrderItemPage();
-                    },
-                    child: const Text('客户商品添加', style: TextStyle(fontSize: 18)),
-                  ),
-                  FilledButton(
-                    style: ButtonStyle(
-                      shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
-                    ),
-                    onPressed: () {
-                      controller.copyTextToClipboard();
-                    },
-                    child: const Text('复制', style: TextStyle(fontSize: 18)),
-                  ),
-                  FilledButton(
-                    style: ButtonStyle(
-                      shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
-                    ),
-                    onPressed: () {
-                      controller.showPreferResolutionSelectorDialog();
-                    },
-                    child: const Text('打印', style: TextStyle(fontSize: 18)),
-                  ),
-                ],
+                ),
+                actions: Get.width > 680
+                    ? [
+                        FilledButton(
+                          style: ButtonStyle(
+                            shape: WidgetStateProperty.all(
+                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+                          ),
+                          onPressed: () {
+                            controller.setOrderCalculationType(
+                                controller.salesOrderCalculationType.value == SalesOrderCalculationType.round ? 1 : 0);
+                          },
+                          child: Obx(
+                            () => Text(
+                              controller.salesOrderCalculationType.value == SalesOrderCalculationType.round
+                                  ? '计价-整数'
+                                  : '计价-两位小数',
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        ),
+                        FilledButton(
+                          style: ButtonStyle(
+                            shape: WidgetStateProperty.all(
+                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+                          ),
+                          onPressed: () {
+                            controller.showCreateOrderDialog();
+                          },
+                          child: const Text('添加', style: TextStyle(fontSize: 18)),
+                        ),
+                        FilledButton(
+                          style: ButtonStyle(
+                            shape: WidgetStateProperty.all(
+                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+                          ),
+                          onPressed: () {
+                            controller.showMutipleOrderItemPage();
+                          },
+                          child: const Text('批量添加', style: TextStyle(fontSize: 18)),
+                        ),
+                        FilledButton(
+                          style: ButtonStyle(
+                            shape: WidgetStateProperty.all(
+                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+                          ),
+                          onPressed: () {
+                            controller.showMutipleCustomerOrderItemPage();
+                          },
+                          child: const Text('客户商品添加', style: TextStyle(fontSize: 18)),
+                        ),
+                        FilledButton(
+                          style: ButtonStyle(
+                            shape: WidgetStateProperty.all(
+                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+                          ),
+                          onPressed: () {
+                            controller.copyTextToClipboard();
+                          },
+                          child: const Text('复制', style: TextStyle(fontSize: 18)),
+                        ),
+                        FilledButton(
+                          style: ButtonStyle(
+                            shape: WidgetStateProperty.all(
+                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+                          ),
+                          onPressed: () {
+                            controller.showPreferResolutionSelectorDialog();
+                          },
+                          child: const Text('打印', style: TextStyle(fontSize: 18)),
+                        ),
+                      ]
+                    : null,
                 checkboxHorizontalMargin: 10,
                 wrapInCard: true,
                 rowsPerPage: controller.rowsPerPage.value,
@@ -154,7 +226,7 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                 columnSpacing: 20,
                 fixedColumnsColor: Theme.of(context).highlightColor,
                 fixedCornerColor: Theme.of(context).highlightColor,
-                fixedLeftColumns: 1,
+                fixedLeftColumns: Get.width > 680 ? 1 : 0,
                 columns: [
                   const DataColumn2(
                     label: Text('操作'),

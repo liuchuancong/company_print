@@ -47,7 +47,7 @@ class _UnitsPageState extends State<UnitsPage> {
                 fixedColumnsColor: Theme.of(context).highlightColor,
                 fixedCornerColor: Theme.of(context).highlightColor,
                 isHorizontalScrollBarVisible: true,
-                fixedLeftColumns: 1,
+                fixedLeftColumns: Get.width > 680 ? 1 : 0,
                 header: Container(),
                 actions: [
                   FilledButton(

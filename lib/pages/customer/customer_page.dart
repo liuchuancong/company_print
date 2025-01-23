@@ -66,7 +66,7 @@ class _CustomersPageState extends State<CustomersPage> with AutomaticKeepAliveCl
                 minWidth: 1000,
                 isHorizontalScrollBarVisible: true,
                 isVerticalScrollBarVisible: true,
-                fixedLeftColumns: 1,
+                fixedLeftColumns: Get.width > 680 ? 1 : 0,
                 columns: [
                   const DataColumn2(
                     headingRowAlignment: MainAxisAlignment.start,

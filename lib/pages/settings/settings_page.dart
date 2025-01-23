@@ -61,14 +61,13 @@ class SettingsPage extends GetView<SettingsService> {
               subtitle: const Row(
                 children: [
                   SizedBox(width: 48), // 添加一些间距
-                  Text('在使用软件时，防止手机进入休眠状态。'),
+                  Text('防止手机进入休眠状态。'),
                 ],
               ),
               value: controller.enableScreenKeepOn.value,
               activeColor: Theme.of(context).colorScheme.primary,
               onChanged: (bool value) {
                 controller.enableScreenKeepOn.value = value;
-                // EventBus.instance.emit('enableScreenKeepOn', value); // 如果需要的话，可以解注释
               },
             ),
           ),

@@ -104,7 +104,7 @@ class _MyAppState extends State<MyApp> {
             //字体大小不跟随系统变化
             builder: (context, child) => MediaQuery(
               data: MediaQuery.of(context).copyWith(
-                textScaler: const TextScaler.linear(1.1),
+                textScaler: TextScaler.linear(Get.width > 680 ? 1.1 : 1.0),
               ),
               child: child!,
             ),
