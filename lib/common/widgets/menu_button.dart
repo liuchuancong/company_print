@@ -44,14 +44,6 @@ class MenuButton extends GetView {
             text: '打印',
           ),
         ),
-        const PopupMenuItem(
-          value: 3,
-          padding: EdgeInsets.symmetric(horizontal: 12),
-          child: MenuListTile(
-            leading: Icon(Icons.kitchen_outlined),
-            text: '图片识别',
-          ),
-        ),
       ],
     );
   }
