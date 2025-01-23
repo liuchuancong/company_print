@@ -30,7 +30,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
-
+/mnist_dataset/
 # Symbolication related
 app.*.symbols
 
