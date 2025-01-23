@@ -107,16 +107,7 @@ class CustomerOrderItemsController extends GetxController {
   void showCreateCustomerPage() {
     Get.to(() => EditOrderItemPage(
           controller: this,
-          onConfirm: (newCustomerOrderItem) => addCustomerOrderItem(
-            newCustomerOrderItem.itemName,
-            newCustomerOrderItem.itemShortName,
-            newCustomerOrderItem.purchaseUnit,
-            newCustomerOrderItem.purchaseQuantity,
-            newCustomerOrderItem.actualUnit,
-            newCustomerOrderItem.actualQuantity,
-            newCustomerOrderItem.presetPrice,
-            newCustomerOrderItem.actualPrice,
-          ),
+          onConfirm: (newCustomerOrderItem) => addCustomerOrderItem(newCustomerOrderItem),
         ));
   }
 
@@ -142,16 +133,7 @@ class CustomerOrderItemsController extends GetxController {
 
   void handleMutipleOrderItem(List<CustomerOrderItem> newCustomerOrderItems) async {
     for (var item in newCustomerOrderItems) {
-      addCustomerOrderItem(
-        item.itemName,
-        item.itemShortName,
-        item.purchaseUnit,
-        item.purchaseQuantity,
-        item.actualUnit,
-        item.actualQuantity,
-        item.presetPrice,
-        item.actualPrice,
-      );
+      addCustomerOrderItem(item);
     }
   }
 
@@ -159,59 +141,17 @@ class CustomerOrderItemsController extends GetxController {
     Get.to(() => EditOrderItemPage(
           controller: this,
           orderItem: customerOrderItem,
-          onConfirm: (updatedCustomerOrderItem) => updateCustomerOrderItem(
-            customerOrderItem.id,
-            customerId,
-            updatedCustomerOrderItem.itemName,
-            updatedCustomerOrderItem.itemShortName,
-            updatedCustomerOrderItem.purchaseUnit,
-            updatedCustomerOrderItem.purchaseQuantity,
-            updatedCustomerOrderItem.actualUnit,
-            updatedCustomerOrderItem.actualQuantity,
-            updatedCustomerOrderItem.presetPrice,
-            updatedCustomerOrderItem.actualPrice,
-          ),
+          onConfirm: (updatedCustomerOrderItem) => updateCustomerOrderItem(updatedCustomerOrderItem),
         ));
   }
 
-  Future<void> addCustomerOrderItem(
-    String itemName,
-    String? itemShortName,
-    String? purchaseUnit,
-    double? purchaseQuantity,
-    String? actualUnit,
-    double? actualQuantity,
-    double? presetPrice,
-    double? actualPrice,
-  ) async {
-    await database.customerOrderItemsDao.insertCustomerOrderItem(
-      customerId,
-      itemName,
-      itemShortName,
-      purchaseUnit,
-      purchaseQuantity,
-      actualUnit,
-      actualQuantity,
-      presetPrice,
-      actualPrice,
-    );
+  Future<void> addCustomerOrderItem(CustomerOrderItem addCustomerOrderItem) async {
+    await database.customerOrderItemsDao.insertCustomerOrderItem(addCustomerOrderItem);
     dataSource?.refreshDatasource();
   }
 
-  Future<void> updateCustomerOrderItem(
-    int id,
-    int customerId,
-    String itemName,
-    String? itemShortName,
-    String? purchaseUnit,
-    double? purchaseQuantity,
-    String? actualUnit,
-    double? actualQuantity,
-    double? presetPrice,
-    double? actualPrice,
-  ) async {
-    await database.customerOrderItemsDao.updateCustomerOrderItem(id, customerId, itemName, itemShortName, purchaseUnit,
-        purchaseQuantity, actualUnit, actualQuantity, presetPrice, actualPrice);
+  Future<void> updateCustomerOrderItem(CustomerOrderItem updatedCustomerOrderItem) async {
+    await database.customerOrderItemsDao.updateCustomerOrderItem(updatedCustomerOrderItem);
     dataSource?.refreshDatasource();
   }
 

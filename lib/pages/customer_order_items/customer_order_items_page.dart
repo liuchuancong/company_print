@@ -74,7 +74,7 @@ class _CustomerOrderItemsPageState extends State<CustomerOrderItemsPage> {
                       onPressed: () {
                         controller.showMutipleOrderItemPage();
                       },
-                      child: const Text('批量导入', style: TextStyle(fontSize: 18)),
+                      child: const Text('批量添加', style: TextStyle(fontSize: 18)),
                     ),
                     FilledButton(
                       style: ButtonStyle(
@@ -210,7 +210,7 @@ class EditOrderItemPageState extends State<EditOrderItemPage> {
     if (_itemNameController.text.isNotEmpty) {
       final newOrUpdatedOrderItem = CustomerOrderItem(
         id: isNew ? DateTime.now().millisecondsSinceEpoch : widget.orderItem!.id,
-        customerId: widget.orderItem?.customerId ?? 0, // 确保提供有效的 customer ID
+        customerId: widget.controller.customerId, // 确保提供有效的 customer ID
         itemName: _itemNameController.text,
         itemShortName: _itemShortNameController.text.isNotEmpty ? _itemShortNameController.text : '',
         purchaseUnit: _purchaseUnitController.text.isNotEmpty ? _purchaseUnitController.text : '',
@@ -478,9 +478,9 @@ class CustomerOrderItemsDataSource extends AsyncDataTableSource {
               ),
               DataCell(Text(orderItem.itemName)),
               DataCell(Text(Utils.concatenation(orderItem.purchaseQuantity, orderItem.purchaseUnit))),
-              DataCell(Text(orderItem.presetPrice.toString())),
+              DataCell(Text('${orderItem.presetPrice}')),
               DataCell(Text(Utils.concatenation(orderItem.actualQuantity, orderItem.actualUnit))),
-              DataCell(Text(orderItem.actualPrice.toString())),
+              DataCell(Text('${orderItem.actualPrice}')),
               DataCell(Text(orderItem.itemShortName ?? '')),
             ],
           );

@@ -98,16 +98,6 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                       padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                     ),
                     onPressed: () {
-                      controller.showMutipleOrderItemPage();
-                    },
-                    child: const Text('批量添加', style: TextStyle(fontSize: 18)),
-                  ),
-                  FilledButton(
-                    style: ButtonStyle(
-                      shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
-                    ),
-                    onPressed: () {
                       controller.showCreateOrderDialog();
                     },
                     child: const Text('添加', style: TextStyle(fontSize: 18)),
@@ -118,9 +108,19 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                       padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                     ),
                     onPressed: () {
+                      controller.showMutipleOrderItemPage();
+                    },
+                    child: const Text('批量添加', style: TextStyle(fontSize: 18)),
+                  ),
+                  FilledButton(
+                    style: ButtonStyle(
+                      shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+                    ),
+                    onPressed: () {
                       controller.showMutipleCustomerOrderItemPage();
                     },
-                    child: const Text('客户商品导入', style: TextStyle(fontSize: 18)),
+                    child: const Text('客户商品添加', style: TextStyle(fontSize: 18)),
                   ),
                   FilledButton(
                     style: ButtonStyle(

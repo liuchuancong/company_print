@@ -11,27 +11,17 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
   CustomerOrderItemsDao(this.db) : super(db);
 
   /// 插入新的订单项
-  Future<int> insertCustomerOrderItem(
-    int customerId,
-    String itemName,
-    String? itemShortName,
-    String? purchaseUnit,
-    double? purchaseQuantity,
-    String? actualUnit,
-    double? actualQuantity,
-    double? presetPrice,
-    double? actualPrice,
-  ) async {
+  Future<int> insertCustomerOrderItem(CustomerOrderItem addCustomerOrderItem) async {
     final entry = CustomerOrderItemsCompanion(
-      itemName: Value(itemName),
-      itemShortName: Value(itemShortName),
-      customerId: Value(customerId),
-      purchaseUnit: Value(purchaseUnit),
-      purchaseQuantity: Value(purchaseQuantity),
-      actualUnit: Value(actualUnit),
-      actualQuantity: Value(actualQuantity),
-      presetPrice: Value(presetPrice),
-      actualPrice: Value(actualPrice),
+      itemName: Value(addCustomerOrderItem.itemName),
+      itemShortName: Value(addCustomerOrderItem.itemShortName),
+      customerId: Value(addCustomerOrderItem.customerId),
+      purchaseUnit: Value(addCustomerOrderItem.purchaseUnit),
+      purchaseQuantity: Value(addCustomerOrderItem.purchaseQuantity),
+      actualUnit: Value(addCustomerOrderItem.actualUnit),
+      actualQuantity: Value(addCustomerOrderItem.actualQuantity),
+      presetPrice: Value(addCustomerOrderItem.presetPrice),
+      actualPrice: Value(addCustomerOrderItem.actualPrice),
     );
     return await into(db.customerOrderItems).insert(entry);
   }
@@ -136,30 +126,19 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
   }
 
   /// 更新订单项
-  Future updateCustomerOrderItem(
-    int id,
-    int customerId,
-    String itemName,
-    String? itemShortName,
-    String? purchaseUnit,
-    double? purchaseQuantity,
-    String? actualUnit,
-    double? actualQuantity,
-    double? presetPrice,
-    double? actualPrice,
-  ) async {
+  Future updateCustomerOrderItem(CustomerOrderItem updatedCustomerOrderItem) async {
     final entry = CustomerOrderItemsCompanion(
-      customerId: Value(customerId),
-      itemName: Value(itemName),
-      itemShortName: Value(itemShortName),
-      purchaseUnit: Value(purchaseUnit),
-      purchaseQuantity: Value(purchaseQuantity),
-      actualUnit: Value(actualUnit),
-      actualQuantity: Value(actualQuantity),
-      presetPrice: Value(presetPrice),
-      actualPrice: Value(actualPrice),
+      customerId: Value(updatedCustomerOrderItem.customerId),
+      itemName: Value(updatedCustomerOrderItem.itemName),
+      itemShortName: Value(updatedCustomerOrderItem.itemShortName),
+      purchaseUnit: Value(updatedCustomerOrderItem.purchaseUnit),
+      purchaseQuantity: Value(updatedCustomerOrderItem.purchaseQuantity),
+      actualUnit: Value(updatedCustomerOrderItem.actualUnit),
+      actualQuantity: Value(updatedCustomerOrderItem.actualQuantity),
+      presetPrice: Value(updatedCustomerOrderItem.presetPrice),
+      actualPrice: Value(updatedCustomerOrderItem.actualPrice),
     );
-    await (update(db.customerOrderItems)..where((tbl) => tbl.id.equals(id))).write(entry);
+    await (update(db.customerOrderItems)..where((tbl) => tbl.id.equals(updatedCustomerOrderItem.id))).write(entry);
   }
 
   /// 删除订单项

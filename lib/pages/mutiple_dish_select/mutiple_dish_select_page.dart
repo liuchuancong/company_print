@@ -19,7 +19,12 @@ class MutipleDishSelectPage extends GetView<MutipleDishSelectController> {
     return Scaffold(
       appBar: AppBar(
         title: Obx(() => Text(controller.text.value)),
-        actions: [buildSelectBackBtn()],
+        actions: [
+          buildSelectBackBtn(),
+          const SizedBox(
+            width: 12,
+          )
+        ],
       ),
       body: Obx(() => Stack(
             children: [
@@ -48,11 +53,11 @@ class MutipleDishSelectPage extends GetView<MutipleDishSelectController> {
   }
 
   Widget buildSelectBackBtn() {
-    return IconButton(
+    return TextButton(
       onPressed: () {
         controller.handleBackTap();
       },
-      icon: const Icon(Icons.add_circle_outline_outlined),
+      child: const Text('添加'),
     );
   }
 

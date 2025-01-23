@@ -420,7 +420,7 @@ class SaleDetailsController extends GetxController {
                 ),
               pw.Padding(padding: const pw.EdgeInsets.all(2)),
               pw.TableHelper.fromTextArray(
-                headers: ['序号', '商品名称', '数量', '单价', '总价', '备注'],
+                headers: ['序号', '商品名称', '数量', '单价/元', '总价/元', '备注'],
                 data: List.generate(pageProducts.length, (index) {
                   final product = pageProducts[index];
                   // 计算全局序号（基于整个列表）
@@ -428,19 +428,19 @@ class SaleDetailsController extends GetxController {
                   return [
                     globalIndex.toString(),
                     product.itemName,
-                    product.actualQuantity,
-                    Utils.concatenation(product.actualPrice, product.actualUnit),
+                    Utils.concatenation(product.actualQuantity, product.actualUnit),
+                    product.actualPrice,
                     getOrderCalculationType(product.totalPrice),
                     product.itemShortName,
                   ];
                 }),
                 headerStyle: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, font: ttf),
                 cellStyle: pw.TextStyle(fontSize: 10, font: ttf),
-                cellPadding: const pw.EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                cellPadding: const pw.EdgeInsets.only(left: 4, right: 0, top: 1, bottom: 1),
                 columnWidths: {
                   0: const pw.FlexColumnWidth(1),
                   1: const pw.FlexColumnWidth(2),
-                  2: const pw.FlexColumnWidth(1),
+                  2: const pw.FlexColumnWidth(2),
                   3: const pw.FlexColumnWidth(2),
                   4: const pw.FlexColumnWidth(2),
                   5: const pw.FlexColumnWidth(3),
