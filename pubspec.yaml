@@ -23,8 +23,6 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  flutter_tesseract_ocr: ^0.4.28
-  image_picker: ^1.1.2
   go_router: ^14.6.3
   refreshed: ^2.10.3
   shared_preferences: ^2.3.5
@@ -95,4 +93,3 @@ flutter:
   assets:
     - assets/fonts/NotoSansSC-Regular.ttf
     - assets/
-    - assets/tessdata/

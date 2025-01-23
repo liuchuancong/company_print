@@ -4,7 +4,7 @@ import 'package:company_print/common/index.dart';
 class MenuButton extends GetView {
   MenuButton({super.key});
 
-  final menuRoutes = [RoutePath.kMinePage, RoutePath.kSettings, RoutePath.kPrintPage, RoutePath.kTflitePage];
+  final menuRoutes = [RoutePath.kMinePage, RoutePath.kSettings, RoutePath.kPrintPage];
 
   @override
   Widget build(BuildContext context) {
