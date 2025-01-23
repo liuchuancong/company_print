@@ -68,7 +68,7 @@ class PrintPageState extends State<PrintPage> {
             ),
           ),
           InputTextField(
-            labelText: '是否展示客户信息',
+            labelText: Get.width > 680 ? '展示客户信息' : '展示客户',
             gap: 10,
             child: Container(
               height: 50,
@@ -93,7 +93,7 @@ class PrintPageState extends State<PrintPage> {
             ),
           ),
           InputTextField(
-            labelText: '是否展示司机信息',
+            labelText: Get.width > 680 ? '展示司机信息' : '展示司机',
             gap: 10,
             child: Container(
               height: 50,
@@ -118,7 +118,7 @@ class PrintPageState extends State<PrintPage> {
             ),
           ),
           InputTextField(
-            labelText: '是否展示公司信息',
+            labelText: Get.width > 680 ? '展示公司信息' : '展示公司',
             gap: 10,
             child: Container(
               height: 50,
@@ -143,7 +143,7 @@ class PrintPageState extends State<PrintPage> {
             ),
           ),
           InputTextField(
-            labelText: '是否展示结算金额',
+            labelText: Get.width > 680 ? '展示结算金额' : '展示结算',
             gap: 10,
             child: Container(
               height: 50,

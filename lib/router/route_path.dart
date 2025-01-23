@@ -36,4 +36,6 @@ class RoutePath {
   static var kPrintPage = "/printPage";
 
   static var kSetDbPathPage = "/setDbPathPage";
+
+  static var kTflitePage = "/tflitePage";
 }

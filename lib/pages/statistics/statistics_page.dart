@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:company_print/common/index.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:company_print/common/widgets/menu_button.dart';
 import 'package:company_print/pages/statistics/statistics_controller.dart';
 
 class StatisticsPage extends StatefulWidget {
@@ -34,7 +35,7 @@ class StatisticsPageState extends State<StatisticsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('销售额统计'),
-        leading: Get.width > 680 ? null : IconButton(icon: const Icon(Icons.menu), onPressed: () {}),
+        leading: Get.width > 680 ? null : MenuButton(),
         actions: [
           IconButton(
             icon: const Icon(

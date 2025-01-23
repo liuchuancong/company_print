@@ -1,5 +1,6 @@
 import 'package:company_print/common/index.dart';
 import 'package:company_print/pages/mine/mine.dart';
+import 'package:company_print/pages/tflite/tflite.dart';
 import 'package:company_print/pages/home/home_page.dart';
 import 'package:company_print/pages/print/print_page.dart';
 import 'package:company_print/pages/settings/settings_page.dart';
@@ -95,6 +96,10 @@ class AppPages {
     GetPage(
       name: RoutePath.kSetDbPathPage,
       page: SetDbPathPage.new,
+    ),
+    GetPage(
+      name: RoutePath.kTflitePage,
+      page: TflitePage.new,
     ),
   ];
 }
