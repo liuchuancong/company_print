@@ -55,8 +55,8 @@ dependencies:
   scrollview_observer: ^1.24.0
   flutter_sticky_header: ^0.8.0
   collection: ^1.19.0
-  pdf: ^3.11.1
-  flutter_pdfview: ^1.4.0
+  pdf: ^3.11.3
+  flutter_pdfview: ^1.4.1+1
   printing: ^5.13.4
   pinyin: ^3.3.0
   flutter_carousel_widget: ^3.1.0
