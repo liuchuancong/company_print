@@ -90,11 +90,11 @@ class StatisticsController extends GetxController {
               currentDates = [];
               Navigator.of(Get.context!).pop(currentDates);
             }),
-            child: const Text("取消"),
+            child: const Text('取消'),
           ),
           TextButton(
             onPressed: (() => Navigator.of(Get.context!).pop(currentDates)),
-            child: const Text("确定"),
+            child: const Text('确定'),
           ),
         ],
       ),
@@ -109,7 +109,7 @@ class StatisticsController extends GetxController {
     }
   }
 
-  refreshData() {
+  void refreshData() {
     getOrdersForTimeRangeQuery();
   }
 }

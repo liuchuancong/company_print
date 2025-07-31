@@ -23,7 +23,7 @@ class FileRecoverUtils {
   ///验证URL
   static bool isUrl(String value) {
     final urlRegExp = RegExp(
-        r"((https?:www\.)|(https?:\/\/)|(www\.))[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9]{1,6}(\/[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)?");
+        r'((https?:www\.)|(https?:\/\/)|(www\.))[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9]{1,6}(\/[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)?');
     List<String?> urlMatches = urlRegExp.allMatches(value).map((m) => m.group(0)).toList();
     return urlMatches.isNotEmpty;
   }
@@ -31,14 +31,14 @@ class FileRecoverUtils {
   ///验证URL
   static bool isHostUrl(String value) {
     final urlRegExp = RegExp(
-        r"((https?:www\.)|(https?:\/\/))[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9]{1,6}(\/[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)?");
+        r'((https?:www\.)|(https?:\/\/))[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9]{1,6}(\/[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)?');
     List<String?> urlMatches = urlRegExp.allMatches(value).map((m) => m.group(0)).toList();
     return urlMatches.isNotEmpty;
   }
 
   ///验证URL
   static bool isPort(String value) {
-    final portRegExp = RegExp(r"\d+");
+    final portRegExp = RegExp(r'\d+');
     List<String?> portMatches = portRegExp.allMatches(value).map((m) => m.group(0)).toList();
     return portMatches.isNotEmpty;
   }
@@ -82,17 +82,17 @@ class FileRecoverUtils {
       if (result == true) {
         file.deleteSync();
         file.createSync();
-        SnackBarUtil.success("设置成功");
+        SnackBarUtil.success('设置成功');
         // 首次同步备份目录
         settings.dbPath.value = file.path;
       } else if (result == false) {
-        SnackBarUtil.success("设置成功");
+        SnackBarUtil.success('设置成功');
         // 首次同步备份目录
         settings.dbPath.value = file.path;
       }
     } else {
       file.createSync();
-      SnackBarUtil.success("设置成功");
+      SnackBarUtil.success('设置成功');
       settings.dbPath.value = file.path;
     }
     return selectedDirectory;
@@ -101,7 +101,7 @@ class FileRecoverUtils {
   void recoverBackup() async {
     final settings = Get.find<SettingsService>();
     FilePickerResult? result = await FilePicker.platform.pickFiles(
-      dialogTitle: "选择备份文件",
+      dialogTitle: '选择备份文件',
       type: FileType.custom,
       allowedExtensions: ['txt'],
     );
@@ -109,9 +109,9 @@ class FileRecoverUtils {
 
     final file = File(result.files.single.path!);
     if (settings.recover(file)) {
-      SnackBarUtil.success("恢复备份成功");
+      SnackBarUtil.success('恢复备份成功');
     } else {
-      SnackBarUtil.error("恢复备份失败");
+      SnackBarUtil.error('恢复备份失败');
     }
   }
 

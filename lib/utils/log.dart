@@ -17,19 +17,19 @@ class Log {
   );
 
   static void d(String message) {
-    logger.d("${DateTime.now().toString()}\n$message");
+    logger.d('${DateTime.now().toString()}\n$message');
   }
 
   static void i(String message) {
-    logger.i("${DateTime.now().toString()}\n$message");
+    logger.i('${DateTime.now().toString()}\n$message');
   }
 
   static void e(String message, StackTrace stackTrace) {
-    logger.e("${DateTime.now().toString()}\n$message", stackTrace: stackTrace);
+    logger.e('${DateTime.now().toString()}\n$message', stackTrace: stackTrace);
   }
 
   static void w(String message) {
-    logger.w("${DateTime.now().toString()}\n$message");
+    logger.w('${DateTime.now().toString()}\n$message');
   }
 
   static void logPrint(dynamic obj) {

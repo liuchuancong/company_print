@@ -204,7 +204,7 @@ class EditOrderItemPageState extends State<EditOrderItemPage> {
 
   void _submitForm() {
     if (_itemNameController.text.isEmpty) {
-      SmartDialog.showToast("商品名称不能为空");
+      SmartDialog.showToast('商品名称不能为空');
       return;
     }
     if (_itemNameController.text.isNotEmpty) {
@@ -381,7 +381,7 @@ class EditOrderItemPageState extends State<EditOrderItemPage> {
             padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
           ),
           onPressed: () async {
-            var result = await Utils.showAlertDialog("是否确认退出？", title: "提示");
+            var result = await Utils.showAlertDialog('是否确认退出？', title: '提示');
             if (result == true) {
               Get.back();
             }

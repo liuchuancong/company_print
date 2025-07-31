@@ -28,7 +28,7 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
 
   var currentPage = 0;
 
-  setGroupTextEditingController() {
+  void setGroupTextEditingController() {
     if (widget.controller.dishesSelectType == DishesSelectType.dishes) {
       productsControllers = List.generate(
         categories.length,
@@ -64,7 +64,7 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
     setState(() {});
   }
 
-  disposeTextEditingController() {
+  void disposeTextEditingController() {
     for (var controllers in productsControllers) {
       for (var controller in controllers.values) {
         controller.dispose();
@@ -136,7 +136,7 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
     checkExitsItem(newOrUpdatedOrderItems);
   }
 
-  checkExitsItem(List<OrderItem> orderItems) async {
+  Future<void> checkExitsItem(List<OrderItem> orderItems) async {
     final AppDatabase database = DatabaseManager.instance.appDatabase;
     List<bool> itemNameExits = [];
     for (var order in orderItems) {
@@ -152,7 +152,7 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
     }
     var stringNames = exitsNames.join('/');
     if (count > 0) {
-      var result = await Utils.showAlertDialog("$count个商品名称已存在，$stringNames，是否重复添加？", title: "导入");
+      var result = await Utils.showAlertDialog('$count个商品名称已存在，$stringNames，是否重复添加？', title: '导入');
       if (result == true) {
         widget.onConfirm(orderItems);
         Get.back();
@@ -456,7 +456,7 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
               }
             }
 
-            var result = await Utils.showAlertDialog("是否确认退出？", title: "提示");
+            var result = await Utils.showAlertDialog('是否确认退出？', title: '提示');
             if (result == true) {
               Get.back();
             }

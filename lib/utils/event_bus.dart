@@ -17,7 +17,7 @@ class EventBus {
     if (!_streams.containsKey(name)) {
       _streams.addAll({name: StreamController.broadcast()});
     }
-    Log.d("Emit Event：$name\r\n$data");
+    Log.d('Emit Event：$name\r\n$data');
 
     _streams[name]!.add(data);
   }

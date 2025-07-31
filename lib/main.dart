@@ -48,7 +48,7 @@ class _MyAppState extends State<MyApp> {
     listenWakelock();
   }
 
-  listenWakelock() {
+  void listenWakelock() {
     wakelockPlusSubscription = EventBus.instance.listen('enableScreenKeepOn', (data) {
       if (data == true) {
         WakelockPlus.toggle(enable: true);
@@ -58,7 +58,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  setInitScreen() {
+  void setInitScreen() {
     final settings = Get.find<SettingsService>();
     WakelockPlus.toggle(enable: settings.enableScreenKeepOn.value);
   }
@@ -115,7 +115,7 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-initRefresh() {
+void initRefresh() {
   EasyRefresh.defaultHeaderBuilder = () => const ClassicHeader(
         armedText: '松开加载',
         dragText: '上拉刷新',

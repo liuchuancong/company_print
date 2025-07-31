@@ -57,8 +57,8 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
             fillColor: Theme.of(context).primaryColor.withAlpha(15),
             suffixIcon: IconButton(
               onPressed: () {
-                controller.searchController.text = "";
-                controller.searchQuery.value = "";
+                controller.searchController.text = '';
+                controller.searchQuery.value = '';
               },
               icon: const Icon(Icons.clear),
             ),

@@ -18,7 +18,7 @@ class CustomerSelectPage extends GetView<CustomerSelectController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("请选择客户"),
+        title: const Text('请选择客户'),
       ),
       body: Obx(() => Stack(
             children: [

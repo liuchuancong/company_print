@@ -160,12 +160,12 @@ class CardOrder extends StatelessWidget {
                               //   ),
                               Text.rich(
                                 TextSpan(children: [
-                                  TextSpan(text: "合计：", style: Theme.of(context).textTheme.titleSmall),
+                                  TextSpan(text: '合计：', style: Theme.of(context).textTheme.titleSmall),
                                   TextSpan(
-                                    text: "${order.totalPrice}",
+                                    text: '${order.totalPrice}',
                                     style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.red),
                                   ),
-                                  TextSpan(text: " 元", style: Theme.of(context).textTheme.titleSmall),
+                                  TextSpan(text: ' 元', style: Theme.of(context).textTheme.titleSmall),
                                 ]),
                                 textAlign: TextAlign.center,
                               ),

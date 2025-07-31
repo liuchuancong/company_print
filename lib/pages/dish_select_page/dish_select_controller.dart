@@ -26,7 +26,7 @@ class DishSelectController extends GetxController {
     observerController = SliverObserverController(controller: scrollController);
   }
 
-  handleSwitchModeBtnTap() {
+  void handleSwitchModeBtnTap() {
     isShowListMode.toggle();
     // Clear the offset cache.
     for (var ctx in sliverContextMap.values) {
@@ -94,7 +94,7 @@ class DishSelectController extends GetxController {
     return RegExp(r'[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]').hasMatch(char);
   }
 
-  generateDishData() {}
+  void generateDishData() {}
 
   List<CategoryTreeNode> buildTree(List<DishesCategoryData> data) {
     final Map<int, CategoryTreeNode> nodeMap = {};

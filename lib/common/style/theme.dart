@@ -10,16 +10,16 @@ class MyTheme {
     this.colorScheme,
   }) : assert(colorScheme == null || primaryColor == null);
 
-  get lightThemeData {
+  ThemeData get lightThemeData {
     return ThemeData(
       useMaterial3: true,
       splashFactory: NoSplash.splashFactory,
       colorSchemeSeed: primaryColor,
       colorScheme: colorScheme,
       brightness: Brightness.light,
-      tabBarTheme: const TabBarTheme(dividerColor: Colors.transparent),
+      tabBarTheme: const TabBarThemeData(dividerColor: Colors.transparent),
       appBarTheme: const AppBarTheme(scrolledUnderElevation: null, surfaceTintColor: Colors.transparent),
-      dialogTheme: const DialogTheme(
+      dialogTheme: const DialogThemeData(
         titleTextStyle: TextStyle(fontSize: 18, color: Colors.black),
         contentTextStyle: TextStyle(fontSize: 16, color: Colors.black),
         actionsPadding: EdgeInsets.only(left: 16, right: 16, bottom: 5),
@@ -45,7 +45,7 @@ class MyTheme {
     );
   }
 
-  get darkThemeData {
+  ThemeData get darkThemeData {
     return ThemeData(
       useMaterial3: true,
       colorSchemeSeed: primaryColor,
@@ -53,10 +53,10 @@ class MyTheme {
       colorScheme: colorScheme?.copyWith(
         error: const Color.fromARGB(255, 255, 99, 71),
       ),
-      tabBarTheme: const TabBarTheme(dividerColor: Colors.transparent),
+      tabBarTheme: const TabBarThemeData(dividerColor: Colors.transparent),
       appBarTheme: const AppBarTheme(scrolledUnderElevation: null, surfaceTintColor: Colors.transparent),
       brightness: Brightness.dark,
-      dialogTheme: const DialogTheme(
+      dialogTheme: const DialogThemeData(
         titleTextStyle: TextStyle(fontSize: 18),
         contentTextStyle: TextStyle(fontSize: 16),
         actionsPadding: EdgeInsets.only(left: 16, right: 16, bottom: 5),

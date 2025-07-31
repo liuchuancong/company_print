@@ -35,7 +35,7 @@ class MutipleDishSelectController extends GetxController {
     text.value = selectedCategories.isNotEmpty ? '已选择${selectedCategories.length}个商品' : '请选择商品';
   }
 
-  handleBackTap() async {
+  Future<void> handleBackTap() async {
     if (selectedCategories.isEmpty) {
       final result = await Utils.showAlertDialog('未选择商品是否退出？', title: '提示');
       if (result == true) {

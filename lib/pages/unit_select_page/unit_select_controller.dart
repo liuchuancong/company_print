@@ -31,7 +31,7 @@ class UnitSelectController extends GetxController {
     symbols.assignAll(dashCategoriesList.map((e) => e.section).toList());
   }
 
-  handleSwitchModeBtnTap() {
+  void handleSwitchModeBtnTap() {
     isShowListMode.toggle();
     // Clear the offset cache.
     for (var ctx in sliverContextMap.values) {

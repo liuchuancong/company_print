@@ -24,7 +24,7 @@ class CustomerSelectController extends GetxController {
     observerController = SliverObserverController(controller: scrollController);
   }
 
-  handleSwitchModeBtnTap() {
+  void handleSwitchModeBtnTap() {
     isShowListMode.toggle();
     // Clear the offset cache.
     for (var ctx in sliverContextMap.values) {

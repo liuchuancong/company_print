@@ -42,7 +42,7 @@ class SettingsPage extends GetView<SettingsService> {
                 )),
             onTap: colorPickerDialog,
           ),
-          const SectionTitle(title: "系统"),
+          const SectionTitle(title: '系统'),
           ListTile(
             leading: const Icon(Icons.file_copy_outlined, size: 32),
             title: const Text('数据保存路径'),
@@ -71,10 +71,10 @@ class SettingsPage extends GetView<SettingsService> {
               },
             ),
           ),
-          const SectionTitle(title: "PDF 文档保存目录"),
+          const SectionTitle(title: 'PDF 文档保存目录'),
           Obx(() => ListTile(
                 leading: const Icon(Icons.folder_outlined, size: 32),
-                title: const Text("保存目录"),
+                title: const Text('保存目录'),
                 subtitle:
                     Text(controller.backupDirectory.value.isNotEmpty ? controller.backupDirectory.value : '未选择保存目录'),
                 onTap: () async {

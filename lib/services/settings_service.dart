@@ -58,11 +58,11 @@ class SettingsService extends GetxController {
 
   // Theme settings
   static Map<String, ThemeMode> themeModes = {
-    "系统": ThemeMode.system,
-    "暗黑": ThemeMode.dark,
-    "明亮": ThemeMode.light,
+    '系统': ThemeMode.system,
+    '暗黑': ThemeMode.dark,
+    '明亮': ThemeMode.light,
   };
-  final themeModeName = (PrefUtil.getString('themeMode') ?? "系统").obs;
+  final themeModeName = (PrefUtil.getString('themeMode') ?? '系统').obs;
 
   final myName = (PrefUtil.getString('myName') ?? '').obs;
 
@@ -80,7 +80,7 @@ class SettingsService extends GetxController {
 
   final printIsShowPriceInfo = (PrefUtil.getBool('printIsShowPriceInfo') ?? true).obs;
 
-  get themeMode => SettingsService.themeModes[themeModeName.value]!;
+  ThemeMode get themeMode => SettingsService.themeModes[themeModeName.value]!;
 
   void changeThemeMode(String mode) {
     themeModeName.value = mode;
@@ -98,20 +98,20 @@ class SettingsService extends GetxController {
   }
 
   static Map<String, Color> themeColors = {
-    "Crimson": const Color.fromARGB(255, 220, 20, 60),
-    "Orange": Colors.orange,
-    "Chrome": const Color.fromARGB(255, 230, 184, 0),
-    "Grass": Colors.lightGreen,
-    "Teal": Colors.teal,
-    "SeaFoam": const Color.fromARGB(255, 112, 193, 207),
-    "Ice": const Color.fromARGB(255, 115, 155, 208),
-    "Blue": Colors.blue,
-    "Indigo": Colors.indigo,
-    "Violet": Colors.deepPurple,
-    "Primary": const Color(0xFF6200EE),
-    "Orchid": const Color.fromARGB(255, 218, 112, 214),
-    "Variant": const Color(0xFF3700B3),
-    "Secondary": const Color(0xFF03DAC6),
+    'Crimson': const Color.fromARGB(255, 220, 20, 60),
+    'Orange': Colors.orange,
+    'Chrome': const Color.fromARGB(255, 230, 184, 0),
+    'Grass': Colors.lightGreen,
+    'Teal': Colors.teal,
+    'SeaFoam': const Color.fromARGB(255, 112, 193, 207),
+    'Ice': const Color.fromARGB(255, 115, 155, 208),
+    'Blue': Colors.blue,
+    'Indigo': Colors.indigo,
+    'Violet': Colors.deepPurple,
+    'Primary': const Color(0xFF6200EE),
+    'Orchid': const Color.fromARGB(255, 218, 112, 214),
+    'Variant': const Color(0xFF3700B3),
+    'Secondary': const Color(0xFF03DAC6),
   };
   final themeColorSwitch = (PrefUtil.getString('themeColorSwitch') ?? Colors.blue.hex).obs;
   final Map<ColorSwatch<Object>, String> colorsNameMap =
@@ -178,21 +178,21 @@ class SettingsService extends GetxController {
     return json;
   }
 
-  defaultConfig() {
+  Map<String, dynamic> defaultConfig() {
     Map<String, dynamic> json = {
-      "themeMode": "Light",
-      "themeColorSwitch": Colors.blue.hex,
-      "myName": "",
-      "myPhone": "",
-      "myAddress": "",
-      "printTitle": "",
-      "printIsShowCustomerInfo": true,
-      "printIsShowDriverInfo": true,
-      "printIsShowOwnerInfo": true,
-      "printIsShowPriceInfo": true,
-      "backupDirectory": "",
-      "enableScreenKeepOn": false,
-      "dbPath": "",
+      'themeMode': 'Light',
+      'themeColorSwitch': Colors.blue.hex,
+      'myName': '',
+      'myPhone': '',
+      'myAddress': '',
+      'printTitle': '',
+      'printIsShowCustomerInfo': true,
+      'printIsShowDriverInfo': true,
+      'printIsShowOwnerInfo': true,
+      'printIsShowPriceInfo': true,
+      'backupDirectory': '',
+      'enableScreenKeepOn': false,
+      'dbPath': '',
     };
     return json;
   }

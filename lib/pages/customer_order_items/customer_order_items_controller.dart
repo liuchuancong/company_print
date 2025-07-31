@@ -70,7 +70,7 @@ class CustomerOrderItemsController extends GetxController {
     isLoading(false);
   }
 
-  sort(int columnIndex, bool ascending) {
+  void sort(int columnIndex, bool ascending) {
     sortAscending(ascending);
     sortColumnIndex(columnIndex);
     dataSource?.sort();
@@ -156,7 +156,7 @@ class CustomerOrderItemsController extends GetxController {
   }
 
   void showDeleteCustomerOrderDialog(int id) async {
-    var result = await Utils.showAlertDialog("确定要删除吗？", title: "删除");
+    var result = await Utils.showAlertDialog('确定要删除吗？', title: '删除');
     if (result == true) {
       deleteCustomerOrderItem(id);
     }

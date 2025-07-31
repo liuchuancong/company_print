@@ -43,7 +43,9 @@ class _MutipleCustomerDishListIndexBarState extends State<MutipleCustomerDishLis
       onVerticalDragUpdate: _onGestureHandler,
       onVerticalDragDown: _onGestureHandler,
       onVerticalDragCancel: _onGestureEnd,
-      onVerticalDragEnd: _onGestureEnd,
+      onVerticalDragEnd: (DragEndDetails? details) {
+        _onGestureEnd();
+      },
       child: resultWidget,
     );
     return resultWidget;
@@ -91,7 +93,7 @@ class _MutipleCustomerDishListIndexBarState extends State<MutipleCustomerDishLis
     );
   }
 
-  _onGestureHandler(dynamic details) async {
+  Future<void> _onGestureHandler(dynamic details) async {
     if (details is! DragUpdateDetails && details is! DragDownDetails) return;
     observeOffset = details.localPosition.dy;
 
@@ -123,7 +125,7 @@ class _MutipleCustomerDishListIndexBarState extends State<MutipleCustomerDishLis
     );
   }
 
-  _onGestureEnd([_]) {
+  void _onGestureEnd() {
     selectedIndex.value = -1;
     widget.onSelectionEnd?.call();
   }

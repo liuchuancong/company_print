@@ -20,7 +20,7 @@ class BaseController extends GetxController {
   var notLogin = false.obs;
 
   /// 错误信息
-  var errorMsg = "".obs;
+  var errorMsg = ''.obs;
 
   /// 显示错误
   /// * [msg] 错误信息
@@ -38,7 +38,7 @@ class BaseController extends GetxController {
   }
 
   String exceptionToString(Object exception) {
-    return exception.toString().replaceAll("Exception:", "");
+    return exception.toString().replaceAll('Exception:', '');
   }
 
   void onLogin() {}

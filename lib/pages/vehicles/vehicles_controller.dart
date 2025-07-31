@@ -121,7 +121,7 @@ class VehiclesController extends GetxController {
   }
 
   void showDeleteVehiclePage(int id) async {
-    var result = await Utils.showAlertDialog("确定要删除吗？", title: "删除");
+    var result = await Utils.showAlertDialog('确定要删除吗？', title: '删除');
     if (result == true) {
       deleteVehicle(id);
     }

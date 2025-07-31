@@ -45,7 +45,7 @@ class SalesController extends BasePageController {
     orderRefreshSubscription?.cancel();
   }
 
-  onEditOrder(Order order) {
+  void onEditOrder(Order order) {
     showAddOrEditOrderPage(order: order);
   }
 
@@ -152,11 +152,11 @@ class SalesController extends BasePageController {
               currentDates = [];
               Navigator.of(Get.context!).pop(currentDates);
             }),
-            child: const Text("取消"),
+            child: const Text('取消'),
           ),
           TextButton(
             onPressed: (() => Navigator.of(Get.context!).pop(currentDates)),
-            child: const Text("确定"),
+            child: const Text('确定'),
           ),
         ],
       ),
@@ -306,7 +306,7 @@ class SalesController extends BasePageController {
       itemCount: itemCount!,
       shippingFee: shippingFee!,
       isPaid: isPaid,
-      createdAt: createdAt!,
+      createdAt: createdAt,
     );
   }
 

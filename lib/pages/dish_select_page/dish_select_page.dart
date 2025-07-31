@@ -18,7 +18,7 @@ class DishSelectPage extends GetView<DishSelectController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("请选择商品"),
+        title: const Text('请选择商品'),
       ),
       body: Obx(() => Stack(
             children: [

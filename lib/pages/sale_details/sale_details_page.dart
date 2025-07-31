@@ -347,7 +347,7 @@ class EditOrderItemsPageState extends State<EditOrderItemsPage> {
 
   void _submitForm() {
     if (_itemNameController.text.isEmpty) {
-      SmartDialog.showToast("商品名称不能为空");
+      SmartDialog.showToast('商品名称不能为空');
       return;
     }
     if (_itemNameController.text.isNotEmpty) {
@@ -375,11 +375,11 @@ class EditOrderItemsPageState extends State<EditOrderItemsPage> {
     }
   }
 
-  checkExitsItem(OrderItem orderItem) async {
+  Future<void> checkExitsItem(OrderItem orderItem) async {
     final AppDatabase database = DatabaseManager.instance.appDatabase;
     var isExit = await database.orderItemsDao.doesItemNameExistForOrder(orderItem.itemName!, widget.controller.orderId);
     if (isExit) {
-      var result = await Utils.showAlertDialog("${orderItem.itemName}商品已存在，是否重复添加？", title: "添加");
+      var result = await Utils.showAlertDialog('${orderItem.itemName}商品已存在，是否重复添加？', title: '添加');
       if (result == true) {
         widget.onConfirm(orderItem);
         Get.back();
@@ -571,7 +571,7 @@ class EditOrderItemsPageState extends State<EditOrderItemsPage> {
             padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
           ),
           onPressed: () async {
-            var result = await Utils.showAlertDialog("是否确认退出？", title: "提示");
+            var result = await Utils.showAlertDialog('是否确认退出？', title: '提示');
             if (result == true) {
               Get.back();
             }

@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
     setState(() => selectedTab = index);
   }
 
-  void onBackButtonPressed(canPop, _) async {
+  void onBackButtonPressed(bool canPop, _) async {
     if (canPop) {
       final moveToDesktopPlugin = MoveToDesktop();
       moveToDesktopPlugin.moveToDesktop();

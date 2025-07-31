@@ -257,7 +257,7 @@ class EditOrCreateDishUnitPageState extends State<EditOrCreateDishUnitPage> {
             padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
           ),
           onPressed: () async {
-            var result = await Utils.showAlertDialog("是否确认退出？", title: "提示");
+            var result = await Utils.showAlertDialog('是否确认退出？', title: '提示');
             if (result == true) {
               Get.back();
             }

@@ -110,7 +110,7 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                 });
                 Navigator.of(Get.context!).pop();
               }),
-              child: const Text("重置"),
+              child: const Text('重置'),
             ),
             TextButton(
               onPressed: () {
@@ -120,7 +120,7 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                 });
                 Navigator.of(Get.context!).pop();
               },
-              child: const Text("确定"),
+              child: const Text('确定'),
             ),
           ],
         ),
@@ -130,7 +130,7 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
 
   void _submitForm() {
     if (_customerNameController.text.isEmpty) {
-      SmartDialog.showToast("客户姓名不能为空");
+      SmartDialog.showToast('客户姓名不能为空');
       return;
     }
 
@@ -452,7 +452,7 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                           padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                         ),
                         onPressed: () async {
-                          var result = await Utils.showAlertDialog("是否确认退出？", title: "提示");
+                          var result = await Utils.showAlertDialog('是否确认退出？', title: '提示');
                           if (result == true) {
                             Get.back();
                           }

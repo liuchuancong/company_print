@@ -29,7 +29,7 @@ class UnitsController extends GetxController {
     return sortNames[sortColumnIndex.value];
   }
 
-  sort(int columnIndex, bool ascending) {
+  void sort(int columnIndex, bool ascending) {
     sortAscending(ascending);
     sortColumnIndex(columnIndex);
     dataSource?.sort();
@@ -122,7 +122,7 @@ class UnitsController extends GetxController {
   }
 
   void showDeleteDishUnitPage(DishUnit dishUnit) async {
-    var result = await Utils.showAlertDialog("确定要删除吗？", title: "删除");
+    var result = await Utils.showAlertDialog('确定要删除吗？', title: '删除');
     if (result == true) {
       deleteDishUnit(dishUnit);
     }

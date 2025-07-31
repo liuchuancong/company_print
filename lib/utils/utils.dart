@@ -29,11 +29,11 @@ class Utils {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(Get.context!).pop(false),
-            child: Text(cancel.isEmpty ? "取消" : cancel),
+            child: Text(cancel.isEmpty ? '取消' : cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(Get.context!).pop(true),
-            child: Text(confirm.isEmpty ? "确定" : confirm),
+            child: Text(confirm.isEmpty ? '确定' : confirm),
           ),
           ...?actions,
         ],
@@ -159,7 +159,7 @@ class Utils {
     );
   }
 
-  static getString(dynamic str1) {
+  static String getString(dynamic str1) {
     if (str1 == null) {
       return '';
     }

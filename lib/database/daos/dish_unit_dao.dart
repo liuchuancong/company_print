@@ -29,7 +29,7 @@ class DishUnitsDao extends DatabaseAccessor<AppDatabase> with _$DishUnitsDaoMixi
 
     // 检查是否提供了有效的排序字段
     if (columnMap.containsKey(orderByField)) {
-      final column = columnMap[orderByField]!;
+      final column = columnMap[orderByField];
       final orderMode = ascending ? OrderingMode.asc : OrderingMode.desc;
       query.orderBy([
         (t) => OrderingTerm(expression: column, mode: orderMode),

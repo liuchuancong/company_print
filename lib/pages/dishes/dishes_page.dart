@@ -191,11 +191,11 @@ class EditOrCreateCategoryPageState extends State<EditOrCreateCategoryPage> {
     }
   }
 
-  checkExitsItem(DishesCategoryData category) async {
+  Future<void> checkExitsItem(DishesCategoryData category) async {
     final AppDatabase database = DatabaseManager.instance.appDatabase;
     var isExit = await database.dishesCategoryDao.doesCategoryExistForOrder(category.name);
     if (isExit) {
-      Utils.showAlertDialog("${category.name}商品已存在，请重新修改后添加!", title: "添加");
+      Utils.showAlertDialog('${category.name}商品已存在，请重新修改后添加!', title: '添加');
     } else {
       widget.onConfirm(category);
       Get.back();
@@ -311,7 +311,7 @@ class EditOrCreateCategoryPageState extends State<EditOrCreateCategoryPage> {
                             padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                           ),
                           onPressed: () async {
-                            var result = await Utils.showAlertDialog("是否确认退出？", title: "提示");
+                            var result = await Utils.showAlertDialog('是否确认退出？', title: '提示');
                             if (result == true) {
                               Get.back();
                             }

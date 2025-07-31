@@ -18,7 +18,7 @@ class DriverSelectPage extends GetView<DriverSelectController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("请选择司机"),
+        title: const Text('请选择司机'),
       ),
       body: Obx(() => Stack(
             children: [
