@@ -1,3 +1,6 @@
 {
-  "cmake.ignoreCMakeListsMissing": true
+  "cmake.ignoreCMakeListsMissing": true,
+  "terminal.integrated.env.windows": {  // 替换为你的操作系统（windows/macos/linux）
+    "CMAKE_TLS_VERIFY": "0"
+  }
 }

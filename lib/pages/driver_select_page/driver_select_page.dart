@@ -17,43 +17,34 @@ class DriverSelectPage extends GetView<DriverSelectController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('请选择司机'),
+      appBar: AppBar(title: const Text('请选择司机')),
+      body: Obx(
+        () => Stack(
+          children: [
+            SliverViewObserver(
+              controller: controller.observerController,
+              sliverContexts: () {
+                return controller.sliverContextMap.values.toList();
+              },
+              child: CustomScrollView(
+                controller: controller.scrollController,
+                slivers: controller.driversList.mapIndexed((i, e) {
+                  return buildSliver(index: i, model: e);
+                }).toList(),
+              ),
+            ),
+            buildCursor(),
+            Positioned(top: 0, bottom: 0, right: 10, child: buildIndexBar()),
+          ],
+        ),
       ),
-      body: Obx(() => Stack(
-            children: [
-              SliverViewObserver(
-                controller: controller.observerController,
-                sliverContexts: () {
-                  return controller.sliverContextMap.values.toList();
-                },
-                child: CustomScrollView(
-                  controller: controller.scrollController,
-                  slivers: controller.driversList.mapIndexed((i, e) {
-                    return buildSliver(index: i, model: e);
-                  }).toList(),
-                ),
-              ),
-              buildCursor(),
-              Positioned(
-                top: 0,
-                bottom: 0,
-                right: 10,
-                child: buildIndexBar(),
-              ),
-            ],
-          )),
     );
   }
 
   Widget buildCursor() {
     return ValueListenableBuilder<DriverListCursorInfoModel?>(
       valueListenable: controller.cursorInfo,
-      builder: (
-        BuildContext context,
-        DriverListCursorInfoModel? value,
-        Widget? child,
-      ) {
+      builder: (BuildContext context, DriverListCursorInfoModel? value, Widget? child) {
         Widget resultWidget = Container();
         double top = 0;
         double right = controller.indexBarWidth + 20;
@@ -64,11 +55,7 @@ class DriverSelectPage extends GetView<DriverSelectController> {
           top = value.offset.dy - titleSize * 0.5;
           resultWidget = DriverListCursor(size: titleSize, title: value.title);
         }
-        resultWidget = Positioned(
-          top: top,
-          right: right,
-          child: resultWidget,
-        );
+        resultWidget = Positioned(top: top, right: right, child: resultWidget);
         return resultWidget;
       },
     );
@@ -89,10 +76,7 @@ class DriverSelectPage extends GetView<DriverSelectController> {
           );
           final sliverContext = controller.sliverContextMap[index];
           if (sliverContext == null) return;
-          controller.observerController.jumpTo(
-            index: 0,
-            sliverContext: sliverContext,
-          );
+          controller.observerController.jumpTo(index: 0, sliverContext: sliverContext);
         },
         onSelectionEnd: () {
           controller.cursorInfo.value = null;
@@ -101,37 +85,25 @@ class DriverSelectPage extends GetView<DriverSelectController> {
     );
   }
 
-  Widget buildSliver({
-    required int index,
-    required DriverListDriverModel model,
-  }) {
+  Widget buildSliver({required int index, required DriverListDriverModel model}) {
     final categories = model.categories;
     if (categories.isEmpty) return const SliverToBoxAdapter();
     Widget resultWidget = SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (context, itemIndex) {
-          if (controller.sliverContextMap[index] == null) {
-            controller.sliverContextMap[index] = context;
-          }
-          return GestureDetector(
-            child: DriverListItemView(
-              driver: categories[itemIndex],
-              onDriverPressed: controller.onDriverPressed,
-            ),
-          );
-        },
-        childCount: categories.length,
-      ),
+      delegate: SliverChildBuilderDelegate((context, itemIndex) {
+        if (controller.sliverContextMap[index] == null) {
+          controller.sliverContextMap[index] = context;
+        }
+        return GestureDetector(
+          child: DriverListItemView(driver: categories[itemIndex], onDriverPressed: controller.onDriverPressed),
+        );
+      }, childCount: categories.length),
     );
     resultWidget = SliverStickyHeader(
       header: Container(
         height: 44.0,
         color: Colors.white,
         alignment: Alignment.centerLeft,
-        child: SectionTitle(
-          title: model.section,
-          horizontal: 18,
-        ),
+        child: SectionTitle(title: model.section, horizontal: 18),
       ),
       sliver: resultWidget,
     );

@@ -7,7 +7,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.5.4
+  sdk: ^3.8.1
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -24,7 +24,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   go_router: ^16.0.0
-  refreshed: ^3.2.0
+  refreshed: ^2.10.4
   shared_preferences: ^2.3.5
   flutter_smart_dialog: ^4.9.8+5
   flex_color_picker: ^3.7.0
@@ -43,8 +43,7 @@ dependencies:
   path_provider: ^2.1.5
   path: ^1.9.0
   sqlite3_flutter_libs: ^0.5.28
-  search_choices: ^2.3.1
-  data_table_2: ^2.5.18
+  data_table_2: ^2.6.0
   date_format: ^2.0.9
   input_quantity: ^2.5.1
   material_text_fields: ^1.0.6
@@ -52,7 +51,7 @@ dependencies:
   easy_refresh: ^3.4.0
   calendar_date_picker2: ^2.0.1
   flutter_staggered_grid_view: ^0.7.0
-  scrollview_observer: ^1.24.0
+  scrollview_observer: ^1.26.1
   flutter_sticky_header: ^0.8.0
   collection: ^1.19.0
   pdf: ^3.11.3
