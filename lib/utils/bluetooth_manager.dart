@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:typed_data';
+import 'package:company_print/common/index.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -31,7 +32,8 @@ class BluetoothManager {
 
   // 扫描结果流
   Stream<List<ScanResult>> get scanResults => FlutterBluePlus.scanResults;
-
+  // 存储设备的所有服务和特征信息
+  final RxList<Map<String, dynamic>> deviceServices = <Map<String, dynamic>>[].obs;
   // 检查并请求权限 (适配Android 12+的蓝牙权限模型)
   Future<bool> requestPermissions() async {
     Map<Permission, PermissionStatus> statuses = await [
@@ -61,7 +63,9 @@ class BluetoothManager {
   Future<void> startScan({Duration? timeout, List<Guid> withServices = const []}) async {
     // 确保扫描前权限已获取
     if (!await _hasScanPermissions()) {
-      throw Exception('蓝牙扫描权限未授予');
+      log('没有扫描权限，请先请求权限');
+      SmartDialog.showToast('没有扫描权限，请先请求权限');
+      return;
     }
 
     // 停止任何正在进行的扫描
@@ -86,12 +90,7 @@ class BluetoothManager {
   }
 
   // 连接设备 (最新版连接API)
-  Future<bool> connect(
-    BluetoothDevice device, {
-    required Guid serviceUuid,
-    required Guid writeCharUuid,
-    required Guid readCharUuid,
-  }) async {
+  Future<bool> connect(BluetoothDevice device) async {
     try {
       // 断开之前的连接
       if (_connectedDevice != null && _connectedDevice!.isConnected) {
@@ -99,11 +98,11 @@ class BluetoothManager {
       }
 
       // 连接设备
-      await device.connect(timeout: const Duration(seconds: 15), autoConnect: false);
+      await device.connect(timeout: const Duration(seconds: 15), autoConnect: true);
 
       _connectedDevice = device;
       _connectionStateController.add(true);
-
+      log('连接成功: ${device.platformName} (${device.remoteId})');
       // 监听设备连接状态变化
       device.connectionState.listen((state) {
         if (state == BluetoothConnectionState.disconnected) {
@@ -113,23 +112,47 @@ class BluetoothManager {
 
       // 发现服务
       List<BluetoothService> services = await device.discoverServices();
+      // 清空之前的记录
+      deviceServices.clear();
 
+      // 遍历所有服务和特征，提取UUID
+      for (var service in services) {
+        // 存储当前服务的信息
+        Map<String, dynamic> serviceInfo = {'serviceUuid': service.uuid.toString(), 'characteristics': []};
+
+        // 遍历服务下的所有特征
+        for (var characteristic in service.characteristics) {
+          // 记录特征UUID和支持的属性
+          serviceInfo['characteristics'].add({
+            'charUuid': characteristic.uuid.toString(),
+            'properties': {
+              'read': characteristic.properties.read,
+              'write': characteristic.properties.write,
+              'notify': characteristic.properties.notify,
+              'indicate': characteristic.properties.indicate,
+            },
+          });
+        }
+
+        // 添加到列表
+        deviceServices.add(serviceInfo);
+      }
       // 查找目标服务
-      BluetoothService targetService = services.firstWhere(
-        (s) => s.uuid == serviceUuid,
-        orElse: () => throw Exception('未找到服务: $serviceUuid'),
-      );
+      // BluetoothService targetService = services.firstWhere(
+      //   (s) => s.uuid == serviceUuid,
+      //   orElse: () => throw Exception('未找到服务: $serviceUuid'),
+      // );
 
-      // 查找读写特征
-      _writeCharacteristic = targetService.characteristics.firstWhere(
-        (c) => c.uuid == writeCharUuid && c.properties.write,
-        orElse: () => throw Exception('未找到写入特征: $writeCharUuid'),
-      );
+      // // 查找读写特征
+      // _writeCharacteristic = targetService.characteristics.firstWhere(
+      //   (c) => c.uuid == writeCharUuid && c.properties.write,
+      //   orElse: () => throw Exception('未找到写入特征: $writeCharUuid'),
+      // );
 
-      _readCharacteristic = targetService.characteristics.firstWhere(
-        (c) => c.uuid == readCharUuid && c.properties.notify,
-        orElse: () => throw Exception('未找到通知特征: $readCharUuid'),
-      );
+      // _readCharacteristic = targetService.characteristics.firstWhere(
+      //   (c) => c.uuid == readCharUuid && c.properties.notify,
+      //   orElse: () => throw Exception('未找到通知特征: $readCharUuid'),
+      // );
 
       // 启用通知
       await _readCharacteristic!.setNotifyValue(true);

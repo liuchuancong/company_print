@@ -23,10 +23,7 @@ class SalesController extends BasePageController {
   FocusNode searchFocusNode = FocusNode();
 
   StreamSubscription<dynamic>? orderRefreshSubscription;
-  final refreshController = EasyRefreshController(
-    controlFinishRefresh: true,
-    controlFinishLoad: true,
-  );
+  final refreshController = EasyRefreshController(controlFinishRefresh: true, controlFinishLoad: true);
 
   @override
   void onInit() {
@@ -56,10 +53,7 @@ class SalesController extends BasePageController {
   void completeOrder(Order order) async {
     var query = await database.ordersDao.getOrderById(order.id);
     if (query != null) {
-      var result = await Utils.showAlertDialog(
-        query.isPaid ? '是否标记该订单为未结算？' : '是否标记该订单为已结算？',
-        title: '提示',
-      );
+      var result = await Utils.showAlertDialog(query.isPaid ? '是否标记该订单为未结算？' : '是否标记该订单为已结算？', title: '提示');
       if (result == true) {
         updateOrder(
           order.id,
@@ -85,10 +79,7 @@ class SalesController extends BasePageController {
   }
 
   void onDeleteOrder(Order order) async {
-    var result = await Utils.showAlertDialog(
-      '确定删除该订单吗？',
-      title: '提示',
-    );
+    var result = await Utils.showAlertDialog('确定删除该订单吗？', title: '提示');
     if (result == true) {
       await deleteOrder(order);
       refreshData();
@@ -114,10 +105,8 @@ class SalesController extends BasePageController {
       AlertDialog(
         title: const Text('选择日期'),
         content: Container(
-          width: Get.width < 600 ? Get.width * 0.9 : Get.width * 0.6,
-          constraints: const BoxConstraints(
-            maxHeight: 500,
-          ),
+          width: Get.width < 680 ? Get.width : Get.width * 0.6,
+          constraints: const BoxConstraints(maxHeight: 500),
           child: SingleChildScrollView(
             child: CalendarDatePicker2(
               config: CalendarDatePicker2Config(
@@ -154,10 +143,7 @@ class SalesController extends BasePageController {
             }),
             child: const Text('取消'),
           ),
-          TextButton(
-            onPressed: (() => Navigator.of(Get.context!).pop(currentDates)),
-            child: const Text('确定'),
-          ),
+          TextButton(onPressed: (() => Navigator.of(Get.context!).pop(currentDates)), child: const Text('确定')),
         ],
       ),
     );
@@ -183,57 +169,64 @@ class SalesController extends BasePageController {
   }
 
   Future<List<Order>> fetchOrders(int page, int pageSize) async {
-    var orders = await database.ordersDao.getOrdersForTimeRange(dateRange[0], dateRange[1],
-        searchQuery: searchQuery.value, page: page, pageSize: pageSize);
+    var orders = await database.ordersDao.getOrdersForTimeRange(
+      dateRange[0],
+      dateRange[1],
+      searchQuery: searchQuery.value,
+      page: page,
+      pageSize: pageSize,
+    );
     return orders;
   }
 
   void showAddOrEditOrderPage({Order? order}) {
-    Get.to(() => AddOrEditOrderPage(
-          controller: this,
-          order: order,
-          onConfirm: (updatedOrder) async {
-            if (updatedOrder.id == -1) {
-              await addOrder(
-                updatedOrder.customerName!,
-                updatedOrder.orderName,
-                updatedOrder.description,
-                updatedOrder.remark,
-                updatedOrder.customerPhone,
-                updatedOrder.customerAddress,
-                updatedOrder.driverName,
-                updatedOrder.driverPhone,
-                updatedOrder.vehiclePlateNumber,
-                updatedOrder.advancePayment,
-                updatedOrder.totalPrice,
-                updatedOrder.itemCount,
-                updatedOrder.shippingFee,
-                updatedOrder.isPaid,
-                updatedOrder.customerId,
-              );
-            } else {
-              await updateOrder(
-                updatedOrder.id,
-                updatedOrder.customerName!,
-                updatedOrder.orderName,
-                updatedOrder.description,
-                updatedOrder.remark,
-                updatedOrder.customerPhone,
-                updatedOrder.customerAddress,
-                updatedOrder.driverName,
-                updatedOrder.driverPhone,
-                updatedOrder.vehiclePlateNumber,
-                updatedOrder.advancePayment,
-                updatedOrder.totalPrice,
-                updatedOrder.itemCount,
-                updatedOrder.shippingFee,
-                updatedOrder.isPaid,
-                updatedOrder.createdAt,
-              );
-            }
-            refreshData();
-          },
-        ));
+    Get.to(
+      () => AddOrEditOrderPage(
+        controller: this,
+        order: order,
+        onConfirm: (updatedOrder) async {
+          if (updatedOrder.id == -1) {
+            await addOrder(
+              updatedOrder.customerName!,
+              updatedOrder.orderName,
+              updatedOrder.description,
+              updatedOrder.remark,
+              updatedOrder.customerPhone,
+              updatedOrder.customerAddress,
+              updatedOrder.driverName,
+              updatedOrder.driverPhone,
+              updatedOrder.vehiclePlateNumber,
+              updatedOrder.advancePayment,
+              updatedOrder.totalPrice,
+              updatedOrder.itemCount,
+              updatedOrder.shippingFee,
+              updatedOrder.isPaid,
+              updatedOrder.customerId,
+            );
+          } else {
+            await updateOrder(
+              updatedOrder.id,
+              updatedOrder.customerName!,
+              updatedOrder.orderName,
+              updatedOrder.description,
+              updatedOrder.remark,
+              updatedOrder.customerPhone,
+              updatedOrder.customerAddress,
+              updatedOrder.driverName,
+              updatedOrder.driverPhone,
+              updatedOrder.vehiclePlateNumber,
+              updatedOrder.advancePayment,
+              updatedOrder.totalPrice,
+              updatedOrder.itemCount,
+              updatedOrder.shippingFee,
+              updatedOrder.isPaid,
+              updatedOrder.createdAt,
+            );
+          }
+          refreshData();
+        },
+      ),
+    );
   }
 
   Future<void> addOrder(

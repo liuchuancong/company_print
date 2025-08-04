@@ -6,7 +6,9 @@ import 'package:company_print/pages/web_dav/web_dav_page.dart';
 import 'package:company_print/pages/settings/settings_page.dart';
 import 'package:company_print/pages/set_db_page/set_db_path.dart';
 import 'package:company_print/pages/web_dav/web_dav_binding.dart';
+import 'package:company_print/pages/shared/bluetooth_binging.dart';
 import 'package:company_print/pages/settings/settings_binding.dart';
+import 'package:company_print/pages/shared/bluetooth_order_page.dart';
 import 'package:company_print/pages/sale_details/sale_details_page.dart';
 import 'package:company_print/pages/dish_select_page/dish_select_page.dart';
 import 'package:company_print/pages/sale_details/sale_details_binding.dart';
@@ -57,5 +59,6 @@ class AppPages {
     GetPage(name: RoutePath.kPrintPage, page: PrintPage.new),
     GetPage(name: RoutePath.kSetDbPathPage, page: SetDbPathPage.new),
     GetPage(name: RoutePath.kWebDavPage, page: () => WebDavPage(), bindings: [WebDavBinding()]),
+    GetPage(name: RoutePath.kBluetoothPage, page: () => const BluetoothOrderPage(), bindings: [BluetoothBinding()]),
   ];
 }

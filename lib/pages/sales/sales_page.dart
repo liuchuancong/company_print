@@ -31,9 +31,10 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    bool isDesktop = Get.width > 680;
     return Scaffold(
       appBar: AppBar(
-        leading: Get.width > 680 ? null : MenuButton(),
+        leading: isDesktop ? null : MenuButton(),
         automaticallyImplyLeading: false,
         title: TextField(
           controller: controller.searchController,
@@ -62,55 +63,48 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
               },
               icon: const Icon(Icons.clear),
             ),
-            prefixIcon: GestureDetector(
-              onTap: () async {
-                final result = await Get.toNamed(RoutePath.kCustomerSelectPage);
-                if (result != null) {
-                  controller.searchController.text = result.name;
-                  controller.searchQuery.value = result.name;
-                  controller.searchFocusNode.unfocus();
-                  controller.refreshData();
-                }
-              },
-              child: Container(
-                height: 48,
-                width: 100,
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.only(topLeft: Radius.circular(5), bottomLeft: Radius.circular(5)),
-                  color: Theme.of(context).primaryColor,
-                ),
-                margin: const EdgeInsets.only(left: 0, right: 10),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Container(
-                    margin: const EdgeInsets.only(left: 10),
-                    child: Text(
-                      '选择客户',
-                      style: TextStyle(fontSize: Get.width > 680 ? 18 : 15, color: Colors.white),
+            prefixIcon: isDesktop
+                ? GestureDetector(
+                    onTap: () async {
+                      final result = await Get.toNamed(RoutePath.kCustomerSelectPage);
+                      if (result != null) {
+                        controller.searchController.text = result.name;
+                        controller.searchQuery.value = result.name;
+                        controller.searchFocusNode.unfocus();
+                        controller.refreshData();
+                      }
+                    },
+                    child: Container(
+                      height: 48,
+                      width: 100,
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(5),
+                          bottomLeft: Radius.circular(5),
+                        ),
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      margin: const EdgeInsets.only(left: 0, right: 10),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          margin: const EdgeInsets.only(left: 10),
+                          child: Text(
+                            '选择客户',
+                            style: TextStyle(fontSize: Get.width > 680 ? 18 : 15, color: Colors.white),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            ),
+                  )
+                : null,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(
-              Icons.calendar_month_outlined,
-              size: 30,
-            ),
+            icon: const Icon(Icons.calendar_month_outlined, size: 30),
             onPressed: () {
               controller.showDateTimerPicker();
-            },
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.add_circle_outline,
-              size: 30,
-            ),
-            onPressed: () {
-              controller.showAddOrEditOrderPage();
             },
           ),
           AppStyle.hGap20,
@@ -120,6 +114,12 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [Expanded(child: OrderGridView(controller: controller))],
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add_circle_outline, size: 30),
+        onPressed: () {
+          controller.showAddOrEditOrderPage();
+        },
       ),
     );
   }
