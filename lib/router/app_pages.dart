@@ -2,8 +2,10 @@ import 'package:company_print/common/index.dart';
 import 'package:company_print/pages/mine/mine.dart';
 import 'package:company_print/pages/home/home_page.dart';
 import 'package:company_print/pages/print/print_page.dart';
+import 'package:company_print/pages/web_dav/web_dav_page.dart';
 import 'package:company_print/pages/settings/settings_page.dart';
 import 'package:company_print/pages/set_db_page/set_db_path.dart';
+import 'package:company_print/pages/web_dav/web_dav_binding.dart';
 import 'package:company_print/pages/settings/settings_binding.dart';
 import 'package:company_print/pages/sale_details/sale_details_page.dart';
 import 'package:company_print/pages/dish_select_page/dish_select_page.dart';
@@ -28,42 +30,17 @@ class AppPages {
   AppPages._();
 
   static final routes = [
-    GetPage(
-      name: RoutePath.kInitial,
-      page: HomePage.new,
-      participatesInRootNavigator: true,
-      preventDuplicates: true,
-    ),
+    GetPage(name: RoutePath.kInitial, page: HomePage.new, participatesInRootNavigator: true, preventDuplicates: true),
     GetPage(
       name: RoutePath.kCustomerOrderItemsPage,
       page: CustomerOrderItemsPage.new,
       bindings: [CustomerOrderItemBinding()],
     ),
-    GetPage(
-      name: RoutePath.kSaleDetails,
-      page: SaleDetailsPage.new,
-      bindings: [SaleDetailsBinding()],
-    ),
-    GetPage(
-      name: RoutePath.kSettings,
-      page: SettingsPage.new,
-      bindings: [SettingsBinding()],
-    ),
-    GetPage(
-      name: RoutePath.kDishSelectPage,
-      page: DishSelectPage.new,
-      bindings: [DishSelectBinding()],
-    ),
-    GetPage(
-      name: RoutePath.kCustomerSelectPage,
-      page: CustomerSelectPage.new,
-      bindings: [CustomerSelectBinding()],
-    ),
-    GetPage(
-      name: RoutePath.kDriverSelectPage,
-      page: DriverSelectPage.new,
-      bindings: [DriverSelectBinding()],
-    ),
+    GetPage(name: RoutePath.kSaleDetails, page: SaleDetailsPage.new, bindings: [SaleDetailsBinding()]),
+    GetPage(name: RoutePath.kSettings, page: SettingsPage.new, bindings: [SettingsBinding()]),
+    GetPage(name: RoutePath.kDishSelectPage, page: DishSelectPage.new, bindings: [DishSelectBinding()]),
+    GetPage(name: RoutePath.kCustomerSelectPage, page: CustomerSelectPage.new, bindings: [CustomerSelectBinding()]),
+    GetPage(name: RoutePath.kDriverSelectPage, page: DriverSelectPage.new, bindings: [DriverSelectBinding()]),
     GetPage(
       name: RoutePath.kMutipleDishSelectPage,
       page: MutipleDishSelectPage.new,
@@ -74,27 +51,11 @@ class AppPages {
       page: MutipleCustomerDishSelectPage.new,
       bindings: [MutipleCustomerDishSelectBinding()],
     ),
-    GetPage(
-      name: RoutePath.kUnitSelectPage,
-      page: UnitSelectPage.new,
-      bindings: [UnitSelectBinding()],
-    ),
-    GetPage(
-      name: RoutePath.kUnitSelectPage,
-      page: UnitSelectPage.new,
-      bindings: [UnitSelectBinding()],
-    ),
-    GetPage(
-      name: RoutePath.kMinePage,
-      page: MinePage.new,
-    ),
-    GetPage(
-      name: RoutePath.kPrintPage,
-      page: PrintPage.new,
-    ),
-    GetPage(
-      name: RoutePath.kSetDbPathPage,
-      page: SetDbPathPage.new,
-    ),
+    GetPage(name: RoutePath.kUnitSelectPage, page: UnitSelectPage.new, bindings: [UnitSelectBinding()]),
+    GetPage(name: RoutePath.kUnitSelectPage, page: UnitSelectPage.new, bindings: [UnitSelectBinding()]),
+    GetPage(name: RoutePath.kMinePage, page: MinePage.new),
+    GetPage(name: RoutePath.kPrintPage, page: PrintPage.new),
+    GetPage(name: RoutePath.kSetDbPathPage, page: SetDbPathPage.new),
+    GetPage(name: RoutePath.kWebDavPage, page: () => WebDavPage(), bindings: [WebDavBinding()]),
   ];
 }

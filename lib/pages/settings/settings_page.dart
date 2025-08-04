@@ -13,16 +13,11 @@ class SettingsPage extends GetView<SettingsService> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: AppBar(
-        scrolledUnderElevation: screenWidth > 640 ? 0 : null,
-        title: const Text('设置'),
-      ),
+      appBar: AppBar(scrolledUnderElevation: screenWidth > 640 ? 0 : null, title: const Text('设置')),
       body: ListView(
         physics: const BouncingScrollPhysics(),
         children: <Widget>[
-          const SectionTitle(
-            title: '通用',
-          ),
+          const SectionTitle(title: '通用'),
           ListTile(
             leading: const Icon(Icons.dark_mode_rounded, size: 32),
             title: const Text('主题模式'),
@@ -33,16 +28,26 @@ class SettingsPage extends GetView<SettingsService> {
             leading: const Icon(Icons.color_lens, size: 32),
             title: const Text('主题颜色'),
             subtitle: const Text('切换软件的主题颜色'),
-            trailing: Obx(() => ColorIndicator(
-                  width: 44,
-                  height: 44,
-                  borderRadius: 4,
-                  color: HexColor(controller.themeColorSwitch.value),
-                  onSelectFocus: false,
-                )),
+            trailing: Obx(
+              () => ColorIndicator(
+                width: 44,
+                height: 44,
+                borderRadius: 4,
+                color: HexColor(controller.themeColorSwitch.value),
+                onSelectFocus: false,
+              ),
+            ),
             onTap: colorPickerDialog,
           ),
           const SectionTitle(title: '系统'),
+          ListTile(
+            leading: const Icon(Icons.backup_outlined, size: 32),
+            title: const Text('WebDav'),
+            subtitle: const Text('备份到WebDav服务器'),
+            onTap: () async {
+              Get.toNamed(RoutePath.kWebDavPage);
+            },
+          ),
           ListTile(
             leading: const Icon(Icons.file_copy_outlined, size: 32),
             title: const Text('数据保存路径'),
@@ -72,21 +77,25 @@ class SettingsPage extends GetView<SettingsService> {
             ),
           ),
           const SectionTitle(title: 'PDF 文档保存目录'),
-          Obx(() => ListTile(
-                leading: const Icon(Icons.folder_outlined, size: 32),
-                title: const Text('保存目录'),
-                subtitle:
-                    Text(controller.backupDirectory.value.isNotEmpty ? controller.backupDirectory.value : '未选择保存目录'),
-                onTap: () async {
-                  if (!Platform.isAndroid) {
-                    final selectedDirectory =
-                        await FileRecoverUtils().selectBackupDirectory(controller.backupDirectory.value);
-                    if (selectedDirectory != null) {
-                      controller.backupDirectory.value = selectedDirectory;
-                    }
+          Obx(
+            () => ListTile(
+              leading: const Icon(Icons.folder_outlined, size: 32),
+              title: const Text('保存目录'),
+              subtitle: Text(
+                controller.backupDirectory.value.isNotEmpty ? controller.backupDirectory.value : '未选择保存目录',
+              ),
+              onTap: () async {
+                if (!Platform.isAndroid) {
+                  final selectedDirectory = await FileRecoverUtils().selectBackupDirectory(
+                    controller.backupDirectory.value,
+                  );
+                  if (selectedDirectory != null) {
+                    controller.backupDirectory.value = selectedDirectory;
                   }
-                },
-              )),
+                }
+              },
+            ),
+          ),
         ],
       ),
     );
@@ -94,24 +103,25 @@ class SettingsPage extends GetView<SettingsService> {
 
   void showThemeModeSelectorDialog() {
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return SimpleDialog(
-            title: const Text('主题模式'),
-            children: SettingsService.themeModes.keys.map<Widget>((name) {
-              return RadioListTile<String>(
-                activeColor: Theme.of(context).colorScheme.primary,
-                groupValue: controller.themeModeName.value,
-                value: name,
-                title: Text(name),
-                onChanged: (value) {
-                  controller.changeThemeMode(value!);
-                  SmartDialog.dismiss();
-                },
-              );
-            }).toList(),
-          );
-        });
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: const Text('主题模式'),
+          children: SettingsService.themeModes.keys.map<Widget>((name) {
+            return RadioListTile<String>(
+              activeColor: Theme.of(context).colorScheme.primary,
+              groupValue: controller.themeModeName.value,
+              value: name,
+              title: Text(name),
+              onChanged: (value) {
+                controller.changeThemeMode(value!);
+                SmartDialog.dismiss();
+              },
+            );
+          }).toList(),
+        );
+      },
+    );
   }
 
   Future<bool> colorPickerDialog() async {
@@ -131,36 +141,16 @@ class SettingsPage extends GetView<SettingsService> {
       spacing: 5,
       runSpacing: 5,
       wheelDiameter: 155,
-      tonalSubheading: Text(
-        '主题色调',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      recentColorsSubheading: Text(
-        '最近使用',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      opacitySubheading: Text(
-        '透明度',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      heading: Text(
-        '主题颜色',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      subheading: Text(
-        '选择透明度',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      wheelSubheading: Text(
-        '主题颜色及透明度',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
+      tonalSubheading: Text('主题色调', style: Theme.of(context).textTheme.titleMedium),
+      recentColorsSubheading: Text('最近使用', style: Theme.of(context).textTheme.titleMedium),
+      opacitySubheading: Text('透明度', style: Theme.of(context).textTheme.titleMedium),
+      heading: Text('主题颜色', style: Theme.of(context).textTheme.titleMedium),
+      subheading: Text('选择透明度', style: Theme.of(context).textTheme.titleMedium),
+      wheelSubheading: Text('主题颜色及透明度', style: Theme.of(context).textTheme.titleMedium),
       showMaterialName: false,
       showColorName: false,
       showColorCode: true,
-      copyPasteBehavior: const ColorPickerCopyPasteBehavior(
-        longPressMenu: true,
-      ),
+      copyPasteBehavior: const ColorPickerCopyPasteBehavior(longPressMenu: true),
       materialNameTextStyle: Theme.of(context).textTheme.bodySmall,
       colorNameTextStyle: Theme.of(context).textTheme.bodySmall,
       colorCodeTextStyle: Theme.of(context).textTheme.bodyMedium,

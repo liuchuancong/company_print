@@ -36,4 +36,6 @@ class RoutePath {
   static var kPrintPage = '/printPage';
 
   static var kSetDbPathPage = '/setDbPathPage';
+
+  static const kWebDavPage = '/web_dav_page';
 }

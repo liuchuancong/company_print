@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/utils/event_bus.dart';
+import 'package:company_print/pages/web_dav/webdav_config.dart';
 
 class SettingsService extends GetxController {
   SettingsService() {
@@ -54,14 +55,18 @@ class SettingsService extends GetxController {
     dbPath.listen((value) {
       PrefUtil.setString('dbPath', value);
     });
+
+    webDavConfigs.listen((configs) {
+      PrefUtil.setStringList('webDavConfigs', configs.map<String>((e) => jsonEncode(e.toJson())).toList());
+    });
+
+    currentWebDavConfig.listen((config) {
+      PrefUtil.setString('currentWebDavConfig', config);
+    });
   }
 
   // Theme settings
-  static Map<String, ThemeMode> themeModes = {
-    '系统': ThemeMode.system,
-    '暗黑': ThemeMode.dark,
-    '明亮': ThemeMode.light,
-  };
+  static Map<String, ThemeMode> themeModes = {'系统': ThemeMode.system, '暗黑': ThemeMode.dark, '明亮': ThemeMode.light};
   final themeModeName = (PrefUtil.getString('themeMode') ?? '系统').obs;
 
   final myName = (PrefUtil.getString('myName') ?? '').obs;
@@ -79,6 +84,49 @@ class SettingsService extends GetxController {
   final printIsShowOwnerInfo = (PrefUtil.getBool('printIsShowOwnerInfo') ?? true).obs;
 
   final printIsShowPriceInfo = (PrefUtil.getBool('printIsShowPriceInfo') ?? true).obs;
+
+  final webDavConfigs =
+      ((PrefUtil.getStringList('webDavConfigs') ?? []).map((e) => WebDAVConfig.fromJson(jsonDecode(e))).toList()).obs;
+  final currentWebDavConfig = (PrefUtil.getString('currentWebDavConfig') ?? '').obs;
+
+  bool addWebDavConfig(WebDAVConfig config) {
+    if (webDavConfigs.any((element) => element.name == config.name)) {
+      return false;
+    }
+    webDavConfigs.add(config);
+    return true;
+  }
+
+  bool removeWebDavConfig(WebDAVConfig config) {
+    if (!webDavConfigs.any((element) => element.name == config.name)) {
+      return false;
+    }
+    webDavConfigs.remove(config);
+    return true;
+  }
+
+  bool updateWebDavConfig(WebDAVConfig config) {
+    int idx = webDavConfigs.indexWhere((element) => element.name == config.name);
+    if (idx == -1) return false;
+    webDavConfigs[idx] = config;
+    return true;
+  }
+
+  void updateWebDavConfigs(List<WebDAVConfig> configs) {
+    webDavConfigs.value = configs;
+  }
+
+  bool isWebDavConfigExist(String name) {
+    return webDavConfigs.any((element) => element.name == name);
+  }
+
+  WebDAVConfig? getWebDavConfigByName(String name) {
+    if (isWebDavConfigExist(name)) {
+      return webDavConfigs.firstWhere((element) => element.name == name);
+    } else {
+      return null;
+    }
+  }
 
   ThemeMode get themeMode => SettingsService.themeModes[themeModeName.value]!;
 
@@ -114,8 +162,9 @@ class SettingsService extends GetxController {
     'Secondary': const Color(0xFF03DAC6),
   };
   final themeColorSwitch = (PrefUtil.getString('themeColorSwitch') ?? Colors.blue.hex).obs;
-  final Map<ColorSwatch<Object>, String> colorsNameMap =
-      themeColors.map((key, value) => MapEntry(ColorTools.createPrimarySwatch(value), key));
+  final Map<ColorSwatch<Object>, String> colorsNameMap = themeColors.map(
+    (key, value) => MapEntry(ColorTools.createPrimarySwatch(value), key),
+  );
   // Backup & recover storage
   final backupDirectory = (PrefUtil.getString('backupDirectory') ?? '').obs;
 
@@ -157,6 +206,10 @@ class SettingsService extends GetxController {
     backupDirectory.value = json['backupDirectory'];
     enableScreenKeepOn.value = json['enableScreenKeepOn'];
     dbPath.value = json['dbPath'];
+    webDavConfigs.value = json['webDavConfigs'] != null
+        ? (json['webDavConfigs'] as List).map<WebDAVConfig>((e) => WebDAVConfig.fromJson(jsonDecode(e))).toList()
+        : [];
+    json['currentWebDavConfig'] = currentWebDavConfig.value;
     EventBus.instance.emit('enableScreenKeepOn', enableScreenKeepOn.value);
   }
 
@@ -164,6 +217,8 @@ class SettingsService extends GetxController {
     Map<String, dynamic> json = {};
     json['themeMode'] = themeModeName.value;
     json['themeColorSwitch'] = themeColorSwitch.value;
+    json['webDavConfigs'] = webDavConfigs.map<String>((e) => jsonEncode(e.toJson())).toList();
+    json['currentWebDavConfig'] = currentWebDavConfig.value;
     json['myName'] = myName.value;
     json['myPhone'] = myPhone.value;
     json['myAddress'] = myAddress.value;
@@ -193,6 +248,8 @@ class SettingsService extends GetxController {
       'backupDirectory': '',
       'enableScreenKeepOn': false,
       'dbPath': '',
+      'webDavConfigs': [],
+      'currentWebDavConfig': '',
     };
     return json;
   }
