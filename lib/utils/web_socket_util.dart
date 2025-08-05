@@ -62,7 +62,7 @@ class WebScoketUtils {
       if (backupUrl != null && backupUrl!.isNotEmpty && retry) {
         wsurl = backupUrl!;
       }
-      webSocket = IOWebSocketChannel.connect(wsurl, connectTimeout: const Duration(seconds: 10), headers: headers);
+      webSocket = IOWebSocketChannel.connect(wsurl, connectTimeout: const Duration(seconds: 20), headers: headers);
 
       await webSocket?.ready;
       ready();

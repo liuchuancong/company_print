@@ -70,6 +70,10 @@ dependencies:
   wifi_iot: ^0.3.19+2
   network_info_plus: ^6.1.4
   web_socket_channel: ^3.0.3
+  device_info_plus: ^11.5.0
+  shelf: ^1.4.2
+  shelf_web_socket: ^3.0.0
+  synchronized: ^3.4.0
   flutter_localizations:
     sdk: flutter
 dev_dependencies:

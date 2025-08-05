@@ -1,13 +1,21 @@
 import 'dart:io';
 import 'dart:async';
+import 'dart:developer' show log;
+import 'package:shelf/shelf.dart';
 import 'package:flutter/material.dart';
-import 'package:wifi_iot/wifi_iot.dart';
-import 'package:web_socket_channel/io.dart';
 import 'package:company_print/common/index.dart';
+import 'package:shelf/shelf_io.dart' as shelf_io;
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:shelf_web_socket/shelf_web_socket.dart';
 import 'package:company_print/utils/web_socket_util.dart';
 import 'package:network_info_plus/network_info_plus.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:company_print/services/overlay_service.dart';
+
+// 常量配置
+const int _wsPort = 8080;
+const Duration _serverBindTimeout = Duration(seconds: 10);
 
 class AutoRoleController extends GetxService {
   static AutoRoleController get to => Get.find();
@@ -21,9 +29,9 @@ class AutoRoleController extends GetxService {
   final TextEditingController _msgController = TextEditingController();
 
   // WebSocket相关
-  WebScoketUtils? _clientWebSocket; // 客户端WebSocket工具
-  HttpServer? _wsServer; // 主机服务器
-  final Map<String, WebScoketUtils> _connectedClients = {}; // 主机管理的客户端
+  WebScoketUtils? _clientWebSocket;
+  HttpServer? _server; // 对应官网的server变量
+  final Map<String, WebSocketChannel> _connectedClients = {};
 
   // 暴露状态
   bool get isHost => _isHost.value;
@@ -44,14 +52,29 @@ class AutoRoleController extends GetxService {
     return this;
   }
 
+  void showClientInfo() {
+    String role = _isHost.value ? '主机' : '设备';
+    String ip = _isHost.value ? _hostIp.value : '未知';
+    String status = _isConnected.value ? '已连接' : '未连接';
+    if (isHost) {
+      String clients = _connectedClients.keys.join(',');
+      _overlayService.showStatusDialog(title: role, message: 'IP: $ip, 连接设备: $clients');
+    } else {
+      _overlayService.showStatusDialog(title: role, message: '状态: $status');
+    }
+  }
+
   // 请求权限
   Future<void> _requestPermissions() async {
-    Map<Permission, PermissionStatus> statuses = await [
-      Permission.location,
-      Permission.locationWhenInUse,
-      Permission.nearbyWifiDevices,
-    ].request();
-
+    final List<Permission> permissions = [Permission.location, Permission.locationWhenInUse];
+    if (Platform.isAndroid) {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      if (androidInfo.version.sdkInt >= 31) {
+        permissions.add(Permission.nearbyWifiDevices);
+      }
+    }
+    final Map<Permission, PermissionStatus> statuses = await permissions.request();
+    log('权限申请结果：$statuses');
     if (statuses.values.any((status) => !status.isGranted)) {
       _addMessage('警告：部分权限未授予，可能影响功能');
     }
@@ -59,11 +82,16 @@ class AutoRoleController extends GetxService {
 
   // 角色检测
   Future<void> _detectRole() async {
-    bool isHotspotOwner = await _checkHotspotOwner();
-    String? localIp = await _getLocalIp();
-    bool hasHostIp = _isHostIp(localIp);
+    var contents = ['主机', '设备'];
+    var isHostResult = await Utils.showOptionDialog(contents, '', title: '请选择设备类型');
+    if (isHostResult == null) {
+      return;
+    }
 
-    _isHost.value = isHotspotOwner || hasHostIp;
+    bool isHotspotOwner = isHostResult == '主机';
+    _isHost.value = isHotspotOwner;
+    String? localIp = await _getLocalIp();
+
     if (_isHost.value && localIp != null) {
       _hostIp.value = localIp;
     }
@@ -71,131 +99,121 @@ class AutoRoleController extends GetxService {
     _addMessage("角色检测：${_isHost.value ? '主机' : '设备'}");
   }
 
-  // 检查热点所有权
-  Future<bool> _checkHotspotOwner() async {
-    try {
-      if (Platform.isAndroid) {
-        return await WiFiForIoTPlugin.isWiFiAPEnabled();
-      }
-      return false;
-    } catch (e) {
-      _addMessage('检查热点状态失败：$e');
-      return false;
-    }
-  }
-
   // 获取本地IP
   Future<String?> _getLocalIp() async {
     try {
       final info = NetworkInfo();
-      return await info.getWifiIP();
+      String? ip = await info.getWifiIP();
+      log(ip.toString(), name: 'AutoRoleController');
+
+      if (ip == null || ip.isEmpty) {
+        final interfaces = await NetworkInterface.list(includeLoopback: false, type: InternetAddressType.IPv4);
+        for (var interface in interfaces) {
+          bool isHotspotInterface =
+              interface.name.contains('wlan') || interface.name.contains('ap') || interface.name.contains('tether');
+          if (isHotspotInterface) {
+            for (var addr in interface.addresses) {
+              if (addr.type == InternetAddressType.IPv4) {
+                ip = addr.address;
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      _addMessage('获取到IP：$ip');
+      return ip;
     } catch (e) {
       _addMessage('获取IP失败：$e');
       return null;
     }
   }
 
-  // 判断主机IP
-  bool _isHostIp(String? ip) {
-    if (ip == null) return false;
-    final hostIpPatterns = [RegExp(r'^192\.168\.43\.1$'), RegExp(r'^172\.20\.10\.1$'), RegExp(r'^10\.0\.\d+\.1$')];
-    return hostIpPatterns.any((pattern) => pattern.hasMatch(ip));
+  Middleware logIpMiddleware() {
+    return (innerHandler) {
+      return (request) {
+        var ip = request.context;
+        log('Client IP is $ip');
+        // 可以在这里保存IP地址以便后续处理
+        return innerHandler(request);
+      };
+    };
   }
 
-  // 主机：启动服务器
+  // 主机：启动服务器（严格遵循官网示例风格）
   Future<void> _startHostServer() async {
+    if (_isConnected.value) {
+      _addMessage('服务器已在运行中，无需重复启动');
+      return;
+    }
+
     try {
-      _wsServer = await HttpServer.bind(_hostIp.value, 8080);
-      _addMessage('主机服务器启动：ws://${_hostIp.value}:8080');
+      if (_hostIp.value.isEmpty) {
+        throw Exception('主机IP为空，请重新检测角色');
+      }
 
-      _wsServer!.listen((request) async {
-        if (request.uri.path == '/ws') {
-          final clientIp = request.connectionInfo?.remoteAddress.address ?? '未知IP';
-          _addMessage('新设备尝试连接：$clientIp');
-          // 初始化客户端WebSocket工具
-          // 步骤1：服务器必须通过upgrade将HTTP请求升级为WebSocket连接
-          final webSocket = await WebSocketTransformer.upgrade(request);
-          final channel = IOWebSocketChannel(webSocket); // 包装为通道
-
-          // 步骤2：用工具类管理这个已建立的连接（而非发起新连接）
-          final clientSocket = WebScoketUtils(
-            url: 'ws://${_hostIp.value}:8080',
-            heartBeatTime: 10 * 1000,
-            onMessage: (data) => _handleClientMessage(clientIp, data),
-            onClose: (msg) => _handleClientDisconnect(clientIp, msg),
-            onReady: () => _handleClientConnect(clientIp),
-            onHeartBeat: () => channel.sink.add('heartbeat'),
-          );
-
-          // 关键：将升级后的连接交给工具类管理（而非让工具类主动connect）
-          clientSocket.webSocket = channel; // 需要工具类暴露webSocket字段
-          clientSocket.ready(); // 手动触发连接就绪（因为不是通过connect()建立的）
-
-          _connectedClients[clientIp] = clientSocket;
-        }
+      // 完全遵循官网示例的handler写法
+      var handler = webSocketHandler((webSocket, _) {
+        // 官网核心逻辑：消息监听与回声
+        webSocket.stream.listen(
+          (message) {
+            webSocket.sink.add('echo $message'); // 官网标准回声示例
+          },
+          onError: (e) => _addMessage('$e'),
+          onDone: () {
+            _addMessage('客户端断开连接');
+            if (_connectedClients.isEmpty) {
+              _isConnected.value = false;
+            }
+          },
+        );
       });
+
+      var pipeline = const Pipeline()
+          .addMiddleware(logRequests()) // 可能需要自定义中间件来记录或处理请求信息
+          .addHandler(handler);
+      // 官网标准启动方式（使用then回调）
+      shelf_io
+          .serve(pipeline, _hostIp.value, _wsPort)
+          .timeout(
+            _serverBindTimeout,
+            onTimeout: () {
+              throw TimeoutException('绑定端口 $_wsPort 超时');
+            },
+          )
+          .then((server) {
+            _server = server;
+            _isConnected.value = true;
+            _addMessage('主机服务器启动：ws://${server.address.host}:${server.port}');
+          });
     } catch (e) {
       _addMessage('主机启动失败：$e');
-      _overlayService.showStatusDialog(title: '启动失败', message: '主机服务器启动失败：$e');
+      _overlayService.showStatusDialog(title: '启动失败', message: '服务器启动失败：$e');
+      clear();
     }
-  }
-
-  // 主机：处理客户端连接
-  void _handleClientConnect(String clientIp) {
-    _isConnected.value = true;
-    _addMessage('设备 $clientIp 连接成功');
-    _overlayService.showStatusDialog(title: '新连接', message: '设备 $clientIp 已连接');
-  }
-
-  // 主机：处理客户端消息
-  void _handleClientMessage(String clientIp, dynamic data) {
-    _addMessage('设备 $clientIp 说：$data');
-    _overlayService.showSyncConfirmation(
-      deviceName: clientIp,
-      data: data.toString(),
-      onSync: () {
-        _connectedClients[clientIp]?.sendMessage('已同步：$data');
-        _addMessage('已同步来自 $clientIp 的数据');
-      },
-      onCancel: () {
-        _connectedClients[clientIp]?.sendMessage('拒绝同步：$data');
-        _addMessage('已拒绝来自 $clientIp 的同步请求');
-      },
-    );
-  }
-
-  // 主机：处理客户端断开
-  void _handleClientDisconnect(String clientIp, String msg) {
-    _connectedClients.remove(clientIp);
-    _addMessage('设备 $clientIp 断开：$msg');
-
-    if (_connectedClients.isEmpty) {
-      _isConnected.value = false;
-    }
-
-    _overlayService.showStatusDialog(title: '连接断开', message: '设备 $clientIp 已断开：$msg');
   }
 
   // 客户端：初始化WebSocket
   Future<void> _initClientWebSocket() async {
-    String? localIp = await _getLocalIp();
-    if (localIp == null) {
-      _addMessage('无法获取本地IP，连接失败');
-      return;
-    }
+    String? guessedHostIp = await Utils.showEditTextDialog(
+      _hostIp.value,
+      title: '连接主机',
+      hintText: '请输入主机IP地址',
+      confirm: '确定',
+      cancel: '取消',
+    );
 
-    String? guessedHostIp = _guessHostIpFromLocalIp(localIp);
     if (guessedHostIp == null) {
-      _addMessage('无法推测主机IP，请检查热点连接');
+      _addMessage('请检查热点连接');
       return;
     }
     _hostIp.value = guessedHostIp;
 
-    // 初始化客户端WebSocket工具
+    log('尝试连接主机：$_hostIp', name: 'AutoRoleController');
     _clientWebSocket = WebScoketUtils(
-      url: 'ws://$_hostIp:8080',
+      url: 'ws://$_hostIp:$_wsPort',
       heartBeatTime: 30000,
-      backupUrl: 'ws://$_hostIp:8081', // 备用端口
       onMessage: (data) => _handleHostMessage(data),
       onClose: (msg) => _handleHostDisconnect(msg),
       onReconnect: () => _overlayService.showStatusDialog(title: '重连中', message: '正在尝试重新连接到主机...'),
@@ -226,29 +244,15 @@ class AutoRoleController extends GetxService {
     _overlayService.showStatusDialog(title: '连接断开', message: '与主机连接已断开：$msg');
   }
 
-  // 推测主机IP
-  String? _guessHostIpFromLocalIp(String localIp) {
-    try {
-      final parts = localIp.split('.');
-      if (parts.length != 4) return null;
-      parts[3] = '1';
-      return parts.join('.');
-    } catch (e) {
-      return null;
-    }
-  }
-
   // 发送消息
   void sendMessage() {
     final msg = _msgController.text.trim();
     if (msg.isEmpty || !_isConnected.value) return;
 
     if (_isHost.value) {
-      // 主机广播消息
-      _connectedClients.forEach((ip, client) => client.sendMessage(msg));
+      _connectedClients.forEach((ip, client) => client.sink.add(msg));
       _addMessage('我（主机）说：$msg');
     } else {
-      // 客户端发送消息
       _clientWebSocket?.sendMessage(msg);
       _addMessage('我（设备）说：$msg');
     }
@@ -258,20 +262,30 @@ class AutoRoleController extends GetxService {
   // 添加消息日志
   void _addMessage(String content) {
     final time = DateTime.now().toString().split(' ')[1].substring(0, 8);
+    log('[$time] $content', name: 'AutoRoleController');
     _messages.add('[$time] $content');
+  }
+
+  // 清除资源
+  void clear() {
+    _hostIp.value = '';
+    _isHost.value = false;
+    _isConnected.value = false;
+    _messages.clear();
+
+    // 关闭服务器（官网风格的关闭方式）
+    _server?.close(force: true);
+    _server = null;
+
+    _connectedClients.forEach((ip, client) => client.sink.close());
+    _connectedClients.clear();
+    _clientWebSocket?.close();
   }
 
   // 资源清理
   @override
   void onClose() {
-    // 清理主机资源
-    _wsServer?.close();
-    _connectedClients.forEach((ip, client) => client.close());
-    _connectedClients.clear();
-
-    // 清理客户端资源
-    _clientWebSocket?.close();
-
+    clear();
     super.onClose();
   }
 }

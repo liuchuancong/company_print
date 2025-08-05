@@ -23,7 +23,8 @@ class FileRecoverUtils {
   ///验证URL
   static bool isUrl(String value) {
     final urlRegExp = RegExp(
-        r'((https?:www\.)|(https?:\/\/)|(www\.))[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9]{1,6}(\/[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)?');
+      r'((https?:www\.)|(https?:\/\/)|(www\.))[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9]{1,6}(\/[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)?',
+    );
     List<String?> urlMatches = urlRegExp.allMatches(value).map((m) => m.group(0)).toList();
     return urlMatches.isNotEmpty;
   }
@@ -31,7 +32,8 @@ class FileRecoverUtils {
   ///验证URL
   static bool isHostUrl(String value) {
     final urlRegExp = RegExp(
-        r'((https?:www\.)|(https?:\/\/))[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9]{1,6}(\/[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)?');
+      r'((https?:www\.)|(https?:\/\/))[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9]{1,6}(\/[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)?',
+    );
     List<String?> urlMatches = urlRegExp.allMatches(value).map((m) => m.group(0)).toList();
     return urlMatches.isNotEmpty;
   }
@@ -43,9 +45,17 @@ class FileRecoverUtils {
     return portMatches.isNotEmpty;
   }
 
-  Future<bool> requestStoragePermission() async {
+  Future<bool> requestStorageExternalPermission() async {
     if (await Permission.manageExternalStorage.isDenied) {
       final status = Permission.manageExternalStorage.request();
+      return status.isGranted;
+    }
+    return true;
+  }
+
+  Future<bool> requestStoragePermission() async {
+    if (await Permission.storage.isDenied) {
+      final status = Permission.storage.request();
       return status.isGranted;
     }
     return true;
@@ -59,7 +69,8 @@ class FileRecoverUtils {
     final settings = Get.find<SettingsService>();
     if (Platform.isAndroid || Platform.isIOS) {
       final granted = await requestStoragePermission();
-      if (!granted) {
+      final grantedExternal = await requestStorageExternalPermission();
+      if (!granted || !grantedExternal) {
         SnackBarUtil.error('请先授予读写文件权限');
         return null;
       }
@@ -70,13 +81,12 @@ class FileRecoverUtils {
     debugPrint('file path: $selectedDirectory');
     String dbFolder = '${Platform.pathSeparator}xiao_liu_da_yin';
     String dbPath = '${Platform.pathSeparator}xiao_liu_da_yin${Platform.pathSeparator}app_database.db';
-    debugPrint('file path: $dbPath');
+
     final dbFolderFile = Directory(selectedDirectory + dbFolder);
     if (!dbFolderFile.existsSync()) {
       dbFolderFile.createSync();
     }
     final file = File(selectedDirectory + dbPath);
-    debugPrint('file path: ${file.path}');
     if (file.existsSync()) {
       final result = await onFileExistsPop();
       if (result == true) {
