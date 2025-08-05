@@ -69,7 +69,7 @@ dependencies:
   mime: ^1.0.6
   wifi_iot: ^0.3.19+2
   network_info_plus: ^6.1.4
-  web_socket: ^1.0.1
+  web_socket_channel: ^3.0.3
   flutter_localizations:
     sdk: flutter
 dev_dependencies:

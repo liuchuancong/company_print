@@ -6,6 +6,7 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:company_print/common/index.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:company_print/utils/event_bus.dart';
+import 'package:company_print/services/overlay_service.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -16,10 +17,12 @@ Future<void> initSystem() async {
   await ScreenUtil.ensureScreenSize(); // 确保屏幕大小被正确设置
   initService();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    systemNavigationBarColor: Colors.transparent,
-    systemNavigationBarContrastEnforced: false,
-  ));
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarContrastEnforced: false,
+    ),
+  );
   initRefresh();
 }
 
@@ -82,12 +85,11 @@ class _MyAppState extends State<MyApp> {
           darkTheme: darkTheme.useSystemChineseFont(Brightness.dark),
           navigatorObservers: [FlutterSmartDialog.observer],
           initialRoute: isExits ? RoutePath.kSetDbPathPage : RoutePath.kInitial,
+          navigatorKey: navigatorKey, // 配置全局导航键
           defaultTransition: Transition.native,
           getPages: AppPages.routes,
           debugShowCheckedModeBanner: false,
-          supportedLocales: const [
-            Locale('zh', ''),
-          ],
+          supportedLocales: const [Locale('zh', '')],
           locale: const Locale('zh', ''),
           localizationsDelegates: const [GlobalMaterialLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
           builder: FlutterSmartDialog.init(
@@ -95,17 +97,12 @@ class _MyAppState extends State<MyApp> {
               child: SizedBox(
                 width: 5.w,
                 height: 5.w,
-                child: CircularProgressIndicator(
-                  strokeWidth: 0.2.w,
-                  color: Colors.white,
-                ),
+                child: CircularProgressIndicator(strokeWidth: 0.2.w, color: Colors.white),
               ),
             ),
             //字体大小不跟随系统变化
             builder: (context, child) => MediaQuery(
-              data: MediaQuery.of(context).copyWith(
-                textScaler: TextScaler.linear(Get.width > 680 ? 1.1 : 1.0),
-              ),
+              data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(Get.width > 680 ? 1.1 : 1.0)),
               child: child!,
             ),
           ),
@@ -117,23 +114,23 @@ class _MyAppState extends State<MyApp> {
 
 void initRefresh() {
   EasyRefresh.defaultHeaderBuilder = () => const ClassicHeader(
-        armedText: '松开加载',
-        dragText: '上拉刷新',
-        readyText: '加载中...',
-        processingText: '正在刷新...',
-        noMoreText: '没有更多数据了',
-        failedText: '加载失败',
-        messageText: '上次加载时间 %T',
-        processedText: '加载成功',
-      );
+    armedText: '松开加载',
+    dragText: '上拉刷新',
+    readyText: '加载中...',
+    processingText: '正在刷新...',
+    noMoreText: '没有更多数据了',
+    failedText: '加载失败',
+    messageText: '上次加载时间 %T',
+    processedText: '加载成功',
+  );
   EasyRefresh.defaultFooterBuilder = () => const ClassicFooter(
-        armedText: '松开加载',
-        dragText: '下拉刷新',
-        readyText: '加载中...',
-        processingText: '正在刷新...',
-        noMoreText: '没有更多数据了',
-        failedText: '加载失败',
-        messageText: '上次加载时间 %T',
-        processedText: '加载成功',
-      );
+    armedText: '松开加载',
+    dragText: '下拉刷新',
+    readyText: '加载中...',
+    processingText: '正在刷新...',
+    noMoreText: '没有更多数据了',
+    failedText: '加载失败',
+    messageText: '上次加载时间 %T',
+    processedText: '加载成功',
+  );
 }
