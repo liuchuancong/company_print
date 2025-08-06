@@ -38,4 +38,6 @@ class RoutePath {
   static var kSetDbPathPage = '/setDbPathPage';
 
   static const kWebDavPage = '/web_dav_page';
+
+  static var kSharedPage = '/sharedPage';
 }

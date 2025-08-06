@@ -35,6 +35,11 @@ class OrderItemsDao extends DatabaseAccessor<AppDatabase> with _$OrderItemsDaoMi
     return await (select(db.orderItems)..where((tbl) => tbl.orderId.equals(orderId))).get();
   }
 
+  /// 获取特定订单的所有订单项
+  Future<List<OrderItem>> getAllOrderItems() async {
+    return await (select(db.orderItems)).get();
+  }
+
   /// 分页获取特定订单的订单项
   Future<List<OrderItem>> getPaginatedOrderItemsByOrderId(
     int orderId,
@@ -68,13 +73,9 @@ class OrderItemsDao extends DatabaseAccessor<AppDatabase> with _$OrderItemsDaoMi
     if (columnMap.containsKey(orderByField)) {
       final column = columnMap[orderByField];
       final orderMode = ascending ? OrderingMode.asc : OrderingMode.desc;
-      query.orderBy([
-        (t) => OrderingTerm(expression: column, mode: orderMode),
-      ]);
+      query.orderBy([(t) => OrderingTerm(expression: column, mode: orderMode)]);
     } else {
-      query.orderBy([
-        (t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc),
-      ]);
+      query.orderBy([(t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc)]);
     }
 
     return await query.get();
@@ -151,26 +152,27 @@ class OrderItemsDao extends DatabaseAccessor<AppDatabase> with _$OrderItemsDaoMi
       double advancePayment = 0;
       if (calculationType == SalesOrderCalculationType.decimal) {
         totalPrice = Utils.getDoubleDecimal(
-            Utils.getDoubleDecimal(item.actualPrice) * Utils.getDoubleDecimal(item.actualQuantity));
+          Utils.getDoubleDecimal(item.actualPrice) * Utils.getDoubleDecimal(item.actualQuantity),
+        );
         advancePayment = Utils.getDoubleDecimal(item.advancePayment);
       } else if (calculationType == SalesOrderCalculationType.round) {
         totalPrice = Utils.getDoubleRound(
-            Utils.getDoubleDecimal(item.actualPrice) * Utils.getDoubleDecimal(item.actualQuantity));
+          Utils.getDoubleDecimal(item.actualPrice) * Utils.getDoubleDecimal(item.actualQuantity),
+        );
         advancePayment = Utils.getDoubleRound(item.advancePayment);
       }
       totalOrderPrice += totalPrice;
       advanceOrderPayment += advancePayment;
-      final entry = OrderItemsCompanion(
-        totalPrice: Value(totalPrice),
-        advancePayment: Value(advancePayment),
-      );
+      final entry = OrderItemsCompanion(totalPrice: Value(totalPrice), advancePayment: Value(advancePayment));
       await (update(db.orderItems)..where((tbl) => tbl.id.equals(item.id))).write(entry);
     }
-    await (update(db.orders)..where((tbl) => tbl.id.equals(orderId))).write(OrdersCompanion(
-      totalPrice: Value(totalOrderPrice),
-      advancePayment: Value(advanceOrderPayment),
-      itemCount: Value(double.parse(orderItems.length.toString())),
-    ));
+    await (update(db.orders)..where((tbl) => tbl.id.equals(orderId))).write(
+      OrdersCompanion(
+        totalPrice: Value(totalOrderPrice),
+        advancePayment: Value(advanceOrderPayment),
+        itemCount: Value(double.parse(orderItems.length.toString())),
+      ),
+    );
   }
 
   Future<double?> getTotalOrderPrice(int orderId) async {

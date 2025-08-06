@@ -2,6 +2,8 @@ import 'package:company_print/common/index.dart';
 import 'package:company_print/pages/mine/mine.dart';
 import 'package:company_print/pages/home/home_page.dart';
 import 'package:company_print/pages/print/print_page.dart';
+import 'package:company_print/pages/shared/shared_page.dart';
+import 'package:company_print/pages/shared/shared_bings.dart';
 import 'package:company_print/pages/web_dav/web_dav_page.dart';
 import 'package:company_print/pages/settings/settings_page.dart';
 import 'package:company_print/pages/set_db_page/set_db_path.dart';
@@ -57,5 +59,6 @@ class AppPages {
     GetPage(name: RoutePath.kPrintPage, page: PrintPage.new),
     GetPage(name: RoutePath.kSetDbPathPage, page: SetDbPathPage.new),
     GetPage(name: RoutePath.kWebDavPage, page: () => WebDavPage(), bindings: [WebDavBinding()]),
+    GetPage(name: RoutePath.kSharedPage, page: SharedPage.new, bindings: [SharedBindings()]),
   ];
 }

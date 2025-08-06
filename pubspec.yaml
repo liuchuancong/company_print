@@ -67,7 +67,6 @@ dependencies:
   syncfusion_flutter_charts: ^30.1.42
   webdav_client: ^1.2.2
   mime: ^1.0.6
-  wifi_iot: ^0.3.19+2
   network_info_plus: ^6.1.4
   web_socket_channel: ^3.0.3
   device_info_plus: ^11.5.0

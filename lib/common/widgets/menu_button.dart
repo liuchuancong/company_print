@@ -4,7 +4,7 @@ import 'package:company_print/common/index.dart';
 class MenuButton extends GetView {
   MenuButton({super.key});
 
-  final menuRoutes = [RoutePath.kMinePage, RoutePath.kSettings, RoutePath.kPrintPage];
+  final menuRoutes = [RoutePath.kMinePage, RoutePath.kSettings, RoutePath.kPrintPage, RoutePath.kSharedPage];
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +32,11 @@ class MenuButton extends GetView {
           value: 2,
           padding: EdgeInsets.symmetric(horizontal: 12),
           child: MenuListTile(leading: Icon(Icons.print_rounded), text: '打印'),
+        ),
+        const PopupMenuItem(
+          value: 3,
+          padding: EdgeInsets.symmetric(horizontal: 12),
+          child: MenuListTile(leading: Icon(Icons.sync_rounded), text: '同步'),
         ),
       ],
     );

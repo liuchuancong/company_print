@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/utils/event_bus.dart';
@@ -143,6 +144,31 @@ class SettingsService extends GetxController {
     PrefUtil.setString('themeColorSwitch', hexColor);
     Get.changeTheme(lightTheme);
     Get.changeTheme(darkTheme);
+  }
+
+  void backupAllData() async {
+    final AppDatabase database = DatabaseManager.instance.appDatabase;
+    List<Customer> allCustomers = await database.customerDao.getAllCustomers();
+    List<CustomerOrderItem> allCustomerOrderItems = await database.customerOrderItemsDao.getAllOrderItems();
+    List<DishUnit> allDishUnits = await database.dishUnitsDao.getAllDishUnits();
+    List<DishesCategoryData> allCategories = await database.dishesCategoryDao.getAllCategories();
+    List<Order> allOrders = await database.ordersDao.getAllOrders();
+    List<OrderItem> allOrderItems = await database.orderItemsDao.getAllOrderItems();
+    List<Vehicle> vehicles = await database.vehicleDao.getAllVehicles();
+    var allData = {
+      'customers': allCustomers.map((e) => jsonEncode(e.toJson())).toList(),
+      'customerOrderItems': allCustomerOrderItems.map((e) => jsonEncode(e.toJson())).toList(),
+      'dishUnits': allDishUnits.map((e) => jsonEncode(e.toJson())).toList(),
+      'categories': allCategories.map((e) => jsonEncode(e.toJson())).toList(),
+      'orders': allOrders.map((e) => jsonEncode(e.toJson())).toList(),
+      'orderItems': allOrderItems.map((e) => jsonEncode(e.toJson())).toList(),
+      'vehicles': vehicles.map((e) => jsonEncode(e.toJson())).toList(),
+    };
+    log(jsonEncode(allData), name: 'jsonEncode(allData)');
+    final String backupDirectory = this.backupDirectory.value;
+    final String fileName = '${DateTime.now().toString().replaceAll(' ', '_')}.json';
+    final File file = File('$backupDirectory/$fileName');
+    file.writeAsStringSync(jsonEncode(allData));
   }
 
   static Map<String, Color> themeColors = {

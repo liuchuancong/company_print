@@ -4,7 +4,6 @@ import 'package:company_print/common/style/app_style.dart';
 import 'package:company_print/common/widgets/menu_button.dart';
 import 'package:company_print/pages/sales/order_grid_view.dart';
 import 'package:company_print/pages/sales/sales_controller.dart';
-import 'package:company_print/services/auto_role_controller.dart';
 
 class SalesPage extends StatefulWidget {
   const SalesPage({super.key});
@@ -20,7 +19,6 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
   void initState() {
     super.initState();
     Get.put(SalesController());
-    Get.putAsync(() => AutoRoleController().init());
     controller = Get.find<SalesController>();
   }
 
@@ -109,16 +107,6 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
               controller.showDateTimerPicker();
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.sync, size: 30),
-            onPressed: () {
-              if (controller.autoRoleController.isHost) {
-                controller.autoRoleController.showClientInfo();
-              } else {
-                controller.autoRoleController.init();
-              }
-            },
-          ),
           AppStyle.hGap20,
         ],
       ),
@@ -130,7 +118,9 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add_circle_outline, size: 30),
         onPressed: () {
-          controller.showAddOrEditOrderPage();
+          var settings = Get.find<SettingsService>();
+          settings.backupAllData();
+          // controller.showAddOrEditOrderPage();
         },
       ),
     );

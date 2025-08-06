@@ -4,7 +4,6 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/utils/event_bus.dart';
 import 'package:company_print/common/base/base_controller.dart';
-import 'package:company_print/services/auto_role_controller.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:company_print/pages/sales/add_or_edit_order.dart';
 
@@ -22,7 +21,6 @@ class SalesController extends BasePageController {
   TextEditingController searchController = TextEditingController();
   List<DateTime> currentDates = [];
   FocusNode searchFocusNode = FocusNode();
-  late final AutoRoleController autoRoleController = Get.find<AutoRoleController>();
   StreamSubscription<dynamic>? orderRefreshSubscription;
   final refreshController = EasyRefreshController(controlFinishRefresh: true, controlFinishLoad: true);
 

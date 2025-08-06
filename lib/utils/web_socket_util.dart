@@ -3,7 +3,7 @@ import 'package:web_socket_channel/io.dart';
 
 enum SocketStatus { connected, failed, closed }
 
-class WebScoketUtils {
+class WebSocketUtils {
   SocketStatus status = SocketStatus.closed;
 
   /// 链接
@@ -32,7 +32,7 @@ class WebScoketUtils {
 
   /// 请求头
   Map<String, dynamic>? headers;
-  WebScoketUtils({
+  WebSocketUtils({
     required this.url,
     required this.heartBeatTime,
     this.onMessage,
@@ -58,11 +58,7 @@ class WebScoketUtils {
   void connect({bool retry = false}) async {
     close();
     try {
-      var wsurl = url;
-      if (backupUrl != null && backupUrl!.isNotEmpty && retry) {
-        wsurl = backupUrl!;
-      }
-      webSocket = IOWebSocketChannel.connect(wsurl, connectTimeout: const Duration(seconds: 20), headers: headers);
+      webSocket = IOWebSocketChannel.connect(url, headers: headers);
 
       await webSocket?.ready;
       ready();
@@ -78,11 +74,13 @@ class WebScoketUtils {
   /// 连接完成
   void ready() {
     status = SocketStatus.connected;
+
     streamSubscription = webSocket?.stream.listen(
       (data) => receiveMessage(data),
       onError: (e, s) => onError(e, s),
       onDone: onDone,
     );
+
     onReady?.call();
     initHeartBeat();
   }
@@ -120,10 +118,14 @@ class WebScoketUtils {
 
   void close() {
     status = SocketStatus.closed;
+
     streamSubscription?.cancel();
+
     reconnectTimer?.cancel();
     reconnectTimer = null;
+
     webSocket?.sink.close();
+
     heartBeatTimer?.cancel();
     heartBeatTimer = null;
   }
