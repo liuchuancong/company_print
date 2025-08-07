@@ -378,15 +378,15 @@ class SharedPage extends GetView<SharedController> {
           valueColor: controller.isConnected.value ? Colors.green : Colors.orange,
         ),
         const SizedBox(height: 8),
-        _buildInfoRow(label: '连接设备数', value: controller.clientNames.keys.length.toString()),
+        _buildInfoRow(label: '连接设备数', value: controller.deviceHeartbeats.keys.length.toString()),
         const SizedBox(height: 12),
-        if (controller.clientNames.isNotEmpty) ...[
+        if (controller.deviceHeartbeats.isNotEmpty) ...[
           Text(
             '已连接设备：',
             style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.grey[700]),
           ),
           const SizedBox(height: 8),
-          ...controller.clientNames.keys.map((ip) {
+          ...controller.deviceHeartbeats.keys.map((ip) {
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Row(
@@ -395,7 +395,10 @@ class SharedPage extends GetView<SharedController> {
                   const SizedBox(width: 8),
                   Text(ip),
                   const SizedBox(width: 8),
-                  Text('(${controller.clientNames[ip]})', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                  Text(
+                    '(${controller.deviceHeartbeats[ip]})',
+                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
                 ],
               ),
             );

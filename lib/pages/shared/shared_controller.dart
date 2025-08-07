@@ -34,7 +34,10 @@ class SharedController extends GetxService {
 
   // WebSocket相关资源（私有）
   final Map<String, WebSocketChannel> connectedClients = {};
-  final clientNames = {}.obs;
+  final RxMap<String, Map<String, dynamic>> deviceHeartbeats = <String, Map<String, dynamic>>{}.obs;
+  final int heartbeatTimeout = 15;
+  // 心跳检查定时器
+  Timer? heartbeatTimer;
   final OverlayService _overlayService = OverlayService();
   // 设备名称控制器
   final TextEditingController deviceNameController = TextEditingController(text: '');
@@ -80,7 +83,6 @@ class SharedController extends GetxService {
     if (!isConnected.value) return;
     if (isHost.value) {
       final jsonMsg = jsonEncode(message.toJson());
-      log(jsonMsg, name: 'SharedController');
       serverWebSocket?.sink.add(jsonMsg);
     } else {
       message = message.copyWith(ip: hostIp.value, name: isHost.value ? '主机' : deviceNameController.text);
@@ -246,12 +248,38 @@ class SharedController extends GetxService {
     };
   }
 
+  void checkHeartbeatTimeout() {
+    final now = DateTime.now();
+    final offlineIps = <String>[];
+
+    deviceHeartbeats.forEach((ip, info) {
+      final lastBeat = info['lastBeat'] as DateTime;
+      final duration = now.difference(lastBeat).inSeconds;
+
+      // 如果超时，标记为离线
+      if (duration > heartbeatTimeout) {
+        offlineIps.add(ip);
+      }
+    });
+
+    // 处理离线设备
+    for (final ip in offlineIps) {
+      final deviceName = deviceHeartbeats[ip]?['name'] ?? '未知设备';
+      deviceHeartbeats.remove(ip); // 从心跳列表移除
+      addMessage(BaseMessage(type: MessageType.leave, data: '设备 [$deviceName] 已断开', from: '主机', to: 'all'));
+    }
+  }
+
   // 启动主机服务器
   Future<void> startHostServer() async {
     if (isConnected.value) {
       SmartDialog.showToast('服务器已运行');
       return;
     }
+    heartbeatTimer?.cancel();
+    heartbeatTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      checkHeartbeatTimeout();
+    });
     final ip = await getLocalIp();
     if (ip != null) {
       hostIp.value = ip;
@@ -355,6 +383,21 @@ class SharedController extends GetxService {
     try {
       final msg = BaseMessage.fromJson(jsonDecode(data));
       sendDataToClient(msg);
+      // 处理设备加入（首次连接）
+      if (msg.type == MessageType.join) {
+        final deviceName = msg.name ?? '未知设备';
+        // 记录设备并更新心跳时间
+        deviceHeartbeats[msg.ip!] = {
+          'name': deviceName,
+          'lastBeat': DateTime.now(), // 初始心跳时间
+        };
+        addMessage(BaseMessage(type: MessageType.join, data: '设备 [$deviceName] 已加入', from: '主机', to: 'all'));
+      } else if (msg.type == MessageType.heartbeat) {
+        if (deviceHeartbeats.containsKey([msg.ip!])) {
+          // 更新最后心跳时间
+          deviceHeartbeats[msg.ip!]!['lastBeat'] = DateTime.now();
+        }
+      }
     } catch (e) {
       SmartDialog.showToast('客户端消息解析错误：$e');
     }
@@ -390,6 +433,7 @@ class SharedController extends GetxService {
     if (_server != null) {
       await _server!.close(force: true);
       _server = null;
+      heartbeatTimer?.cancel();
       SmartDialog.showToast('服务器已停止');
     }
   }
