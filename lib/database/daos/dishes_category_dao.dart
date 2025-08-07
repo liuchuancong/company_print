@@ -26,7 +26,7 @@ class DishesCategoryDao extends DatabaseAccessor<AppDatabase> with _$DishesCateg
   Future<int> createCategory(DishesCategoryData category) async {
     final entry = DishesCategoryCompanion(
       name: Value(category.name),
-      parentId: Value(category.parentId),
+      parentId: category.parentId == 0 ? const Value(null) : Value(category.parentId),
       description: Value(category.description),
       createdAt: Value(category.createdAt),
       uuid: Value(category.uuid),
@@ -39,10 +39,8 @@ class DishesCategoryDao extends DatabaseAccessor<AppDatabase> with _$DishesCateg
   Future updateCategory(DishesCategoryData category) async {
     final entry = DishesCategoryCompanion(
       name: Value(category.name),
-      parentId: Value(category.parentId),
       description: Value(category.description),
       updatedAt: Value(category.updatedAt),
-      uuid: Value(category.uuid),
     );
     return await (update(dishesCategory)..where((tbl) => tbl.id.equals(category.id))).write(entry);
   }

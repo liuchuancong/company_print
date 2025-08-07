@@ -397,7 +397,7 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
                 options: FlutterCarouselOptions(
                   viewportFraction: 1.0,
                   autoPlay: false,
-                  height: widget.controller.dishesSelectType == DishesSelectType.dishes ? 650 : 820,
+                  height: 820,
                   floatingIndicator: false,
                   enableInfiniteScroll: true,
                   initialPage: currentPage,

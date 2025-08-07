@@ -60,6 +60,8 @@ class VehicleDao extends DatabaseAccessor<AppDatabase> with _$VehicleDaoMixin {
       plateNumber: Value(vehicle.plateNumber),
       driverName: Value(vehicle.driverName),
       driverPhone: Value(vehicle.driverPhone),
+      uuid: Value(vehicle.uuid),
+      updatedAt: Value(vehicle.updatedAt),
     );
     return await into(vehicles).insert(entry);
   }
@@ -70,6 +72,7 @@ class VehicleDao extends DatabaseAccessor<AppDatabase> with _$VehicleDaoMixin {
       plateNumber: Value(vehicle.plateNumber),
       driverName: Value(vehicle.driverName),
       driverPhone: Value(vehicle.driverPhone),
+      updatedAt: Value(vehicle.updatedAt),
     );
     return await (update(vehicles)..where((tbl) => tbl.id.equals(vehicle.id))).write(entry);
   }

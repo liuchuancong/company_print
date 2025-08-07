@@ -17,7 +17,6 @@ class OrderItemsDao extends DatabaseAccessor<AppDatabase> with _$OrderItemsDaoMi
     final entry = OrderItemsCompanion.insert(
       orderId: order.orderId,
       itemName: Value(order.itemName),
-      uuid: order.uuid,
       itemShortName: Value(order.itemShortName),
       purchaseUnit: Value(order.purchaseUnit),
       purchaseQuantity: Value(order.purchaseQuantity),
@@ -27,6 +26,8 @@ class OrderItemsDao extends DatabaseAccessor<AppDatabase> with _$OrderItemsDaoMi
       actualPrice: Value(order.actualPrice),
       advancePayment: Value(order.advancePayment),
       totalPrice: Value(order.totalPrice),
+      updatedAt: Value(order.updatedAt),
+      uuid: order.uuid,
     );
     return await into(db.orderItems).insert(entry);
   }

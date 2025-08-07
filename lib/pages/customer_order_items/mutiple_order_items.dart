@@ -264,7 +264,7 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
                 options: FlutterCarouselOptions(
                   viewportFraction: 1.0,
                   autoPlay: false,
-                  height: 650,
+                  height: 1000,
                   floatingIndicator: false,
                   enableInfiniteScroll: true,
                   initialPage: currentPage,
