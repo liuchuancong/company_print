@@ -203,4 +203,8 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
       );
     });
   }
+
+  Future<int> deleteAll() async {
+    return await delete(customerOrderItems).go();
+  }
 }

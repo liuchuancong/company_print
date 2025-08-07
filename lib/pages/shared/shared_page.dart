@@ -10,7 +10,22 @@ class SharedPage extends GetView<SharedController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('同步'), centerTitle: true),
+      key: scaffoldKey,
+      appBar: AppBar(
+        title: const Text('同步'),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications),
+            onPressed: () => scaffoldKey.currentState!.openEndDrawer(),
+            tooltip: '查看消息',
+          ),
+        ],
+      ),
+      // 右侧消息抽屉
+      endDrawer: _buildMessageDrawer(),
+      // 允许通过滑动手势打开抽屉
+      endDrawerEnableOpenDragGesture: true,
       body: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
@@ -77,6 +92,156 @@ class SharedPage extends GetView<SharedController> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMessageDrawer() {
+    return Drawer(
+      width: MediaQuery.of(Get.context!).size.width * 0.85,
+      child: Column(
+        children: [
+          // 优化后的抽屉头部（更紧凑）
+          Container(
+            height: 80, // 固定高度，比默认DrawerHeader矮很多
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), // 减少内边距
+            decoration: BoxDecoration(color: Theme.of(Get.context!).primaryColor),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  '操作消息',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16, // 稍微减小字体
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Row(
+                  children: [
+                    // 清空消息按钮
+                    TextButton(
+                      onPressed: () {
+                        controller.messages.clear();
+                        SmartDialog.showToast('消息已清空');
+                      },
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 8), // 减少按钮内边距
+                        minimumSize: const Size(40, 30), // 减小按钮最小尺寸
+                      ),
+                      child: const Text(
+                        '清空',
+                        style: TextStyle(
+                          color: Colors.white70, // 稍微淡化颜色
+                          fontSize: 14, // 减小字体
+                        ),
+                      ),
+                    ),
+                    // 关闭按钮
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white, size: 18), // 减小图标
+                      padding: const EdgeInsets.all(8), // 减少图标内边距
+                      onPressed: () => Navigator.of(Get.context!).pop(),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // 消息列表
+          Expanded(
+            child: Obx(() {
+              if (controller.messages.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.inbox, size: 60, color: Colors.grey),
+                      const SizedBox(height: 16),
+                      const Text('暂无消息记录', style: TextStyle(color: Colors.grey, fontSize: 16)),
+                      const SizedBox(height: 8),
+                      Text('所有操作将在这里显示', style: TextStyle(color: Colors.grey[400], fontSize: 14)),
+                    ],
+                  ),
+                );
+              }
+
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                itemCount: controller.messages.length,
+                controller: controller.messageScrollController,
+                itemBuilder: (context, index) {
+                  final message = controller.messages[index];
+                  return _buildMessageItem(message);
+                },
+              );
+            }),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  // 构建单个消息项
+  Widget _buildMessageItem(BaseMessage message) {
+    // 根据消息类型设置不同样式
+    Color bgColor;
+    Color textColor;
+    IconData icon;
+
+    switch (message.type) {
+      case MessageType.join:
+        bgColor = Colors.green.withValues(alpha: 0.1);
+        textColor = Colors.green[800]!;
+        icon = Icons.check_circle;
+        break;
+      case MessageType.leave:
+        bgColor = Colors.red.withValues(alpha: 0.1);
+        textColor = Colors.red[800]!;
+        icon = Icons.error;
+        break;
+      case MessageType.system:
+        bgColor = Colors.blueGrey.withValues(alpha: 0.1);
+        textColor = Colors.blueGrey[800]!;
+        icon = Icons.warning;
+        break;
+      case MessageType.allData ||
+          MessageType.customers ||
+          MessageType.customerOrderItems ||
+          MessageType.dishUnits ||
+          MessageType.categories ||
+          MessageType.orders ||
+          MessageType.orderItems ||
+          MessageType.vehicles ||
+          MessageType.heartbeat:
+        bgColor = Colors.blue.withValues(alpha: 0.1);
+        textColor = Colors.blue[800]!;
+        icon = Icons.info;
+        break;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Container(
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: textColor.withValues(alpha: 0.2)),
+        ),
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: textColor),
+                Text(message.data, style: TextStyle(color: textColor, fontSize: 15), softWrap: true, maxLines: null),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -442,6 +607,8 @@ class SharedPage extends GetView<SharedController> {
       data: '加入连接',
       name: controller.deviceNameController.text,
       ip: controller.hostIp.value,
+      from: deviceName,
+      to: '主机',
     );
     controller.sendMessage(joinMsg);
   }

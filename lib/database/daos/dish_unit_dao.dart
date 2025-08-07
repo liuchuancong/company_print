@@ -102,4 +102,8 @@ class DishUnitsDao extends DatabaseAccessor<AppDatabase> with _$DishUnitsDaoMixi
       );
     });
   }
+
+  Future<int> deleteAll() async {
+    return await delete(dishUnits).go();
+  }
 }

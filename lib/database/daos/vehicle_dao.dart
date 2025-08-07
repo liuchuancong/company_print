@@ -111,4 +111,8 @@ class VehicleDao extends DatabaseAccessor<AppDatabase> with _$VehicleDaoMixin {
       );
     });
   }
+
+  Future<int> deleteAll() async {
+    return await delete(vehicles).go();
+  }
 }

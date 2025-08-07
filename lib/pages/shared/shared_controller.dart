@@ -22,12 +22,14 @@ const int _wsPort = 8080;
 const Duration _serverBindTimeout = Duration(seconds: 10);
 const int _heartbeatIntervalMs = 10000;
 
+final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
 class SharedController extends GetxService {
   // 暴露状态变量（供页面直接访问）
   final RxBool isHost = false.obs;
   final RxBool isConnected = false.obs;
   final RxString hostIp = ''.obs;
-  final RxList<String> messages = <String>[].obs;
+  final RxList<BaseMessage> messages = <BaseMessage>[].obs;
   final TextEditingController msgController = TextEditingController();
 
   // WebSocket相关资源（私有）
@@ -36,7 +38,7 @@ class SharedController extends GetxService {
   final OverlayService _overlayService = OverlayService();
   // 设备名称控制器
   final TextEditingController deviceNameController = TextEditingController(text: '');
-
+  final ScrollController messageScrollController = ScrollController();
   // 主机IP输入控制器
   final TextEditingController hostIpController = TextEditingController();
   HttpServer? _server;
@@ -76,12 +78,72 @@ class SharedController extends GetxService {
   // 发送消息（支持所有消息类型）
   void sendMessage(BaseMessage message) async {
     if (!isConnected.value) return;
-    message = message.copyWith(ip: hostIp.value, name: isHost.value ? '主机' : deviceNameController.text);
-    final jsonMsg = jsonEncode(message.toJson());
     if (isHost.value) {
+      final jsonMsg = jsonEncode(message.toJson());
+      log(jsonMsg, name: 'SharedController');
       serverWebSocket?.sink.add(jsonMsg);
     } else {
+      message = message.copyWith(ip: hostIp.value, name: isHost.value ? '主机' : deviceNameController.text);
+      final jsonMsg = jsonEncode(message.toJson());
       _webSocketUtils?.sendMessage(jsonMsg);
+    }
+    addMessage(message);
+  }
+
+  void addMessage(BaseMessage message) {
+    String msg = '';
+    String content = '';
+    switch (message.type) {
+      case MessageType.allData:
+        content = message.from == '主机' ? '向设备${message.from}发送全部数据' : '向主机请求全部数据';
+        break;
+      case MessageType.customers:
+        content = message.from == '主机' ? '向设备${message.from}发送客户数据' : '向主机请求客户数据';
+        break;
+      case MessageType.customerOrderItems:
+        break;
+      case MessageType.dishUnits:
+        content = message.from == '主机' ? '向设备${message.from}发送商品单位数据' : '向主机请求商品单位数据';
+        break;
+      case MessageType.categories:
+        content = message.from == '主机' ? '向设备${message.from}发送商品分类数据' : '向主机请求商品分类数据';
+        break;
+      case MessageType.orders:
+        content = message.from == '主机' ? '向设备${message.from}发送销售清单数据' : '向主机请求销售清单数据';
+        break;
+      case MessageType.orderItems:
+        break;
+      case MessageType.vehicles:
+        content = message.from == '主机' ? '向设备${message.from}发送车辆数据' : '向主机请求车辆数据';
+        break;
+      case MessageType.leave:
+        content = message.from == '主机' ? '设备${message.from}离开' : '已断开连接';
+        break;
+      case MessageType.heartbeat:
+        content = '心跳';
+        break;
+      case MessageType.join:
+        content = message.from == '主机' ? '设备${message.from}加入' : '已连接到主机';
+        break;
+      case MessageType.system:
+        content = message.data.toString();
+        break;
+    }
+    msg = '${message.from == '主机' ? '[主机]' : '[我]'} ：$content';
+    // 排除指定的三种消息类型，只添加其他类型的消息
+    if (message.type != MessageType.heartbeat &&
+        message.type != MessageType.customerOrderItems &&
+        message.type != MessageType.orderItems) {
+      messages.add(BaseMessage(type: message.type, data: msg, from: message.from, to: message.to));
+
+      // 滚动到最新消息
+      if (messageScrollController.hasClients) {
+        messageScrollController.animateTo(
+          messageScrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
     }
   }
 
@@ -105,16 +167,18 @@ class SharedController extends GetxService {
     await stopServer();
     _clearClientResources();
     msgController.clear();
-    messages.clear();
     hostIp.value = '';
     isConnected.value = false;
   }
 
   Future<void> clearDeviceResources() async {
     // 关闭客户端WebSocket连接
-    isConnected.value = false;
-    _webSocketUtils?.close();
-    _webSocketUtils = null;
+    sendMessage(BaseMessage(type: MessageType.leave, data: 'leave', from: deviceNameController.text, to: '主机'));
+    Future.delayed(const Duration(seconds: 1), () {
+      isConnected.value = false;
+      _webSocketUtils?.close();
+      _webSocketUtils = null;
+    });
   }
 
   Future<void> _requestPermissions() async {
@@ -143,8 +207,6 @@ class SharedController extends GetxService {
       if (ip == null || ip.isEmpty) {
         final interfaces = await NetworkInterface.list(includeLoopback: false, type: InternetAddressType.IPv4);
         for (var interface in interfaces) {
-          log(interface.addresses.toString(), name: 'AutoRoleController');
-          log(interface.name.toString(), name: 'AutoRoleController');
           bool isHotspotInterface =
               interface.name.contains('wlan') ||
               interface.name.contains('ap') ||
@@ -209,7 +271,15 @@ class SharedController extends GetxService {
       // 完善WebSocket处理器逻辑
       final handler = shelf_ws.webSocketHandler((webSocket, _) {
         // 监听客户端消息
-        webSocket.stream.listen((data) => handleClientMessage(data), onError: (error) {}, onDone: () {});
+        webSocket.stream.listen(
+          (data) => handleClientMessage(data),
+          onError: (error) {
+            SmartDialog.showToast('客户端消息处理失败：$error');
+          },
+          onDone: () {
+            SmartDialog.showToast('客户端已断开连接');
+          },
+        );
         serverWebSocket = webSocket;
       });
 
@@ -240,6 +310,7 @@ class SharedController extends GetxService {
 
   Future<void> initClientWebSocket() async {
     SmartDialog.showToast('尝试连接主机...');
+    sendMessage(BaseMessage(type: MessageType.system, data: '正在连接...', from: deviceNameController.text, to: '主机'));
     _webSocketUtils?.close();
     final wsUrl = 'ws://${hostIp.value}:$_wsPort';
     _webSocketUtils = WebSocketUtils(
@@ -251,17 +322,26 @@ class SharedController extends GetxService {
       // 连接关闭回调
       onClose: (msg) => handleDisconnect(msg),
       // 重连回调
-      onReconnect: () => SmartDialog.showToast('尝试重连主机...'),
+      onReconnect: () {
+        Future.delayed(const Duration(seconds: 1), () {
+          sendMessage(BaseMessage(type: MessageType.join, data: 'join', from: deviceNameController.text, to: '主机'));
+        });
+      },
       // 连接就绪回调
       onReady: () {
         isConnected.value = true;
         SmartDialog.showToast('连接主机成功');
+        Future.delayed(const Duration(seconds: 1), () {
+          sendMessage(BaseMessage(type: MessageType.join, data: 'join', from: deviceNameController.text, to: '主机'));
+        });
       },
       // 心跳回调
       onHeartBeat: () {
         // 发送心跳消息
         if (isConnected.value) {
-          sendMessage(BaseMessage(type: MessageType.system, data: 'heartbeat'));
+          sendMessage(
+            BaseMessage(type: MessageType.heartbeat, data: 'heartbeat', from: deviceNameController.text, to: '主机'),
+          );
         }
       },
     );
@@ -273,19 +353,18 @@ class SharedController extends GetxService {
   // 处理客户端消息（主机角色）
   void handleClientMessage(dynamic data) {
     try {
-      // ignore: unused_local_variable
       final msg = BaseMessage.fromJson(jsonDecode(data));
-      // todo: 处理客户端消息
+      sendDataToClient(msg);
     } catch (e) {
-      SmartDialog.showToast('消息解析错误：$e');
+      SmartDialog.showToast('客户端消息解析错误：$e');
     }
   }
 
-  // 处理主机消息（设备角色）
   void _handleHostMessage(dynamic data) {
     try {
-      // ignore: unused_local_variable
       final msg = BaseMessage.fromJson(jsonDecode(data));
+      log(msg.data.runtimeType.toString(), name: 'SharedController');
+      syncLocalData(msg);
     } catch (e) {
       SmartDialog.showToast('消息解析错误：$e');
     }
@@ -325,37 +404,238 @@ class SharedController extends GetxService {
     if (isConnected.value) {
       switch (type) {
         case MessageType.allData:
-          sendMessage(BaseMessage(type: MessageType.allData, data: 'syncAllData'));
+          sendMessage(
+            BaseMessage(type: MessageType.allData, data: 'syncAllData', from: deviceNameController.text, to: '主机'),
+          );
         case MessageType.customers:
-          sendMessage(BaseMessage(type: MessageType.customers, data: 'syncCustomers'));
+          sendMessage(
+            BaseMessage(type: MessageType.customers, data: 'syncCustomers', from: deviceNameController.text, to: '主机'),
+          );
           break;
         case MessageType.customerOrderItems:
-          sendMessage(BaseMessage(type: MessageType.customerOrderItems, data: 'syncCustomerOrderItems'));
+          sendMessage(
+            BaseMessage(
+              type: MessageType.customerOrderItems,
+              data: 'syncCustomerOrderItems',
+              from: deviceNameController.text,
+              to: '主机',
+            ),
+          );
           break;
         case MessageType.dishUnits:
-          sendMessage(BaseMessage(type: MessageType.dishUnits, data: 'syncDishUnits'));
+          sendMessage(
+            BaseMessage(type: MessageType.dishUnits, data: 'syncDishUnits', from: deviceNameController.text, to: '主机'),
+          );
           break;
         case MessageType.categories:
-          sendMessage(BaseMessage(type: MessageType.categories, data: 'syncCategories'));
+          sendMessage(
+            BaseMessage(
+              type: MessageType.categories,
+              data: 'syncCategories',
+              from: deviceNameController.text,
+              to: '主机',
+            ),
+          );
           break;
         case MessageType.orders:
-          sendMessage(BaseMessage(type: MessageType.orders, data: 'syncOrders'));
+          sendMessage(
+            BaseMessage(type: MessageType.orders, data: 'syncOrders', from: deviceNameController.text, to: '主机'),
+          );
           break;
         case MessageType.orderItems:
-          sendMessage(BaseMessage(type: MessageType.orderItems, data: 'syncOrderItems'));
+          sendMessage(
+            BaseMessage(
+              type: MessageType.orderItems,
+              data: 'syncOrderItems',
+              from: deviceNameController.text,
+              to: '主机',
+            ),
+          );
           break;
         case MessageType.vehicles:
-          sendMessage(BaseMessage(type: MessageType.vehicles, data: 'syncVehicles'));
+          sendMessage(
+            BaseMessage(type: MessageType.vehicles, data: 'syncVehicles', from: deviceNameController.text, to: '主机'),
+          );
           break;
         case MessageType.join:
-          sendMessage(BaseMessage(type: MessageType.join, data: 'join'));
+          sendMessage(BaseMessage(type: MessageType.join, data: 'join', from: deviceNameController.text, to: '主机'));
         case MessageType.leave:
-          sendMessage(BaseMessage(type: MessageType.leave, data: 'leave'));
+          sendMessage(BaseMessage(type: MessageType.leave, data: 'leave', from: deviceNameController.text, to: '主机'));
         case MessageType.system:
-          sendMessage(BaseMessage(type: MessageType.system, data: 'system'));
+          sendMessage(BaseMessage(type: MessageType.system, data: 'system', from: deviceNameController.text, to: '主机'));
         case MessageType.heartbeat:
-          sendMessage(BaseMessage(type: MessageType.heartbeat, data: 'heartbeat'));
+          sendMessage(
+            BaseMessage(type: MessageType.heartbeat, data: 'heartbeat', from: deviceNameController.text, to: '主机'),
+          );
       }
+    }
+  }
+
+  void sendDataToClient(BaseMessage message) async {
+    if (isConnected.value) {
+      if (message.type != MessageType.heartbeat &&
+          message.type != MessageType.customerOrderItems &&
+          message.type != MessageType.orderItems) {
+        var data = await dataToJson(message.type, message.data);
+        sendMessage(message.copyWith(data: data, from: message.to, to: message.from));
+      }
+    }
+  }
+
+  void syncLocalData(BaseMessage message) async {
+    if (isConnected.value) {
+      switch (message.type) {
+        case MessageType.allData:
+          final result = await Utils.showAlertDialog('是否同步全部数据？, 注意：同步后本地数据将被覆盖');
+          if (result == true) {
+            _syncAllData(jsonDecode(message.data));
+          }
+          break;
+        case MessageType.customers:
+          final result = await Utils.showAlertDialog('是否同步客户数据？, 注意：同步后本地数据将被覆盖');
+          if (result == true) {
+            _syncCustomers(jsonDecode(message.data));
+          }
+          break;
+        case MessageType.dishUnits:
+          final result = await Utils.showAlertDialog('是否同步商品单位数据？, 注意：同步后本地数据将被覆盖');
+          if (result == true) {
+            _syncDishUnits(jsonDecode(message.data));
+          }
+          break;
+        case MessageType.categories:
+          final result = await Utils.showAlertDialog('是否同步商品分类数据？, 注意：同步后本地数据将被覆盖');
+          if (result == true) {
+            _syncCategories(jsonDecode(message.data));
+          }
+          break;
+        case MessageType.orders:
+          final result = await Utils.showAlertDialog('是否同步销售单数据？, 注意：同步后本地数据将被覆盖');
+          if (result == true) {
+            _syncOrders(jsonDecode(message.data));
+          }
+          break;
+        case MessageType.vehicles:
+          final result = await Utils.showAlertDialog('是否同步车辆数据？, 注意：同步后本地数据将被覆盖');
+          if (result == true) {
+            _syncVehicles(jsonDecode(message.data));
+          }
+          break;
+        case MessageType.join:
+          break;
+        case MessageType.leave:
+          break;
+        case MessageType.system:
+          break;
+        case MessageType.heartbeat:
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  void _syncAllData(Map<String, dynamic> data) async {
+    final AppDatabase database = DatabaseManager.instance.appDatabase;
+    try {
+      await database.customerDao.deleteAll();
+      await database.customerOrderItemsDao.deleteAll();
+      await database.dishUnitsDao.deleteAll();
+      await database.dishesCategoryDao.deleteAll();
+      await database.ordersDao.deleteAll();
+      await database.orderItemsDao.deleteAll();
+      await database.vehicleDao.deleteAll();
+      List<Customer> customers = (data['customers'] as List).map((e) => Customer.fromJson(jsonDecode(e))).toList();
+      List<CustomerOrderItem> customerOrderItems = (data['customerOrderItems'] as List)
+          .map((e) => CustomerOrderItem.fromJson(jsonDecode(e)))
+          .toList();
+      List<DishUnit> dishUnits = (data['dishUnits'] as List).map((e) => DishUnit.fromJson(jsonDecode(e))).toList();
+      List<DishesCategoryData> categories = (data['categories'] as List)
+          .map((e) => DishesCategoryData.fromJson(jsonDecode(e)))
+          .toList();
+      List<Order> orders = (data['orders'] as List).map((e) => Order.fromJson(jsonDecode(e))).toList();
+      List<OrderItem> orderItems = (data['orderItems'] as List).map((e) => OrderItem.fromJson(jsonDecode(e))).toList();
+      List<Vehicle> vehicles = (data['vehicles'] as List).map((e) => Vehicle.fromJson(jsonDecode(e))).toList();
+      await database.customerDao.insertAllCustomers(customers);
+      await database.customerOrderItemsDao.insertAllOrderItems(customerOrderItems);
+      await database.dishUnitsDao.insertAllDishUnits(dishUnits);
+      await database.dishesCategoryDao.insertAllCategories(categories);
+      await database.ordersDao.insertAllOrders(orders);
+      await database.orderItemsDao.insertAllOrderItems(orderItems);
+      await database.vehicleDao.insertAllVehicles(vehicles);
+      SmartDialog.showToast('数据同步成功');
+    } catch (e) {
+      SmartDialog.showToast('数据同步失败：$e');
+    }
+  }
+
+  void _syncCustomers(Map<String, dynamic> data) async {
+    final AppDatabase database = DatabaseManager.instance.appDatabase;
+    try {
+      await database.customerOrderItemsDao.deleteAll();
+      List<Customer> customers = (data['customers'] as List).map((e) => Customer.fromJson(jsonDecode(e))).toList();
+      List<CustomerOrderItem> customerOrderItems = (data['customerOrderItems'] as List)
+          .map((e) => CustomerOrderItem.fromJson(jsonDecode(e)))
+          .toList();
+      await database.customerDao.insertAllCustomers(customers);
+      await database.customerOrderItemsDao.insertAllOrderItems(customerOrderItems);
+      SmartDialog.showToast('客户数据同步成功');
+    } catch (e) {
+      SmartDialog.showToast('客户数据同步失败：$e');
+    }
+  }
+
+  void _syncDishUnits(Map<String, dynamic> data) async {
+    final AppDatabase database = DatabaseManager.instance.appDatabase;
+    try {
+      await database.dishUnitsDao.deleteAll();
+      List<DishUnit> dishUnits = (data['dishUnits'] as List).map((e) => DishUnit.fromJson(jsonDecode(e))).toList();
+      await database.dishUnitsDao.insertAllDishUnits(dishUnits);
+      SmartDialog.showToast('商品单位数据同步成功');
+    } catch (e) {
+      SmartDialog.showToast('商品单位数据同步失败：$e');
+    }
+  }
+
+  void _syncCategories(Map<String, dynamic> data) async {
+    final AppDatabase database = DatabaseManager.instance.appDatabase;
+    try {
+      await database.dishesCategoryDao.deleteAll();
+      List<DishesCategoryData> categories = (data['categories'] as List)
+          .map((e) => DishesCategoryData.fromJson(jsonDecode(e)))
+          .toList();
+      await database.dishesCategoryDao.insertAllCategories(categories);
+      SmartDialog.showToast('商品分类数据同步成功');
+    } catch (e) {
+      SmartDialog.showToast('商品分类数据同步失败：$e');
+    }
+  }
+
+  void _syncOrders(Map<String, dynamic> data) async {
+    final AppDatabase database = DatabaseManager.instance.appDatabase;
+    try {
+      await database.ordersDao.deleteAll();
+      await database.orderItemsDao.deleteAll();
+      List<Order> orders = (data['orders'] as List).map((e) => Order.fromJson(jsonDecode(e))).toList();
+      List<OrderItem> orderItems = (data['orderItems'] as List).map((e) => OrderItem.fromJson(jsonDecode(e))).toList();
+      await database.ordersDao.insertAllOrders(orders);
+      await database.orderItemsDao.insertAllOrderItems(orderItems);
+      SmartDialog.showToast('销售单数据同步成功');
+    } catch (e) {
+      SmartDialog.showToast('销售单数据同步失败：$e');
+    }
+  }
+
+  void _syncVehicles(Map<String, dynamic> data) async {
+    List<Vehicle> vehicles = (data['vehicles'] as List).map((e) => Vehicle.fromJson(jsonDecode(e))).toList();
+    final AppDatabase database = DatabaseManager.instance.appDatabase;
+    try {
+      await database.vehicleDao.deleteAll();
+      await database.vehicleDao.insertAllVehicles(vehicles);
+      SmartDialog.showToast('车辆数据同步成功');
+    } catch (e) {
+      log(e.toString(), name: 'SharedController');
+      SmartDialog.showToast('车辆数据同步失败：$e');
     }
   }
 }

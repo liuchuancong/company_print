@@ -26,16 +26,35 @@ class BaseMessage {
   final String? ip; // 发送者IP
   final String? name; // 发送者名称
   final DateTime time;
+  final String from; // 发送者设备
+  final String to; // 接收者设备
 
-  BaseMessage({required this.type, required this.data, this.ip, this.name, DateTime? time})
-    : time = time ?? DateTime.now();
-  BaseMessage copyWith({MessageType? type, dynamic data, String? ip, String? name, DateTime? time}) {
+  BaseMessage({
+    required this.type,
+    required this.from,
+    required this.to,
+    required this.data,
+    this.ip,
+    this.name,
+    DateTime? time,
+  }) : time = time ?? DateTime.now();
+  BaseMessage copyWith({
+    MessageType? type,
+    dynamic data,
+    String? ip,
+    String? name,
+    DateTime? time,
+    String? from,
+    String? to,
+  }) {
     return BaseMessage(
       type: type ?? this.type,
       data: data ?? this.data,
       ip: ip ?? this.ip,
       name: name ?? this.name,
       time: time ?? this.time,
+      from: from ?? this.from,
+      to: to ?? this.to,
     );
   }
 
@@ -43,10 +62,12 @@ class BaseMessage {
   Map<String, dynamic> toJson() {
     return {
       'type': type.index,
-      'data': data, // 根据类型序列化数据
+      'data': data,
       'ip': ip,
+      'from': from,
       'name': name,
       'time': time.millisecondsSinceEpoch,
+      'to': to,
     };
   }
 
@@ -55,18 +76,22 @@ class BaseMessage {
 
   static BaseMessage fromJson(Map<String, dynamic> json) {
     final type = MessageType.values[json['type']];
+
     return BaseMessage(
       type: type,
       data: json['data'],
       ip: json['ip'],
       name: json['name'],
       time: DateTime.fromMillisecondsSinceEpoch(json['time']),
+      from: json['from'],
+      to: json['to'],
     );
   }
 }
 
 Future<String> dataToJson(MessageType type, dynamic data) async {
   final AppDatabase database = DatabaseManager.instance.appDatabase;
+
   if (type == MessageType.allData) {
     List<Customer> allCustomers = await database.customerDao.getAllCustomers();
     List<CustomerOrderItem> allCustomerOrderItems = await database.customerOrderItemsDao.getAllOrderItems();
@@ -87,10 +112,11 @@ Future<String> dataToJson(MessageType type, dynamic data) async {
     return jsonEncode(allData);
   } else if (type == MessageType.customers) {
     List<Customer> allCustomers = await database.customerDao.getAllCustomers();
-    return jsonEncode({'customers': allCustomers.map((e) => jsonEncode(e.toJson())).toList()});
-  } else if (type == MessageType.customerOrderItems) {
     List<CustomerOrderItem> allCustomerOrderItems = await database.customerOrderItemsDao.getAllOrderItems();
-    return jsonEncode({'customerOrderItems': allCustomerOrderItems.map((e) => jsonEncode(e.toJson())).toList()});
+    return jsonEncode({
+      'customers': allCustomers.map((e) => jsonEncode(e.toJson())).toList(),
+      'customerOrderItems': allCustomerOrderItems.map((e) => jsonEncode(e.toJson())).toList(),
+    });
   } else if (type == MessageType.dishUnits) {
     List<DishUnit> allDishUnits = await database.dishUnitsDao.getAllDishUnits();
     return jsonEncode({'dishUnits': allDishUnits.map((e) => jsonEncode(e.toJson())).toList()});
@@ -98,90 +124,16 @@ Future<String> dataToJson(MessageType type, dynamic data) async {
     List<DishesCategoryData> allCategories = await database.dishesCategoryDao.getAllCategories();
     return jsonEncode({'categories': allCategories.map((e) => jsonEncode(e.toJson())).toList()});
   } else if (type == MessageType.orders) {
-    List<Order> allOrders = await database.ordersDao.getAllOrders();
-    return jsonEncode({'orders': allOrders.map((e) => jsonEncode(e.toJson())).toList()});
-  } else if (type == MessageType.orderItems) {
     List<OrderItem> allOrderItems = await database.orderItemsDao.getAllOrderItems();
-    return jsonEncode({'orderItems': allOrderItems.map((e) => jsonEncode(e.toJson())).toList()});
+    List<Order> allOrders = await database.ordersDao.getAllOrders();
+    return jsonEncode({
+      'orders': allOrders.map((e) => jsonEncode(e.toJson())).toList(),
+      'orderItems': allOrderItems.map((e) => jsonEncode(e.toJson())).toList(),
+    });
   } else if (type == MessageType.vehicles) {
     List<Vehicle> vehicles = await database.vehicleDao.getAllVehicles();
     return jsonEncode({'vehicles': vehicles.map((e) => jsonEncode(e.toJson())).toList()});
   } else {
     return jsonEncode(data);
-  }
-}
-
-Future<dynamic> dataFromJson(MessageType type, String dataJson) async {
-  final AppDatabase database = DatabaseManager.instance.appDatabase;
-  if (type == MessageType.allData) {
-    var allData = jsonDecode(dataJson);
-    List<Customer> allCustomers = (allData['customers'] as List).map((e) => Customer.fromJson(jsonDecode(e))).toList();
-    List<CustomerOrderItem> allCustomerOrderItems = (allData['customerOrderItems'] as List)
-        .map((e) => CustomerOrderItem.fromJson(jsonDecode(e)))
-        .toList();
-    List<DishUnit> allDishUnits = (allData['dishUnits'] as List).map((e) => DishUnit.fromJson(jsonDecode(e))).toList();
-    List<DishesCategoryData> allCategories = (allData['categories'] as List)
-        .map((e) => DishesCategoryData.fromJson(jsonDecode(e)))
-        .toList();
-    List<Order> allOrders = (allData['orders'] as List).map((e) => Order.fromJson(jsonDecode(e))).toList();
-    List<OrderItem> allOrderItems = (allData['orderItems'] as List)
-        .map((e) => OrderItem.fromJson(jsonDecode(e)))
-        .toList();
-    List<Vehicle> vehicles = (allData['vehicles'] as List).map((e) => Vehicle.fromJson(jsonDecode(e))).toList();
-    await database.customerDao.insertAllCustomers(allCustomers);
-    await database.customerOrderItemsDao.insertAllOrderItems(allCustomerOrderItems);
-    await database.dishUnitsDao.insertAllDishUnits(allDishUnits);
-    await database.dishesCategoryDao.insertAllCategories(allCategories);
-    await database.ordersDao.insertAllOrders(allOrders);
-    await database.orderItemsDao.insertAllOrderItems(allOrderItems);
-    await database.vehicleDao.insertAllVehicles(vehicles);
-    return '同步成功';
-  } else if (type == MessageType.customers) {
-    var customersData = jsonDecode(dataJson);
-    List<Customer> allCustomers = (customersData['customers'] as List)
-        .map((e) => Customer.fromJson(jsonDecode(e)))
-        .toList();
-    await database.customerDao.insertAllCustomers(allCustomers);
-    return '同步成功';
-  } else if (type == MessageType.customerOrderItems) {
-    var customerOrderItemsData = jsonDecode(dataJson);
-    List<CustomerOrderItem> allCustomerOrderItems = (customerOrderItemsData['customerOrderItems'] as List)
-        .map((e) => CustomerOrderItem.fromJson(jsonDecode(e)))
-        .toList();
-    await database.customerOrderItemsDao.insertAllOrderItems(allCustomerOrderItems);
-    return '同步成功';
-  } else if (type == MessageType.dishUnits) {
-    var dishUnitsData = jsonDecode(dataJson);
-    List<DishUnit> allDishUnits = (dishUnitsData['dishUnits'] as List)
-        .map((e) => DishUnit.fromJson(jsonDecode(e)))
-        .toList();
-    await database.dishUnitsDao.insertAllDishUnits(allDishUnits);
-    return '同步成功';
-  } else if (type == MessageType.categories) {
-    var categoriesData = jsonDecode(dataJson);
-    List<DishesCategoryData> allCategories = (categoriesData['categories'] as List)
-        .map((e) => DishesCategoryData.fromJson(jsonDecode(e)))
-        .toList();
-    await database.dishesCategoryDao.insertAllCategories(allCategories);
-    return '同步成功';
-  } else if (type == MessageType.orders) {
-    var ordersData = jsonDecode(dataJson);
-    List<Order> allOrders = (ordersData['orders'] as List).map((e) => Order.fromJson(jsonDecode(e))).toList();
-    await database.ordersDao.insertAllOrders(allOrders);
-    return '同步成功';
-  } else if (type == MessageType.orderItems) {
-    var orderItemsData = jsonDecode(dataJson);
-    List<OrderItem> allOrderItems = (orderItemsData['orderItems'] as List)
-        .map((e) => OrderItem.fromJson(jsonDecode(e)))
-        .toList();
-    await database.orderItemsDao.insertAllOrderItems(allOrderItems);
-    return '同步成功';
-  } else if (type == MessageType.vehicles) {
-    var vehiclesData = jsonDecode(dataJson);
-    List<Vehicle> vehicles = (vehiclesData['vehicles'] as List).map((e) => Vehicle.fromJson(jsonDecode(e))).toList();
-    await database.vehicleDao.insertAllVehicles(vehicles);
-    return '同步成功';
-  } else {
-    return jsonDecode(dataJson);
   }
 }

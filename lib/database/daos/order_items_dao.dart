@@ -225,4 +225,8 @@ class OrderItemsDao extends DatabaseAccessor<AppDatabase> with _$OrderItemsDaoMi
       );
     });
   }
+
+  Future<int> deleteAll() async {
+    return await delete(orderItems).go();
+  }
 }

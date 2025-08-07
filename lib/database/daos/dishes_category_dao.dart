@@ -81,4 +81,8 @@ class DishesCategoryDao extends DatabaseAccessor<AppDatabase> with _$DishesCateg
       );
     });
   }
+
+  Future<int> deleteAll() async {
+    return await delete(dishesCategory).go();
+  }
 }

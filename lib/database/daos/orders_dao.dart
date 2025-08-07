@@ -153,4 +153,8 @@ class OrdersDao extends DatabaseAccessor<AppDatabase> with _$OrdersDaoMixin {
       );
     });
   }
+
+  Future<int> deleteAll() async {
+    return await delete(orders).go();
+  }
 }

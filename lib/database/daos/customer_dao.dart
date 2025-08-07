@@ -123,4 +123,8 @@ class CustomerDao extends DatabaseAccessor<AppDatabase> with _$CustomerDaoMixin 
       );
     });
   }
+
+  Future<int> deleteAll() async {
+    return await delete(customers).go();
+  }
 }
