@@ -30,10 +30,7 @@ class _VehiclesPageState extends State<VehiclesPage> with AutomaticKeepAliveClie
     super.build(context);
     final controller = Get.find<VehiclesController>();
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('司机信息'),
-        leading: Get.width > 680 ? null : MenuButton(),
-      ),
+      appBar: AppBar(title: const Text('司机信息'), leading: Get.width > 680 ? null : MenuButton()),
       body: Column(
         children: [
           Expanded(
@@ -68,10 +65,7 @@ class _VehiclesPageState extends State<VehiclesPage> with AutomaticKeepAliveClie
                 fixedLeftColumns: Get.width > 680 ? 1 : 0,
                 isHorizontalScrollBarVisible: true,
                 columns: [
-                  const DataColumn2(
-                    label: Text('操作'),
-                    fixedWidth: 220,
-                  ),
+                  const DataColumn2(label: Text('操作'), fixedWidth: 220),
                   DataColumn2(
                     label: const Text('司机姓名'),
                     fixedWidth: 120,
@@ -153,6 +147,8 @@ class EditOrCreateVehiclePageState extends State<EditOrCreateVehiclePage> {
       driverName: _driverNameController.text.isNotEmpty ? _driverNameController.text : null,
       driverPhone: _driverPhoneController.text.isNotEmpty ? _driverPhoneController.text : null,
       createdAt: isNew ? DateTime.now() : widget.vehicle!.createdAt,
+      updatedAt: DateTime.now(),
+      uuid: UuidUtil.v4(),
     );
     widget.onConfirm(newOrUpdatedVehicle);
     Get.back();
@@ -161,9 +157,7 @@ class EditOrCreateVehiclePageState extends State<EditOrCreateVehiclePage> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      appBar: AppBar(
-        title: Text(isNew ? '新增司机' : '编辑司机'),
-      ),
+      appBar: AppBar(title: Text(isNew ? '新增司机' : '编辑司机')),
       body: ListView(
         children: [
           InputTextField(
@@ -177,11 +171,7 @@ class EditOrCreateVehiclePageState extends State<EditOrCreateVehiclePage> {
               maxLines: null,
               maxLength: 10,
               decoration: const InputDecoration(
-                suffixIcon: Icon(
-                  Icons.info_outline,
-                  size: 30,
-                  color: Colors.redAccent,
-                ),
+                suffixIcon: Icon(Icons.info_outline, size: 30, color: Colors.redAccent),
               ),
             ),
           ),
@@ -261,52 +251,53 @@ class VehiclesDataSource extends AsyncDataTableSource {
     await controller.loadTotalData();
     await controller.loadData(startIndex);
     return AsyncRowsResponse(
-        controller.totalVehicles.value,
-        controller.vehicles.map((vehicle) {
-          return DataRow(
-            key: ValueKey<int>(vehicle.id),
-            cells: [
-              DataCell(
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.copy_rounded),
-                      tooltip: '复制',
-                      onPressed: () {
-                        var text =
-                            '姓名：${Utils.getString(vehicle.driverName)}\n电话：${Utils.getString(vehicle.driverPhone)}\n车牌号：${Utils.getString(vehicle.plateNumber)}';
-                        Utils.clipboard(text);
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.remove_red_eye),
-                      tooltip: '查看',
-                      onPressed: () {
-                        controller.showPreviewVehiclePage(vehicle);
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.edit),
-                      tooltip: '编辑',
-                      onPressed: () {
-                        controller.showEditVehiclePage(vehicle);
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      tooltip: '删除',
-                      onPressed: () {
-                        controller.showDeleteVehiclePage(vehicle.id);
-                      },
-                    ),
-                  ],
-                ),
+      controller.totalVehicles.value,
+      controller.vehicles.map((vehicle) {
+        return DataRow(
+          key: ValueKey<int>(vehicle.id),
+          cells: [
+            DataCell(
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.copy_rounded),
+                    tooltip: '复制',
+                    onPressed: () {
+                      var text =
+                          '姓名：${Utils.getString(vehicle.driverName)}\n电话：${Utils.getString(vehicle.driverPhone)}\n车牌号：${Utils.getString(vehicle.plateNumber)}';
+                      Utils.clipboard(text);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.remove_red_eye),
+                    tooltip: '查看',
+                    onPressed: () {
+                      controller.showPreviewVehiclePage(vehicle);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    tooltip: '编辑',
+                    onPressed: () {
+                      controller.showEditVehiclePage(vehicle);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    tooltip: '删除',
+                    onPressed: () {
+                      controller.showDeleteVehiclePage(vehicle.id);
+                    },
+                  ),
+                ],
               ),
-              DataCell(Text(vehicle.driverName ?? '')),
-              DataCell(Text(vehicle.driverPhone ?? '')),
-              DataCell(Text(vehicle.plateNumber ?? '')),
-            ],
-          );
-        }).toList());
+            ),
+            DataCell(Text(vehicle.driverName ?? '')),
+            DataCell(Text(vehicle.driverPhone ?? '')),
+            DataCell(Text(vehicle.plateNumber ?? '')),
+          ],
+        );
+      }).toList(),
+    );
   }
 }

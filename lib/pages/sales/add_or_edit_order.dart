@@ -69,62 +69,60 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
 
   void showDateTimerPicker() async {
     var results = await Get.dialog<List<DateTime>>(
-        AlertDialog(
-          title: const Text('选择日期'),
-          content: Container(
-            width: Get.width < 600 ? Get.width * 0.9 : Get.width * 0.6,
-            constraints: const BoxConstraints(
-              maxHeight: 500,
-            ),
-            child: SingleChildScrollView(
-              child: CalendarDatePicker2(
-                config: CalendarDatePicker2Config(
-                  calendarType: CalendarDatePicker2Type.single,
-                  firstDate: DateTime(1990, 1, 1),
-                  lastDate: DateTime.now(),
-                  controlsTextStyle: const TextStyle(color: Colors.black, fontSize: 18),
-                  dayTextStyle: const TextStyle(color: Colors.black, fontSize: 18),
-                  monthTextStyle: const TextStyle(fontSize: 18),
-                  selectedDayTextStyle: const TextStyle(fontSize: 18, color: Colors.white),
-                  yearTextStyle: const TextStyle(fontSize: 18),
-                  selectedRangeHighlightColor: Theme.of(Get.context!).primaryColor,
-                  weekdayLabelTextStyle: const TextStyle(fontSize: 18),
-                  selectedMonthTextStyle: const TextStyle(fontSize: 18, color: Colors.black),
-                  selectedRangeDayTextStyle: const TextStyle(fontSize: 18, color: Colors.white),
-                  selectedYearTextStyle: const TextStyle(fontSize: 18, color: Colors.white),
-                ),
-                value: selectedDate,
-                onValueChanged: (dates) {
-                  setState(() {
-                    selectedDate = dates;
-                  });
-                },
+      AlertDialog(
+        title: const Text('选择日期'),
+        content: Container(
+          width: Get.width < 600 ? Get.width * 0.9 : Get.width * 0.6,
+          constraints: const BoxConstraints(maxHeight: 500),
+          child: SingleChildScrollView(
+            child: CalendarDatePicker2(
+              config: CalendarDatePicker2Config(
+                calendarType: CalendarDatePicker2Type.single,
+                firstDate: DateTime(1990, 1, 1),
+                lastDate: DateTime.now(),
+                controlsTextStyle: const TextStyle(color: Colors.black, fontSize: 18),
+                dayTextStyle: const TextStyle(color: Colors.black, fontSize: 18),
+                monthTextStyle: const TextStyle(fontSize: 18),
+                selectedDayTextStyle: const TextStyle(fontSize: 18, color: Colors.white),
+                yearTextStyle: const TextStyle(fontSize: 18),
+                selectedRangeHighlightColor: Theme.of(Get.context!).primaryColor,
+                weekdayLabelTextStyle: const TextStyle(fontSize: 18),
+                selectedMonthTextStyle: const TextStyle(fontSize: 18, color: Colors.black),
+                selectedRangeDayTextStyle: const TextStyle(fontSize: 18, color: Colors.white),
+                selectedYearTextStyle: const TextStyle(fontSize: 18, color: Colors.white),
               ),
+              value: selectedDate,
+              onValueChanged: (dates) {
+                setState(() {
+                  selectedDate = dates;
+                });
+              },
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: (() {
-                setState(() {
-                  selectedDate = [widget.order!.createdAt];
-                });
-                Navigator.of(Get.context!).pop();
-              }),
-              child: const Text('重置'),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _dateController.text =
-                      formatDate(selectedDate[0], [yyyy, '-', mm, '-', dd, ' ', HH, ':', nn, ':', ss]);
-                });
-                Navigator.of(Get.context!).pop();
-              },
-              child: const Text('确定'),
-            ),
-          ],
         ),
-        barrierDismissible: false);
+        actions: [
+          TextButton(
+            onPressed: (() {
+              setState(() {
+                selectedDate = [widget.order!.createdAt];
+              });
+              Navigator.of(Get.context!).pop();
+            }),
+            child: const Text('重置'),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _dateController.text = formatDate(selectedDate[0], [yyyy, '-', mm, '-', dd, ' ', HH, ':', nn, ':', ss]);
+              });
+              Navigator.of(Get.context!).pop();
+            },
+            child: const Text('确定'),
+          ),
+        ],
+      ),
+      barrierDismissible: false,
+    );
     if (results != null && results.isNotEmpty) {}
   }
 
@@ -152,6 +150,8 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
       isPaid: _isPaid,
       customerId: customerId,
       createdAt: isNew ? DateTime.now() : selectedDate[0],
+      updatedAt: DateTime.now(),
+      uuid: UuidUtil.v4(),
     );
 
     widget.onConfirm(updatedOrder);
@@ -161,9 +161,7 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(isNew ? '新增订单' : '编辑订单'),
-      ),
+      appBar: AppBar(title: Text(isNew ? '新增订单' : '编辑订单')),
       body: Column(
         children: [
           Expanded(
@@ -182,10 +180,7 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
-                            icon: const Icon(
-                              Icons.chevron_right_outlined,
-                              size: 30,
-                            ),
+                            icon: const Icon(Icons.chevron_right_outlined, size: 30),
                             onPressed: () async {
                               final result = await Get.toNamed(RoutePath.kCustomerSelectPage);
                               if (result != null) {
@@ -209,10 +204,7 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
-                            icon: const Icon(
-                              Icons.chevron_right_outlined,
-                              size: 30,
-                            ),
+                            icon: const Icon(Icons.chevron_right_outlined, size: 30),
                             onPressed: () async {
                               final result = await Get.toNamed(RoutePath.kCustomerSelectPage);
                               if (result != null) {
@@ -267,10 +259,7 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
-                            icon: const Icon(
-                              Icons.calendar_month_outlined,
-                              size: 30,
-                            ),
+                            icon: const Icon(Icons.calendar_month_outlined, size: 30),
                             onPressed: () {
                               showDateTimerPicker();
                             },
@@ -297,20 +286,23 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                         width: double.infinity,
                         decoration: BoxDecoration(
                           color: Theme.of(context).primaryColor.withAlpha(15),
-                          borderRadius:
-                              const BorderRadius.only(topRight: Radius.circular(5), bottomRight: Radius.circular(5)),
+                          borderRadius: const BorderRadius.only(
+                            topRight: Radius.circular(5),
+                            bottomRight: Radius.circular(5),
+                          ),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Switch(
-                                value: _isPaid,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _isPaid = value;
-                                  });
-                                }),
+                              value: _isPaid,
+                              onChanged: (value) {
+                                setState(() {
+                                  _isPaid = value;
+                                });
+                              },
+                            ),
                           ],
                         ),
                       ),
@@ -362,10 +354,7 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                         textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
-                            icon: const Icon(
-                              Icons.chevron_right_outlined,
-                              size: 30,
-                            ),
+                            icon: const Icon(Icons.chevron_right_outlined, size: 30),
                             onPressed: () async {
                               final result = await Get.toNamed(RoutePath.kDriverSelectPage);
                               if (result != null) {
@@ -388,10 +377,7 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
-                            icon: const Icon(
-                              Icons.chevron_right_outlined,
-                              size: 30,
-                            ),
+                            icon: const Icon(Icons.chevron_right_outlined, size: 30),
                             onPressed: () async {
                               final result = await Get.toNamed(RoutePath.kDriverSelectPage);
                               if (result != null) {
@@ -424,7 +410,7 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                         textInputAction: TextInputAction.done,
                       ),
                     ),
-                  AppStyle.vGap40
+                  AppStyle.vGap40,
                 ],
               ),
             ),
@@ -432,9 +418,7 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
           Container(
             padding: const EdgeInsets.all(10.0),
             decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(color: Theme.of(context).primaryColor, width: 0.5),
-              ),
+              border: Border(top: BorderSide(color: Theme.of(context).primaryColor, width: 0.5)),
             ),
             child: SizedBox(
               height: 50,
@@ -447,8 +431,9 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                     children: [
                       FilledButton(
                         style: ButtonStyle(
-                          shape:
-                              WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                          shape: WidgetStateProperty.all(
+                            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
                           padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                         ),
                         onPressed: () async {
@@ -462,8 +447,9 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                       const SizedBox(width: 10),
                       FilledButton(
                         style: ButtonStyle(
-                          shape:
-                              WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                          shape: WidgetStateProperty.all(
+                            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
                           padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                         ),
                         onPressed: _submitForm,
@@ -474,7 +460,7 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );

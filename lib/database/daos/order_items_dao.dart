@@ -17,6 +17,7 @@ class OrderItemsDao extends DatabaseAccessor<AppDatabase> with _$OrderItemsDaoMi
     final entry = OrderItemsCompanion.insert(
       orderId: order.orderId,
       itemName: Value(order.itemName),
+      uuid: order.uuid,
       itemShortName: Value(order.itemShortName),
       purchaseUnit: Value(order.purchaseUnit),
       purchaseQuantity: Value(order.purchaseQuantity),
@@ -194,5 +195,33 @@ class OrderItemsDao extends DatabaseAccessor<AppDatabase> with _$OrderItemsDaoMi
     query.where(db.orders.id.equals(orderId));
     final result = await query.map((row) => row.read<double>(db.orders.itemCount)).getSingle();
     return result;
+  }
+
+  Future<void> insertAllOrderItems(List<OrderItem> allOrderItems) async {
+    await batch((batch) {
+      batch.insertAll(
+        db.orderItems,
+        allOrderItems
+            .map(
+              (orderItem) => OrderItemsCompanion.insert(
+                orderId: orderItem.orderId,
+                itemName: Value(orderItem.itemName),
+                itemShortName: Value(orderItem.itemShortName),
+                purchaseUnit: Value(orderItem.purchaseUnit),
+                purchaseQuantity: Value(orderItem.purchaseQuantity),
+                actualUnit: Value(orderItem.actualUnit),
+                actualQuantity: Value(orderItem.actualQuantity),
+                presetPrice: Value(orderItem.presetPrice),
+                actualPrice: Value(orderItem.actualPrice),
+                advancePayment: Value(orderItem.advancePayment),
+                totalPrice: Value(orderItem.totalPrice),
+                uuid: orderItem.uuid,
+                updatedAt: Value(orderItem.updatedAt),
+              ),
+            )
+            .toList(),
+        mode: InsertMode.insert,
+      );
+    });
   }
 }

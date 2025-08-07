@@ -37,14 +37,10 @@ class VehicleDao extends DatabaseAccessor<AppDatabase> with _$VehicleDaoMixin {
     if (columnMap.containsKey(orderByField)) {
       final column = columnMap[orderByField];
       final orderMode = ascending ? OrderingMode.asc : OrderingMode.desc;
-      query.orderBy([
-        (t) => OrderingTerm(expression: column, mode: orderMode),
-      ]);
+      query.orderBy([(t) => OrderingTerm(expression: column, mode: orderMode)]);
     } else {
       // 如果没有提供有效字段，则默认按照创建时间排序，且默认为倒序
-      query.orderBy([
-        (t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc),
-      ]);
+      query.orderBy([(t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc)]);
     }
 
     return await query.get();
@@ -59,23 +55,23 @@ class VehicleDao extends DatabaseAccessor<AppDatabase> with _$VehicleDaoMixin {
   }
 
   /// 创建新的车辆信息
-  Future<int> createVehicle(String plateNumber, String? driverName, String? driverPhone) async {
+  Future<int> createVehicle(Vehicle vehicle) async {
     final entry = VehiclesCompanion(
-      plateNumber: Value(plateNumber),
-      driverName: Value(driverName),
-      driverPhone: Value(driverPhone),
+      plateNumber: Value(vehicle.plateNumber),
+      driverName: Value(vehicle.driverName),
+      driverPhone: Value(vehicle.driverPhone),
     );
     return await into(vehicles).insert(entry);
   }
 
   /// 更新车辆信息
-  Future updateVehicle(int id, String plateNumber, String? driverName, String? driverPhone) async {
+  Future updateVehicle(Vehicle vehicle) async {
     final entry = VehiclesCompanion(
-      plateNumber: Value(plateNumber),
-      driverName: Value(driverName),
-      driverPhone: Value(driverPhone),
+      plateNumber: Value(vehicle.plateNumber),
+      driverName: Value(vehicle.driverName),
+      driverPhone: Value(vehicle.driverPhone),
     );
-    return await (update(vehicles)..where((tbl) => tbl.id.equals(id))).write(entry);
+    return await (update(vehicles)..where((tbl) => tbl.id.equals(vehicle.id))).write(entry);
   }
 
   /// 删除车辆信息
@@ -91,5 +87,25 @@ class VehicleDao extends DatabaseAccessor<AppDatabase> with _$VehicleDaoMixin {
   /// 根据司机名称查找车辆
   Future<List<Vehicle>> getVehiclesByDriverName(String driverName) async {
     return await (select(vehicles)..where((tbl) => tbl.driverName.equals(driverName))).get();
+  }
+
+  Future<void> insertAllVehicles(List<Vehicle> vehicles) async {
+    await batch((batch) {
+      batch.insertAll(
+        db.vehicles,
+        vehicles
+            .map(
+              (vehicle) => VehiclesCompanion.insert(
+                plateNumber: Value(vehicle.plateNumber),
+                driverName: Value(vehicle.driverName),
+                driverPhone: Value(vehicle.driverPhone),
+                uuid: vehicle.uuid,
+                updatedAt: Value(vehicle.updatedAt),
+              ),
+            )
+            .toList(),
+        mode: InsertMode.insert,
+      );
+    });
   }
 }

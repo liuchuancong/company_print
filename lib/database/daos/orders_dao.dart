@@ -35,8 +35,13 @@ class OrdersDao extends DatabaseAccessor<AppDatabase> with _$OrdersDaoMixin {
     return await query.get();
   }
 
-  Future<List<Order>> getOrdersForTimeRange(DateTime startTime, DateTime endTime,
-      {int page = 1, int pageSize = 10, String searchQuery = ''}) async {
+  Future<List<Order>> getOrdersForTimeRange(
+    DateTime startTime,
+    DateTime endTime, {
+    int page = 1,
+    int pageSize = 10,
+    String searchQuery = '',
+  }) async {
     final offset = (page - 1) * pageSize;
 
     var query = select(orders)
@@ -67,84 +72,85 @@ class OrdersDao extends DatabaseAccessor<AppDatabase> with _$OrdersDaoMixin {
   }
 
   /// 创建新的订单
-  Future<int> createOrder({
-    required String customerName,
-    String? orderName,
-    String? description,
-    String? remark,
-    String? customerPhone,
-    String? customerAddress,
-    String? driverName,
-    String? driverPhone,
-    String? vehiclePlateNumber,
-    double totalPrice = 0.0,
-    double itemCount = 0,
-    double advancePayment = 0.0,
-    double shippingFee = 0.0,
-    bool isPaid = false,
-    int? customerId,
-  }) async {
+  Future<int> createOrder(Order order) async {
     final entry = OrdersCompanion.insert(
-      orderName: Value(orderName),
-      description: Value(description ?? ''),
-      remark: Value(remark ?? ''),
-      customerName: Value(customerName),
-      customerPhone: Value(customerPhone ?? ''),
-      customerAddress: Value(customerAddress ?? ''),
-      driverName: Value(driverName ?? ''),
-      driverPhone: Value(driverPhone ?? ''),
-      vehiclePlateNumber: Value(vehiclePlateNumber ?? ''),
-      totalPrice: Value(totalPrice),
-      itemCount: Value(itemCount),
-      advancePayment: Value(advancePayment),
-      shippingFee: Value(shippingFee),
-      isPaid: Value(isPaid),
-      customerId: Value(customerId),
+      orderName: Value(order.orderName),
+      description: Value(order.description),
+      remark: Value(order.remark),
+      customerName: Value(order.customerName),
+      customerPhone: Value(order.customerPhone),
+      customerAddress: Value(order.customerAddress),
+      driverName: Value(order.driverName),
+      driverPhone: Value(order.driverPhone),
+      vehiclePlateNumber: Value(order.vehiclePlateNumber),
+      totalPrice: Value(order.totalPrice),
+      itemCount: Value(order.itemCount),
+      advancePayment: Value(order.advancePayment),
+      shippingFee: Value(order.shippingFee),
+      isPaid: Value(order.isPaid),
+      customerId: Value(order.customerId),
+      uuid: order.uuid,
     );
     return await into(orders).insert(entry);
   }
 
   /// 更新订单信息
-  Future updateOrder({
-    required int id,
-    required String orderName,
-    String? description,
-    String? remark,
-    String? customerName,
-    String? customerPhone,
-    String? customerAddress,
-    String? driverName,
-    String? driverPhone,
-    String? vehiclePlateNumber,
-    double totalPrice = 0.0,
-    double itemCount = 0,
-    double advancePayment = 0.0,
-    double shippingFee = 0.0,
-    bool isPaid = false,
-    DateTime? createdAt,
-  }) async {
+  Future updateOrder(Order order) async {
     final entry = OrdersCompanion(
-      orderName: Value(orderName),
-      description: Value(description ?? ''),
-      remark: Value(remark ?? ''),
-      customerName: Value(customerName ?? ''),
-      customerPhone: Value(customerPhone ?? ''),
-      customerAddress: Value(customerAddress ?? ''),
-      driverName: Value(driverName ?? ''),
-      driverPhone: Value(driverPhone ?? ''),
-      vehiclePlateNumber: Value(vehiclePlateNumber ?? ''),
-      totalPrice: Value(totalPrice),
-      itemCount: Value(itemCount),
-      advancePayment: Value(advancePayment),
-      shippingFee: Value(shippingFee),
-      isPaid: Value(isPaid),
-      createdAt: Value(createdAt ?? DateTime.now()),
+      orderName: Value(order.orderName),
+      description: Value(order.description),
+      remark: Value(order.remark),
+      customerName: Value(order.customerName),
+      customerPhone: Value(order.customerPhone),
+      customerAddress: Value(order.customerAddress),
+      driverName: Value(order.driverName),
+      driverPhone: Value(order.driverPhone),
+      vehiclePlateNumber: Value(order.vehiclePlateNumber),
+      totalPrice: Value(order.totalPrice),
+      itemCount: Value(order.itemCount),
+      advancePayment: Value(order.advancePayment),
+      shippingFee: Value(order.shippingFee),
+      isPaid: Value(order.isPaid),
+      createdAt: Value(order.createdAt),
     );
-    return await (update(orders)..where((tbl) => tbl.id.equals(id))).write(entry);
+    return await (update(orders)..where((tbl) => tbl.id.equals(order.id))).write(entry);
   }
 
   /// 删除订单
   Future deleteOrder(int id) async {
     return await (delete(orders)..where((tbl) => tbl.id.equals(id))).go();
+  }
+
+  Future<void> insertAllOrders(List<Order> allOrders) async {
+    await batch((batch) {
+      batch.insertAll(
+        db.orders,
+        allOrders
+            .map(
+              (order) => OrdersCompanion.insert(
+                orderName: Value(order.orderName),
+                description: Value(order.description),
+                remark: Value(order.remark),
+                customerName: Value(order.customerName),
+                customerPhone: Value(order.customerPhone),
+                customerAddress: Value(order.customerAddress),
+                driverName: Value(order.driverName),
+                driverPhone: Value(order.driverPhone),
+                vehiclePlateNumber: Value(order.vehiclePlateNumber),
+                totalPrice: Value(order.totalPrice),
+                itemCount: Value(order.itemCount),
+                advancePayment: Value(order.advancePayment),
+                shippingFee: Value(order.shippingFee),
+                isPaid: Value(order.isPaid),
+                createdAt: Value(order.createdAt),
+                customerId: Value(order.customerId),
+                uuid: order.uuid,
+                updatedAt: Value(order.updatedAt),
+              ),
+            )
+            .toList(),
+        mode: InsertMode.insert,
+      );
+    });
   }
 }

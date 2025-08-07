@@ -26,4 +26,6 @@ class Orders extends Table {
   BoolColumn get isPaid => boolean().withDefault(const Constant(false))(); // 是否已支付，默认值为false
 
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)(); // 创建时间字段，默认值为当前时间
+  TextColumn get uuid => text()(); // 全局唯一标识，跨设备唯一
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)(); // 新增：最后更新时间
 }

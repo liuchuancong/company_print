@@ -55,82 +55,88 @@ class _DishesPageState extends State<DishesPage> with TickerProviderStateMixin {
                 padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 15.0, right: 15.0),
                 child: CustomScrollView(
                   slivers: [
-                    Obx(() => SliverTreeView.simpleTyped<CategoryTreeNode, TreeNode<CategoryTreeNode>>(
-                          tree: TreeNode.root()..addAll(controller.nodes),
-                          showRootNode: false,
-                          expansionIndicatorBuilder: (context, node) {
-                            if (node.isRoot) {
-                              return PlusMinusIndicator(
-                                tree: node,
-                                padding: const EdgeInsets.only(left: 5.0, right: 5),
-                                alignment: Alignment.centerLeft,
-                                color: Theme.of(context).primaryColor,
-                              );
-                            }
-
-                            return ChevronIndicator.rightDown(
+                    Obx(
+                      () => SliverTreeView.simpleTyped<CategoryTreeNode, TreeNode<CategoryTreeNode>>(
+                        tree: TreeNode.root()..addAll(controller.nodes),
+                        showRootNode: false,
+                        expansionIndicatorBuilder: (context, node) {
+                          if (node.isRoot) {
+                            return PlusMinusIndicator(
                               tree: node,
                               padding: const EdgeInsets.only(left: 5.0, right: 5),
                               alignment: Alignment.centerLeft,
                               color: Theme.of(context).primaryColor,
                             );
-                          },
-                          indentation: Indentation(
-                            style: IndentStyle.roundJoint,
+                          }
+
+                          return ChevronIndicator.rightDown(
+                            tree: node,
+                            padding: const EdgeInsets.only(left: 5.0, right: 5),
+                            alignment: Alignment.centerLeft,
                             color: Theme.of(context).primaryColor,
+                          );
+                        },
+                        indentation: Indentation(style: IndentStyle.roundJoint, color: Theme.of(context).primaryColor),
+                        builder: (context, node) => Container(
+                          margin: const EdgeInsets.symmetric(vertical: 2.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.0),
+                            color: Theme.of(context).primaryColor.withAlpha(8),
+                            border: Border.all(color: Theme.of(context).primaryColor, width: 2.0),
                           ),
-                          builder: (context, node) => Container(
-                            margin: const EdgeInsets.symmetric(
-                              vertical: 2.0,
-                            ),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.0),
-                                color: Theme.of(context).primaryColor.withAlpha(8),
-                                border: Border.all(color: Theme.of(context).primaryColor, width: 2.0)),
-                            child: ListTile(
-                              title: Container(
-                                margin: const EdgeInsets.only(left: 15.0),
-                                child: Text('商品名称: ${node.data!.data.name}',
-                                    style: const TextStyle(fontSize: 18.0, color: Colors.black)),
-                              ),
-                              subtitle: Container(
-                                margin: const EdgeInsets.only(left: 15.0),
-                                child: Text('商品描述: ${node.data!.data.description}',
-                                    style: const TextStyle(fontSize: 16.0, color: Colors.black)),
-                              ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  FilledButton(
-                                    style: ButtonStyle(
-                                      shape: WidgetStateProperty.all(
-                                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                                      padding: WidgetStateProperty.all(
-                                          const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
-                                    ),
-                                    onPressed: () {
-                                      controller.showEditCategoryDialog(node.data!.data);
-                                    },
-                                    child: const Text('编辑', style: TextStyle(fontSize: 18)),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  FilledButton(
-                                    style: ButtonStyle(
-                                      shape: WidgetStateProperty.all(
-                                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                                      padding: WidgetStateProperty.all(
-                                          const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
-                                    ),
-                                    onPressed: () {
-                                      controller.deleteCategory(node.data!.data.id);
-                                    },
-                                    child: const Text('删除', style: TextStyle(fontSize: 16)),
-                                  ),
-                                ],
+                          child: ListTile(
+                            title: Container(
+                              margin: const EdgeInsets.only(left: 15.0),
+                              child: Text(
+                                '商品名称: ${node.data!.data.name}',
+                                style: const TextStyle(fontSize: 18.0, color: Colors.black),
                               ),
                             ),
+                            subtitle: Container(
+                              margin: const EdgeInsets.only(left: 15.0),
+                              child: Text(
+                                '商品描述: ${node.data!.data.description}',
+                                style: const TextStyle(fontSize: 16.0, color: Colors.black),
+                              ),
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                FilledButton(
+                                  style: ButtonStyle(
+                                    shape: WidgetStateProperty.all(
+                                      RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    padding: WidgetStateProperty.all(
+                                      const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    controller.showEditCategoryDialog(node.data!.data);
+                                  },
+                                  child: const Text('编辑', style: TextStyle(fontSize: 18)),
+                                ),
+                                const SizedBox(width: 10),
+                                FilledButton(
+                                  style: ButtonStyle(
+                                    shape: WidgetStateProperty.all(
+                                      RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    padding: WidgetStateProperty.all(
+                                      const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    controller.deleteCategory(node.data!.data.id);
+                                  },
+                                  child: const Text('删除', style: TextStyle(fontSize: 16)),
+                                ),
+                              ],
+                            ),
                           ),
-                        ))
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -182,6 +188,8 @@ class EditOrCreateCategoryPageState extends State<EditOrCreateCategoryPage> {
       parentId: parentId, // 默认值为0，假设0代表没有父级分类
       description: _descriptionController.text,
       createdAt: isNew ? DateTime.now() : widget.category!.createdAt,
+      updatedAt: DateTime.now(),
+      uuid: UuidUtil.v4(),
     );
     if (isNew) {
       checkExitsItem(newOrUpdatedCategory);
@@ -219,9 +227,7 @@ class EditOrCreateCategoryPageState extends State<EditOrCreateCategoryPage> {
     return BackButtonListener(
       onBackButtonPressed: onWillPop,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(isNew ? '新增' : '编辑'),
-        ),
+        appBar: AppBar(title: Text(isNew ? '新增' : '编辑')),
         body: Column(
           children: [
             Expanded(
@@ -240,11 +246,7 @@ class EditOrCreateCategoryPageState extends State<EditOrCreateCategoryPage> {
                         maxLength: 100,
                         maxLines: null,
                         decoration: const InputDecoration(
-                          suffixIcon: Icon(
-                            Icons.info_outline,
-                            size: 30,
-                            color: Colors.redAccent,
-                          ),
+                          suffixIcon: Icon(Icons.info_outline, size: 30, color: Colors.redAccent),
                         ),
                       ),
                     ),
@@ -269,10 +271,7 @@ class EditOrCreateCategoryPageState extends State<EditOrCreateCategoryPage> {
                           textInputAction: TextInputAction.done,
                           decoration: InputDecoration(
                             suffixIcon: IconButton(
-                              icon: const Icon(
-                                Icons.chevron_right_outlined,
-                                size: 30,
-                              ),
+                              icon: const Icon(Icons.chevron_right_outlined, size: 30),
                               onPressed: () async {
                                 final result = await Get.toNamed(RoutePath.kDishSelectPage);
                                 if (result != null) {
@@ -291,9 +290,7 @@ class EditOrCreateCategoryPageState extends State<EditOrCreateCategoryPage> {
             Container(
               padding: const EdgeInsets.all(10.0),
               decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: Theme.of(context).primaryColor, width: 0.5),
-                ),
+                border: Border(top: BorderSide(color: Theme.of(context).primaryColor, width: 0.5)),
               ),
               child: SizedBox(
                 height: 50,
@@ -307,7 +304,8 @@ class EditOrCreateCategoryPageState extends State<EditOrCreateCategoryPage> {
                         FilledButton(
                           style: ButtonStyle(
                             shape: WidgetStateProperty.all(
-                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
                             padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                           ),
                           onPressed: () async {
@@ -322,7 +320,8 @@ class EditOrCreateCategoryPageState extends State<EditOrCreateCategoryPage> {
                         FilledButton(
                           style: ButtonStyle(
                             shape: WidgetStateProperty.all(
-                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
                             padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                           ),
                           onPressed: _submitForm,
@@ -333,7 +332,7 @@ class EditOrCreateCategoryPageState extends State<EditOrCreateCategoryPage> {
                   ],
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -345,10 +344,7 @@ class EditOrCreateCategoryPageState extends State<EditOrCreateCategoryPage> {
       builder: (BuildContext context) {
         return Container(
           padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(0.0),
-          ),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(0.0)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -357,45 +353,47 @@ class EditOrCreateCategoryPageState extends State<EditOrCreateCategoryPage> {
                   padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 15.0, right: 15.0),
                   child: CustomScrollView(
                     slivers: [
-                      Obx(() => SliverTreeView.simpleTyped<CategoryTreeNode, TreeNode<CategoryTreeNode>>(
-                            tree: TreeNode.root()..addAll(widget.controller.nodes),
-                            showRootNode: false,
-                            expansionIndicatorBuilder: (context, node) {
-                              if (node.isRoot) {
-                                return PlusMinusIndicator(
-                                  tree: node,
-                                  alignment: Alignment.centerLeft,
-                                  color: Colors.black,
-                                );
-                              }
-                              return ChevronIndicator.rightDown(
+                      Obx(
+                        () => SliverTreeView.simpleTyped<CategoryTreeNode, TreeNode<CategoryTreeNode>>(
+                          tree: TreeNode.root()..addAll(widget.controller.nodes),
+                          showRootNode: false,
+                          expansionIndicatorBuilder: (context, node) {
+                            if (node.isRoot) {
+                              return PlusMinusIndicator(
                                 tree: node,
                                 alignment: Alignment.centerLeft,
                                 color: Colors.black,
                               );
-                            },
-                            indentation: const Indentation(),
-                            builder: (context, node) => Container(
-                              padding: const EdgeInsets.only(left: 25.0, right: 16.0, top: 2.0, bottom: 2.0),
-                              child: ListTile(
-                                title: Text(node.data!.data.name, style: const TextStyle(fontSize: 18.0)),
-                                subtitle: Text(node.data!.data.description, style: const TextStyle(fontSize: 16.0)),
-                                onTap: () {
+                            }
+                            return ChevronIndicator.rightDown(
+                              tree: node,
+                              alignment: Alignment.centerLeft,
+                              color: Colors.black,
+                            );
+                          },
+                          indentation: const Indentation(),
+                          builder: (context, node) => Container(
+                            padding: const EdgeInsets.only(left: 25.0, right: 16.0, top: 2.0, bottom: 2.0),
+                            child: ListTile(
+                              title: Text(node.data!.data.name, style: const TextStyle(fontSize: 18.0)),
+                              subtitle: Text(node.data!.data.description, style: const TextStyle(fontSize: 16.0)),
+                              onTap: () {
+                                _parentIdController.text = node.data!.data.name.toString();
+                                parentId = node.data!.data.id;
+                                SmartDialog.dismiss();
+                              },
+                              trailing: ElevatedButton(
+                                onPressed: () {
                                   _parentIdController.text = node.data!.data.name.toString();
                                   parentId = node.data!.data.id;
                                   SmartDialog.dismiss();
                                 },
-                                trailing: ElevatedButton(
-                                  onPressed: () {
-                                    _parentIdController.text = node.data!.data.name.toString();
-                                    parentId = node.data!.data.id;
-                                    SmartDialog.dismiss();
-                                  },
-                                  child: const Text('选择'),
-                                ),
+                                child: const Text('选择'),
                               ),
                             ),
-                          ))
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),

@@ -70,13 +70,13 @@ class UnitsController extends GetxController {
   }
 
   // 添加新商品单位的方法
-  Future<void> addNewDishUnit(String name, String abbreviation, String? description) async {
-    await _database.dishUnitsDao.createDishUnit(name, abbreviation, description);
+  Future<void> addNewDishUnit(DishUnit dishUnit) async {
+    await _database.dishUnitsDao.createDishUnit(dishUnit);
     dataSource?.refreshDatasource();
   }
 
   Future<void> updateDishUnit(DishUnit dishUnit) async {
-    await _database.dishUnitsDao.updateDishUnit(dishUnit.toCompanion(true), dishUnit.id);
+    await _database.dishUnitsDao.updateDishUnit(dishUnit);
     dataSource?.refreshDatasource();
   }
 
@@ -89,7 +89,7 @@ class UnitsController extends GetxController {
     Get.to(
       () => EditOrCreateDishUnitPage(
         onConfirm: (newDishUnit) {
-          addNewDishUnit(newDishUnit.name, newDishUnit.abbreviation ?? '', newDishUnit.description ?? '');
+          addNewDishUnit(newDishUnit);
         },
       ),
     );
@@ -100,13 +100,17 @@ class UnitsController extends GetxController {
       () => EditOrCreateDishUnitPage(
         dishUnit: dishUnit,
         onConfirm: (updatedDishUnit) {
-          updateDishUnit(DishUnit(
-            id: dishUnit.id,
-            name: updatedDishUnit.name,
-            abbreviation: updatedDishUnit.abbreviation,
-            description: updatedDishUnit.description,
-            createdAt: dishUnit.createdAt,
-          ));
+          updateDishUnit(
+            DishUnit(
+              id: dishUnit.id,
+              name: updatedDishUnit.name,
+              abbreviation: updatedDishUnit.abbreviation,
+              description: updatedDishUnit.description,
+              createdAt: dishUnit.createdAt,
+              updatedAt: updatedDishUnit.updatedAt,
+              uuid: dishUnit.uuid,
+            ),
+          );
         },
       ),
     );

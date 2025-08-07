@@ -323,7 +323,7 @@ class SharedController extends GetxService {
 
   void syncAllData() {
     if (isConnected.value) {
-      sendMessage(BaseMessage(type: MessageType.order, data: 'add_order'));
+      // sendMessage(BaseMessage(type: MessageType.allData));
     }
   }
 }

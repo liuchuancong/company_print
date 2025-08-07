@@ -22,6 +22,8 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
       actualQuantity: Value(addCustomerOrderItem.actualQuantity),
       presetPrice: Value(addCustomerOrderItem.presetPrice),
       actualPrice: Value(addCustomerOrderItem.actualPrice),
+      uuid: Value(addCustomerOrderItem.uuid),
+      updatedAt: Value(addCustomerOrderItem.updatedAt),
     );
     return await into(db.customerOrderItems).insert(entry);
   }
@@ -62,13 +64,9 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
     if (columnMap.containsKey(orderByField)) {
       final column = columnMap[orderByField];
       final orderMode = ascending ? OrderingMode.asc : OrderingMode.desc;
-      query.orderBy([
-        (t) => OrderingTerm(expression: column, mode: orderMode),
-      ]);
+      query.orderBy([(t) => OrderingTerm(expression: column, mode: orderMode)]);
     } else {
-      query.orderBy([
-        (t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc),
-      ]);
+      query.orderBy([(t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc)]);
     }
 
     return await query.get();
@@ -100,13 +98,9 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
     if (columnMap.containsKey(orderByField)) {
       final column = columnMap[orderByField];
       final orderMode = ascending ? OrderingMode.asc : OrderingMode.desc;
-      query.orderBy([
-        (t) => OrderingTerm(expression: column, mode: orderMode),
-      ]);
+      query.orderBy([(t) => OrderingTerm(expression: column, mode: orderMode)]);
     } else {
-      query.orderBy([
-        (t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc),
-      ]);
+      query.orderBy([(t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc)]);
     }
 
     return await query.get();
@@ -137,6 +131,8 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
       actualQuantity: Value(updatedCustomerOrderItem.actualQuantity),
       presetPrice: Value(updatedCustomerOrderItem.presetPrice),
       actualPrice: Value(updatedCustomerOrderItem.actualPrice),
+      updatedAt: Value(updatedCustomerOrderItem.updatedAt),
+      uuid: Value(updatedCustomerOrderItem.uuid),
     );
     await (update(db.customerOrderItems)..where((tbl) => tbl.id.equals(updatedCustomerOrderItem.id))).write(entry);
   }
@@ -163,7 +159,6 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
     return result.isNotEmpty;
   }
 
-  /// 检查是否已经存在具有指定 itemName 和 customerId 的订单
   /// 该方法用于在更新订单项时检查是否已经存在具有相同 itemName 和 customerId 的订单
   Future<CustomerOrderItem?> doesOrderExistForCustomer(CustomerOrderItem item, int customerId) async {
     final query = select(db.customerOrderItems)
@@ -180,5 +175,32 @@ class CustomerOrderItemsDao extends DatabaseAccessor<AppDatabase> with _$Custome
     final query = select(db.customerOrderItems)..where((tbl) => tbl.customerId.equals(id));
     final result = await query.get();
     return result;
+  }
+
+  Future<void> insertAllOrderItems(List<CustomerOrderItem> allCustomerOrderItems) async {
+    await batch((batch) {
+      batch.insertAll(
+        db.customerOrderItems,
+        allCustomerOrderItems
+            .map(
+              (customerOrderItem) => CustomerOrderItemsCompanion.insert(
+                itemName: customerOrderItem.itemName,
+                itemShortName: Value(customerOrderItem.itemShortName),
+                customerId: customerOrderItem.customerId,
+                purchaseUnit: Value(customerOrderItem.purchaseUnit),
+                purchaseQuantity: Value(customerOrderItem.purchaseQuantity),
+                actualUnit: Value(customerOrderItem.actualUnit),
+                actualQuantity: Value(customerOrderItem.actualQuantity),
+                presetPrice: Value(customerOrderItem.presetPrice),
+                actualPrice: Value(customerOrderItem.actualPrice),
+                createdAt: Value(customerOrderItem.createdAt),
+                uuid: customerOrderItem.uuid,
+                updatedAt: Value(customerOrderItem.updatedAt),
+              ),
+            )
+            .toList(),
+        mode: InsertMode.insert,
+      );
+    });
   }
 }

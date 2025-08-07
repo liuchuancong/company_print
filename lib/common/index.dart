@@ -19,3 +19,5 @@ export 'package:company_print/database/db.dart';
 export 'package:company_print/common/widgets/input_text_filed.dart';
 
 export 'package:company_print/utils/utils.dart';
+
+export 'package:company_print/utils/uuid_util.dart';

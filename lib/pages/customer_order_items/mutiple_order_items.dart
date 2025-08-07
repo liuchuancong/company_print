@@ -9,11 +9,7 @@ import 'package:company_print/pages/customer_order_items/customer_order_items_co
 class MutipleOrderItemPage extends StatefulWidget {
   final Function(List<CustomerOrderItem> newOrUpdatedOrderItems) onConfirm;
   final CustomerOrderItemsController controller;
-  const MutipleOrderItemPage({
-    super.key,
-    required this.onConfirm,
-    required this.controller,
-  });
+  const MutipleOrderItemPage({super.key, required this.onConfirm, required this.controller});
 
   @override
   MutipleOrderItemPageDialogState createState() => MutipleOrderItemPageDialogState();
@@ -81,6 +77,8 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
         presetPrice: double.tryParse(controllers['presetPrice']!.text) ?? 0,
         actualPrice: double.tryParse(controllers['actualPrice']!.text) ?? 0,
         createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        uuid: UuidUtil.v4(),
       );
       newOrUpdatedOrderItems.add(newOrUpdatedOrderItem);
     }
@@ -91,8 +89,10 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
     final AppDatabase database = DatabaseManager.instance.appDatabase;
     List<bool> itemNameExits = [];
     for (var itemName in orderItems) {
-      var isExit = await database.customerOrderItemsDao
-          .doesItemNameExistForCustomer(itemName.itemName, widget.controller.customerId);
+      var isExit = await database.customerOrderItemsDao.doesItemNameExistForCustomer(
+        itemName.itemName,
+        widget.controller.customerId,
+      );
       itemNameExits.add(isExit);
     }
     var count = itemNameExits.where((element) => element == true).length;
@@ -139,12 +139,12 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
               children: [
                 Text(
                   item.name,
-                  style:
-                      TextStyle(fontSize: 18, color: i == currentPage ? Colors.white : Theme.of(context).primaryColor),
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: i == currentPage ? Colors.white : Theme.of(context).primaryColor,
+                  ),
                 ),
-                const SizedBox(
-                  width: 20,
-                ),
+                const SizedBox(width: 20),
                 IconButton(
                   icon: Icon(
                     Icons.close_rounded,
@@ -176,9 +176,7 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      appBar: AppBar(
-        title: const Text('批量添加'),
-      ),
+      appBar: AppBar(title: const Text('批量添加')),
       body: ListView(
         children: [
           const SectionTitle(title: '商品信息'),
@@ -192,10 +190,7 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
               readOnly: true,
               decoration: InputDecoration(
                 suffixIcon: IconButton(
-                  icon: const Icon(
-                    Icons.chevron_right_outlined,
-                    size: 30,
-                  ),
+                  icon: const Icon(Icons.chevron_right_outlined, size: 30),
                   onPressed: () async {
                     final result = await Get.toNamed(RoutePath.kMutipleDishSelectPage, arguments: [categories]);
                     if (result != null) {
@@ -222,10 +217,7 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
               ),
               const Divider(height: 1),
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 16.0,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -233,8 +225,9 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
                       flex: 1,
                       child: FilledButton(
                         style: ButtonStyle(
-                          shape:
-                              WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                          shape: WidgetStateProperty.all(
+                            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
                           padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                         ),
                         onPressed: carouselController.previousPage,
@@ -244,16 +237,19 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
                     Flexible(
                       flex: 2,
                       child: categories.isNotEmpty
-                          ? Text('当前商品：${categories[currentPage].name} - ${currentPage + 1}/${categories.length}',
-                              style: TextStyle(fontSize: 18, color: Theme.of(context).primaryColor))
+                          ? Text(
+                              '当前商品：${categories[currentPage].name} - ${currentPage + 1}/${categories.length}',
+                              style: TextStyle(fontSize: 18, color: Theme.of(context).primaryColor),
+                            )
                           : const Text(''),
                     ),
                     Flexible(
                       flex: 1,
                       child: FilledButton(
                         style: ButtonStyle(
-                          shape:
-                              WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                          shape: WidgetStateProperty.all(
+                            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
                           padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                         ),
                         onPressed: carouselController.nextPage,
@@ -301,7 +297,7 @@ class MutipleOrderItemPageDialogState extends State<MutipleOrderItemPage> {
                 }).toList(), // 将 Iterable 转换为 List
               ),
             ],
-          )
+          ),
         ],
       ),
       actions: [
@@ -396,10 +392,7 @@ class ProductInputSection extends StatelessWidget {
                 textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
                   suffixIcon: IconButton(
-                    icon: const Icon(
-                      Icons.chevron_right_outlined,
-                      size: 30,
-                    ),
+                    icon: const Icon(Icons.chevron_right_outlined, size: 30),
                     onPressed: () async {
                       final result = await Get.toNamed(RoutePath.kUnitSelectPage);
                       if (result != null) {
@@ -447,10 +440,7 @@ class ProductInputSection extends StatelessWidget {
                 textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
                   suffixIcon: IconButton(
-                    icon: const Icon(
-                      Icons.chevron_right_outlined,
-                      size: 30,
-                    ),
+                    icon: const Icon(Icons.chevron_right_outlined, size: 30),
                     onPressed: () async {
                       final result = await Get.toNamed(RoutePath.kUnitSelectPage);
                       if (result != null) {
@@ -485,9 +475,7 @@ class ProductInputSection extends StatelessWidget {
                 maxLength: 100,
               ),
             ),
-            const SizedBox(
-              height: 40,
-            )
+            const SizedBox(height: 40),
           ],
         ),
       ],

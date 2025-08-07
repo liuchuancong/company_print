@@ -31,14 +31,10 @@ class DishUnitsDao extends DatabaseAccessor<AppDatabase> with _$DishUnitsDaoMixi
     if (columnMap.containsKey(orderByField)) {
       final column = columnMap[orderByField];
       final orderMode = ascending ? OrderingMode.asc : OrderingMode.desc;
-      query.orderBy([
-        (t) => OrderingTerm(expression: column, mode: orderMode),
-      ]);
+      query.orderBy([(t) => OrderingTerm(expression: column, mode: orderMode)]);
     } else {
       // 如果没有提供有效字段，则默认按照创建时间排序，且默认为倒序
-      query.orderBy([
-        (t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc),
-      ]);
+      query.orderBy([(t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc)]);
     }
 
     return await query.get();
@@ -52,11 +48,14 @@ class DishUnitsDao extends DatabaseAccessor<AppDatabase> with _$DishUnitsDaoMixi
   }
 
   // 创建一个新的商品单位
-  Future<int> createDishUnit(String name, String abbreviation, String? description) async {
+  Future<int> createDishUnit(DishUnit dish) async {
     final entry = DishUnitsCompanion(
-      name: Value(name),
-      abbreviation: Value(abbreviation),
-      description: Value(description),
+      name: Value(dish.name),
+      abbreviation: Value(dish.abbreviation),
+      description: Value(dish.description),
+      createdAt: Value(dish.createdAt),
+      uuid: Value(dish.uuid),
+      updatedAt: Value(dish.updatedAt),
     );
     return await db.into(db.dishUnits).insert(entry);
   }
@@ -67,12 +66,40 @@ class DishUnitsDao extends DatabaseAccessor<AppDatabase> with _$DishUnitsDaoMixi
   }
 
   // 根据 ID 更新商品单位
-  Future updateDishUnit(DishUnitsCompanion entry, int id) async {
-    return await (db.update(db.dishUnits)..where((t) => t.id.equals(id))).write(entry);
+  Future updateDishUnit(DishUnit dish) async {
+    final entry = DishUnitsCompanion(
+      name: Value(dish.name),
+      abbreviation: Value(dish.abbreviation),
+      description: Value(dish.description),
+      uuid: Value(dish.uuid),
+      updatedAt: Value(dish.updatedAt),
+    );
+    return await (db.update(db.dishUnits)..where((t) => t.id.equals(dish.id))).write(entry);
   }
 
   // 根据 ID 删除商品单位
   Future deleteDishUnit(int id) async {
     return await (db.delete(db.dishUnits)..where((t) => t.id.equals(id))).go();
+  }
+
+  Future<void> insertAllDishUnits(List<DishUnit> allDishUnits) async {
+    await batch((batch) {
+      batch.insertAll(
+        db.dishUnits,
+        allDishUnits
+            .map(
+              (dishUnit) => DishUnitsCompanion.insert(
+                name: dishUnit.name,
+                abbreviation: Value(dishUnit.abbreviation),
+                description: Value(dishUnit.description),
+                createdAt: Value(dishUnit.createdAt),
+                uuid: dishUnit.uuid,
+                updatedAt: Value(dishUnit.updatedAt),
+              ),
+            )
+            .toList(),
+        mode: InsertMode.insert,
+      );
+    });
   }
 }

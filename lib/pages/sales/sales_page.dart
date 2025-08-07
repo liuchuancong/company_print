@@ -118,9 +118,7 @@ class _SalesPageState extends State<SalesPage> with AutomaticKeepAliveClientMixi
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add_circle_outline, size: 30),
         onPressed: () {
-          var settings = Get.find<SettingsService>();
-          settings.backupAllData();
-          // controller.showAddOrEditOrderPage();
+          controller.showAddOrEditOrderPage();
         },
       ),
     );

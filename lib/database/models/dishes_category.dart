@@ -14,4 +14,6 @@ class DishesCategory extends Table {
 
   // 使用 dateTime() 方法定义日期时间类型的列，并设置默认值为当前时间
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  TextColumn get uuid => text()(); // 全局唯一标识，跨设备唯一
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)(); // 新增：最后更新时间
 }

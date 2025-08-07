@@ -47,33 +47,19 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                           ),
                         ),
                       ),
-                      const PopupMenuItem(
-                        value: 1,
-                        child: Text('添加'),
-                      ),
-                      const PopupMenuItem(
-                        value: 2,
-                        child: Text('批量添加'),
-                      ),
-                      const PopupMenuItem(
-                        value: 3,
-                        child: Text('客户商品添加'),
-                      ),
-                      const PopupMenuItem(
-                        value: 4,
-                        child: Text('复制'),
-                      ),
-                      const PopupMenuItem(
-                        value: 5,
-                        child: Text('打印'),
-                      ),
+                      const PopupMenuItem(value: 1, child: Text('添加')),
+                      const PopupMenuItem(value: 2, child: Text('批量添加')),
+                      const PopupMenuItem(value: 3, child: Text('客户商品添加')),
+                      const PopupMenuItem(value: 4, child: Text('复制')),
+                      const PopupMenuItem(value: 5, child: Text('打印')),
                     ];
                   },
                   onSelected: (value) {
                     switch (value) {
                       case 0:
                         controller.setOrderCalculationType(
-                            controller.salesOrderCalculationType.value == SalesOrderCalculationType.round ? 1 : 0);
+                          controller.salesOrderCalculationType.value == SalesOrderCalculationType.round ? 1 : 0,
+                        );
                         break;
                       case 1:
                         controller.showCreateOrderDialog();
@@ -92,7 +78,7 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                         break;
                     }
                   },
-                )
+                ),
               ]
             : [],
       ),
@@ -109,7 +95,9 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Obx(() => Text.rich(TextSpan(
+                      Obx(
+                        () => Text.rich(
+                          TextSpan(
                             text: '合计：',
                             style: const TextStyle(fontSize: 15),
                             children: [
@@ -133,7 +121,9 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                               ),
                               const TextSpan(text: ' 元'),
                             ],
-                          ))),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -142,12 +132,14 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                         FilledButton(
                           style: ButtonStyle(
                             shape: WidgetStateProperty.all(
-                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
                             padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                           ),
                           onPressed: () {
                             controller.setOrderCalculationType(
-                                controller.salesOrderCalculationType.value == SalesOrderCalculationType.round ? 1 : 0);
+                              controller.salesOrderCalculationType.value == SalesOrderCalculationType.round ? 1 : 0,
+                            );
                           },
                           child: Obx(
                             () => Text(
@@ -161,7 +153,8 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                         FilledButton(
                           style: ButtonStyle(
                             shape: WidgetStateProperty.all(
-                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
                             padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                           ),
                           onPressed: () {
@@ -172,7 +165,8 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                         FilledButton(
                           style: ButtonStyle(
                             shape: WidgetStateProperty.all(
-                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
                             padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                           ),
                           onPressed: () {
@@ -183,7 +177,8 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                         FilledButton(
                           style: ButtonStyle(
                             shape: WidgetStateProperty.all(
-                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
                             padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                           ),
                           onPressed: () {
@@ -194,7 +189,8 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                         FilledButton(
                           style: ButtonStyle(
                             shape: WidgetStateProperty.all(
-                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
                             padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                           ),
                           onPressed: () {
@@ -205,7 +201,8 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                         FilledButton(
                           style: ButtonStyle(
                             shape: WidgetStateProperty.all(
-                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
                             padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
                           ),
                           onPressed: () {
@@ -228,10 +225,7 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                 fixedCornerColor: Theme.of(context).highlightColor,
                 fixedLeftColumns: Get.width > 680 ? 1 : 0,
                 columns: [
-                  const DataColumn2(
-                    label: Text('操作'),
-                    fixedWidth: 160,
-                  ),
+                  const DataColumn2(label: Text('操作'), fixedWidth: 160),
                   DataColumn2(
                     label: const Text('商品名称'),
                     fixedWidth: 200,
@@ -330,19 +324,24 @@ class EditOrderItemsPageState extends State<EditOrderItemsPage> {
     isNew = widget.orderItem == null;
     _itemNameController = TextEditingController(text: isNew ? '' : widget.orderItem!.itemName);
     _totalPriceController = TextEditingController(text: isNew ? '' : widget.orderItem?.presetPrice.toString() ?? '0.0');
-    _advancePaymentController =
-        TextEditingController(text: isNew ? '' : widget.orderItem?.actualPrice.toString() ?? '0.0');
+    _advancePaymentController = TextEditingController(
+      text: isNew ? '' : widget.orderItem?.actualPrice.toString() ?? '0.0',
+    );
     _itemShortNameController = TextEditingController(text: isNew ? '' : widget.orderItem?.itemShortName ?? '');
     _purchaseUnitController = TextEditingController(text: isNew ? '' : widget.orderItem?.purchaseUnit ?? '');
-    _purchaseQuantityController =
-        TextEditingController(text: isNew ? '' : widget.orderItem?.purchaseQuantity.toString() ?? '0');
+    _purchaseQuantityController = TextEditingController(
+      text: isNew ? '' : widget.orderItem?.purchaseQuantity.toString() ?? '0',
+    );
     _actualUnitController = TextEditingController(text: isNew ? '' : widget.orderItem?.actualUnit ?? '');
-    _actualQuantityController =
-        TextEditingController(text: isNew ? '' : widget.orderItem?.actualQuantity.toString() ?? '0');
-    _presetPriceController =
-        TextEditingController(text: isNew ? '' : widget.orderItem?.presetPrice.toString() ?? '0.0');
-    _actualPriceController =
-        TextEditingController(text: isNew ? '' : widget.orderItem?.actualPrice.toString() ?? '0.0');
+    _actualQuantityController = TextEditingController(
+      text: isNew ? '' : widget.orderItem?.actualQuantity.toString() ?? '0',
+    );
+    _presetPriceController = TextEditingController(
+      text: isNew ? '' : widget.orderItem?.presetPrice.toString() ?? '0.0',
+    );
+    _actualPriceController = TextEditingController(
+      text: isNew ? '' : widget.orderItem?.actualPrice.toString() ?? '0.0',
+    );
   }
 
   void _submitForm() {
@@ -365,6 +364,8 @@ class EditOrderItemsPageState extends State<EditOrderItemsPage> {
         presetPrice: double.tryParse(_presetPriceController.text) ?? 0,
         actualPrice: double.tryParse(_actualPriceController.text) ?? 0,
         createdAt: isNew ? DateTime.now() : widget.orderItem!.createdAt,
+        updatedAt: DateTime.now(),
+        uuid: UuidUtil.v4(),
       );
       if (isNew) {
         checkExitsItem(newOrUpdatedOrderItem);
@@ -393,9 +394,7 @@ class EditOrderItemsPageState extends State<EditOrderItemsPage> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      appBar: AppBar(
-        title: Text(isNew ? '新增商品' : '编辑商品'),
-      ),
+      appBar: AppBar(title: Text(isNew ? '新增商品' : '编辑商品')),
       body: ListView(
         children: [
           const SectionTitle(title: '商品信息'),
@@ -408,10 +407,7 @@ class EditOrderItemsPageState extends State<EditOrderItemsPage> {
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 suffixIcon: IconButton(
-                  icon: const Icon(
-                    Icons.chevron_right_outlined,
-                    size: 30,
-                  ),
+                  icon: const Icon(Icons.chevron_right_outlined, size: 30),
                   onPressed: () async {
                     final result = await Get.toNamed(RoutePath.kDishSelectPage);
                     if (result != null) {
@@ -470,10 +466,7 @@ class EditOrderItemsPageState extends State<EditOrderItemsPage> {
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 suffixIcon: IconButton(
-                  icon: const Icon(
-                    Icons.chevron_right_outlined,
-                    size: 30,
-                  ),
+                  icon: const Icon(Icons.chevron_right_outlined, size: 30),
                   onPressed: () async {
                     final result = await Get.toNamed(RoutePath.kUnitSelectPage);
                     if (result != null) {
@@ -521,10 +514,7 @@ class EditOrderItemsPageState extends State<EditOrderItemsPage> {
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 suffixIcon: IconButton(
-                  icon: const Icon(
-                    Icons.chevron_right_outlined,
-                    size: 30,
-                  ),
+                  icon: const Icon(Icons.chevron_right_outlined, size: 30),
                   onPressed: () async {
                     final result = await Get.toNamed(RoutePath.kUnitSelectPage);
                     if (result != null) {
@@ -559,9 +549,7 @@ class EditOrderItemsPageState extends State<EditOrderItemsPage> {
               maxLength: 100,
             ),
           ),
-          const SizedBox(
-            height: 40,
-          )
+          const SizedBox(height: 40),
         ],
       ),
       actions: [
@@ -618,52 +606,61 @@ class SaleDetailsDataSource extends AsyncDataTableSource {
     await controller.loadTotalData();
     await controller.loadData(startIndex);
     return AsyncRowsResponse(
-        controller.totalSaleDetails.value,
-        controller.orderItems.map((orderItem) {
-          return DataRow(
-            key: ValueKey<int>(orderItem.id),
-            cells: [
-              DataCell(
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.remove_red_eye),
-                      tooltip: '查看',
-                      onPressed: () {
-                        controller.showPreviewOrderDialog(orderItem);
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.edit),
-                      tooltip: '编辑',
-                      onPressed: () {
-                        controller.showEditOrderDialog(orderItem);
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      tooltip: '删除',
-                      onPressed: () {
-                        controller.showDeleteOrderOrderDialog(orderItem.id);
-                      },
-                    ),
-                  ],
-                ),
+      controller.totalSaleDetails.value,
+      controller.orderItems.map((orderItem) {
+        return DataRow(
+          key: ValueKey<int>(orderItem.id),
+          cells: [
+            DataCell(
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.remove_red_eye),
+                    tooltip: '查看',
+                    onPressed: () {
+                      controller.showPreviewOrderDialog(orderItem);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    tooltip: '编辑',
+                    onPressed: () {
+                      controller.showEditOrderDialog(orderItem);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    tooltip: '删除',
+                    onPressed: () {
+                      controller.showDeleteOrderOrderDialog(orderItem.id);
+                    },
+                  ),
+                ],
               ),
-              DataCell(Text(orderItem.itemName!)),
-              DataCell(Text(controller.salesOrderCalculationType.value == SalesOrderCalculationType.decimal
-                  ? Utils.getDoubleStringDecimal(orderItem.totalPrice)
-                  : Utils.getDoubleStringRound(orderItem.totalPrice))),
-              DataCell(Text(controller.salesOrderCalculationType.value == SalesOrderCalculationType.decimal
-                  ? Utils.getDoubleStringDecimal(orderItem.advancePayment)
-                  : Utils.getDoubleStringRound(orderItem.advancePayment))),
-              DataCell(Text(Utils.concatenation(orderItem.purchaseQuantity, orderItem.purchaseUnit))),
-              DataCell(Text(orderItem.presetPrice.toString())),
-              DataCell(Text(Utils.concatenation(orderItem.actualQuantity, orderItem.actualUnit))),
-              DataCell(Text(orderItem.actualPrice.toString())),
-              DataCell(Text(orderItem.itemShortName ?? '')),
-            ],
-          );
-        }).toList());
+            ),
+            DataCell(Text(orderItem.itemName!)),
+            DataCell(
+              Text(
+                controller.salesOrderCalculationType.value == SalesOrderCalculationType.decimal
+                    ? Utils.getDoubleStringDecimal(orderItem.totalPrice)
+                    : Utils.getDoubleStringRound(orderItem.totalPrice),
+              ),
+            ),
+            DataCell(
+              Text(
+                controller.salesOrderCalculationType.value == SalesOrderCalculationType.decimal
+                    ? Utils.getDoubleStringDecimal(orderItem.advancePayment)
+                    : Utils.getDoubleStringRound(orderItem.advancePayment),
+              ),
+            ),
+            DataCell(Text(Utils.concatenation(orderItem.purchaseQuantity, orderItem.purchaseUnit))),
+            DataCell(Text(orderItem.presetPrice.toString())),
+            DataCell(Text(Utils.concatenation(orderItem.actualQuantity, orderItem.actualUnit))),
+            DataCell(Text(orderItem.actualPrice.toString())),
+            DataCell(Text(orderItem.itemShortName ?? '')),
+          ],
+        );
+      }).toList(),
+    );
   }
 }

@@ -89,34 +89,22 @@ class VehiclesController extends GetxController {
   }
 
   void showCreateVehiclePage() {
-    Get.to(() => EditOrCreateVehiclePage(
-          onConfirm: (newVehicle) => addVehicle(
-            newVehicle.plateNumber!,
-            newVehicle.driverName,
-            newVehicle.driverPhone,
-          ),
-        ));
+    Get.to(() => EditOrCreateVehiclePage(onConfirm: (newVehicle) => addVehicle(newVehicle)));
   }
 
   void showEditVehiclePage(Vehicle vehicle) {
-    Get.to(() => EditOrCreateVehiclePage(
-          vehicle: vehicle,
-          onConfirm: (updatedVehicle) => updateVehicle(
-            updatedVehicle.id,
-            updatedVehicle.plateNumber!,
-            updatedVehicle.driverName,
-            updatedVehicle.driverPhone,
-          ),
-        ));
+    Get.to(
+      () => EditOrCreateVehiclePage(vehicle: vehicle, onConfirm: (updatedVehicle) => updateVehicle(updatedVehicle)),
+    );
   }
 
-  Future<void> addVehicle(String plateNumber, String? driverName, String? driverPhone) async {
-    await _database.vehicleDao.createVehicle(plateNumber, driverName, driverPhone);
+  Future<void> addVehicle(Vehicle vehicle) async {
+    await _database.vehicleDao.createVehicle(vehicle);
     dataSource?.refreshDatasource();
   }
 
-  Future<void> updateVehicle(int id, String plateNumber, String? driverName, String? driverPhone) async {
-    await _database.vehicleDao.updateVehicle(id, plateNumber, driverName, driverPhone);
+  Future<void> updateVehicle(Vehicle vehicle) async {
+    await _database.vehicleDao.updateVehicle(vehicle);
     dataSource?.refreshDatasource();
   }
 

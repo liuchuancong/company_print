@@ -23,23 +23,28 @@ class DishesCategoryDao extends DatabaseAccessor<AppDatabase> with _$DishesCateg
   }
 
   /// 创建新的分类
-  Future<int> createCategory(String name, int? parentId, String? description) async {
+  Future<int> createCategory(DishesCategoryData category) async {
     final entry = DishesCategoryCompanion(
-      name: Value(name),
-      parentId: Value(parentId),
-      description: Value(description ?? ''),
+      name: Value(category.name),
+      parentId: Value(category.parentId),
+      description: Value(category.description),
+      createdAt: Value(category.createdAt),
+      uuid: Value(category.uuid),
+      updatedAt: Value(category.updatedAt),
     );
     return await into(dishesCategory).insert(entry);
   }
 
   /// 更新分类信息
-  Future updateCategory(String name, int? parentId, String? description, int id) async {
+  Future updateCategory(DishesCategoryData category) async {
     final entry = DishesCategoryCompanion(
-      name: Value(name),
-      parentId: Value(parentId),
-      description: Value(description ?? ''),
+      name: Value(category.name),
+      parentId: Value(category.parentId),
+      description: Value(category.description),
+      updatedAt: Value(category.updatedAt),
+      uuid: Value(category.uuid),
     );
-    return await (update(dishesCategory)..where((tbl) => tbl.id.equals(id))).write(entry);
+    return await (update(dishesCategory)..where((tbl) => tbl.id.equals(category.id))).write(entry);
   }
 
   /// 删除分类
@@ -56,5 +61,26 @@ class DishesCategoryDao extends DatabaseAccessor<AppDatabase> with _$DishesCateg
     final query = select(db.dishesCategory)..where((tbl) => tbl.name.equals(itemName));
     final result = await query.get();
     return result.isNotEmpty;
+  }
+
+  Future<void> insertAllCategories(List<DishesCategoryData> allCategories) async {
+    await batch((batch) {
+      batch.insertAll(
+        db.dishesCategory,
+        allCategories
+            .map(
+              (category) => DishesCategoryCompanion.insert(
+                name: category.name,
+                parentId: Value(category.parentId),
+                description: category.description,
+                createdAt: Value(category.createdAt),
+                uuid: category.uuid,
+                updatedAt: Value(category.updatedAt),
+              ),
+            )
+            .toList(),
+        mode: InsertMode.insert,
+      );
+    });
   }
 }

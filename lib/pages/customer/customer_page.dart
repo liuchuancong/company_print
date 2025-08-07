@@ -30,10 +30,7 @@ class _CustomersPageState extends State<CustomersPage> with AutomaticKeepAliveCl
     super.build(context);
     final controller = Get.find<CustomersController>();
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('客户管理'),
-        leading: Get.width > 680 ? null : MenuButton(),
-      ),
+      appBar: AppBar(title: const Text('客户管理'), leading: Get.width > 680 ? null : MenuButton()),
       body: Column(
         children: [
           Expanded(
@@ -68,11 +65,7 @@ class _CustomersPageState extends State<CustomersPage> with AutomaticKeepAliveCl
                 isVerticalScrollBarVisible: true,
                 fixedLeftColumns: Get.width > 680 ? 1 : 0,
                 columns: [
-                  const DataColumn2(
-                    headingRowAlignment: MainAxisAlignment.start,
-                    label: Text('操作'),
-                    fixedWidth: 250,
-                  ),
+                  const DataColumn2(headingRowAlignment: MainAxisAlignment.start, label: Text('操作'), fixedWidth: 250),
                   DataColumn2(
                     label: const Text('姓名'),
                     fixedWidth: 120,
@@ -162,6 +155,8 @@ class EditOrCreateCustomerPageState extends State<EditOrCreateCustomerPage> {
       address: _addressController.text.isNotEmpty ? _addressController.text : null,
       additionalInfo: _additionalInfoController.text.isNotEmpty ? _additionalInfoController.text : null,
       createdAt: isNew ? DateTime.now() : widget.customer!.createdAt,
+      updatedAt: DateTime.now(),
+      uuid: UuidUtil.v4(),
     );
     widget.onConfirm(newOrUpdatedCustomer);
     Get.back();
@@ -170,9 +165,7 @@ class EditOrCreateCustomerPageState extends State<EditOrCreateCustomerPage> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      appBar: AppBar(
-        title: Text(isNew ? '新增客户' : '编辑客户'),
-      ),
+      appBar: AppBar(title: Text(isNew ? '新增客户' : '编辑客户')),
       body: ListView(
         children: [
           InputTextField(
@@ -185,11 +178,7 @@ class EditOrCreateCustomerPageState extends State<EditOrCreateCustomerPage> {
               maxLines: null,
               maxLength: 10,
               decoration: const InputDecoration(
-                suffixIcon: Icon(
-                  Icons.info_outline,
-                  size: 30,
-                  color: Colors.redAccent,
-                ),
+                suffixIcon: Icon(Icons.info_outline, size: 30, color: Colors.redAccent),
               ),
             ),
           ),
@@ -279,60 +268,61 @@ class CustomersDataSource extends AsyncDataTableSource {
     await controller.loadTotalData();
     await controller.loadData(startIndex);
     return AsyncRowsResponse(
-        controller.totalCustomers.value,
-        controller.customers.map((custom) {
-          return DataRow(
-            key: ValueKey<int>(custom.id),
-            cells: [
-              DataCell(
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.copy_rounded),
-                      tooltip: '复制',
-                      onPressed: () {
-                        var text =
-                            '姓名：${Utils.getString(custom.name)}\n电话：${Utils.getString(custom.phone)}\n地址：${Utils.getString(custom.address)}\n备注：${Utils.getString(custom.additionalInfo)}';
-                        Utils.clipboard(text);
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.remove_red_eye),
-                      tooltip: '查看',
-                      onPressed: () {
-                        controller.showPreviewCustomerDialog(custom);
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.edit),
-                      tooltip: '编辑',
-                      onPressed: () {
-                        controller.showEditCustomerDialog(custom);
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      tooltip: '删除',
-                      onPressed: () {
-                        controller.showDeleteCustomerDialog(custom.id);
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.list_alt),
-                      tooltip: '编辑常用商品',
-                      onPressed: () {
-                        Get.toNamed(RoutePath.kCustomerOrderItemsPage, arguments: [custom.id]);
-                      },
-                    ),
-                  ],
-                ),
+      controller.totalCustomers.value,
+      controller.customers.map((custom) {
+        return DataRow(
+          key: ValueKey<int>(custom.id),
+          cells: [
+            DataCell(
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.copy_rounded),
+                    tooltip: '复制',
+                    onPressed: () {
+                      var text =
+                          '姓名：${Utils.getString(custom.name)}\n电话：${Utils.getString(custom.phone)}\n地址：${Utils.getString(custom.address)}\n备注：${Utils.getString(custom.additionalInfo)}';
+                      Utils.clipboard(text);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.remove_red_eye),
+                    tooltip: '查看',
+                    onPressed: () {
+                      controller.showPreviewCustomerDialog(custom);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    tooltip: '编辑',
+                    onPressed: () {
+                      controller.showEditCustomerDialog(custom);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    tooltip: '删除',
+                    onPressed: () {
+                      controller.showDeleteCustomerDialog(custom.id);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.list_alt),
+                    tooltip: '编辑常用商品',
+                    onPressed: () {
+                      Get.toNamed(RoutePath.kCustomerOrderItemsPage, arguments: [custom.id]);
+                    },
+                  ),
+                ],
               ),
-              DataCell(Text(custom.name ?? '')),
-              DataCell(Text(custom.phone ?? '')),
-              DataCell(Text(custom.address ?? '')),
-              DataCell(Text(custom.additionalInfo ?? '')),
-            ],
-          );
-        }).toList());
+            ),
+            DataCell(Text(custom.name ?? '')),
+            DataCell(Text(custom.phone ?? '')),
+            DataCell(Text(custom.address ?? '')),
+            DataCell(Text(custom.additionalInfo ?? '')),
+          ],
+        );
+      }).toList(),
+    );
   }
 }

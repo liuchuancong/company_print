@@ -56,24 +56,7 @@ class SalesController extends BasePageController {
     if (query != null) {
       var result = await Utils.showAlertDialog(query.isPaid ? '是否标记该订单为未结算？' : '是否标记该订单为已结算？', title: '提示');
       if (result == true) {
-        updateOrder(
-          order.id,
-          query.customerName!,
-          query.orderName,
-          query.description,
-          query.remark,
-          query.customerPhone,
-          query.customerAddress,
-          query.driverName,
-          query.driverPhone,
-          query.vehiclePlateNumber,
-          query.advancePayment,
-          query.totalPrice,
-          query.itemCount,
-          query.shippingFee,
-          query.isPaid ? false : true,
-          query.createdAt,
-        );
+        updateOrder(order.copyWith(isPaid: !query.isPaid));
         refreshData();
       }
     }
@@ -187,42 +170,9 @@ class SalesController extends BasePageController {
         order: order,
         onConfirm: (updatedOrder) async {
           if (updatedOrder.id == -1) {
-            await addOrder(
-              updatedOrder.customerName!,
-              updatedOrder.orderName,
-              updatedOrder.description,
-              updatedOrder.remark,
-              updatedOrder.customerPhone,
-              updatedOrder.customerAddress,
-              updatedOrder.driverName,
-              updatedOrder.driverPhone,
-              updatedOrder.vehiclePlateNumber,
-              updatedOrder.advancePayment,
-              updatedOrder.totalPrice,
-              updatedOrder.itemCount,
-              updatedOrder.shippingFee,
-              updatedOrder.isPaid,
-              updatedOrder.customerId,
-            );
+            await addOrder(updatedOrder);
           } else {
-            await updateOrder(
-              updatedOrder.id,
-              updatedOrder.customerName!,
-              updatedOrder.orderName,
-              updatedOrder.description,
-              updatedOrder.remark,
-              updatedOrder.customerPhone,
-              updatedOrder.customerAddress,
-              updatedOrder.driverName,
-              updatedOrder.driverPhone,
-              updatedOrder.vehiclePlateNumber,
-              updatedOrder.advancePayment,
-              updatedOrder.totalPrice,
-              updatedOrder.itemCount,
-              updatedOrder.shippingFee,
-              updatedOrder.isPaid,
-              updatedOrder.createdAt,
-            );
+            await updateOrder(updatedOrder);
           }
           refreshData();
         },
@@ -230,78 +180,12 @@ class SalesController extends BasePageController {
     );
   }
 
-  Future<void> addOrder(
-    String customerName,
-    String? orderName,
-    String? description,
-    String? remark,
-    String? customerPhone,
-    String? customerAddress,
-    String? driverName,
-    String? driverPhone,
-    String? vehiclePlateNumber,
-    double? advancePayment,
-    double? totalPrice,
-    double? itemCount,
-    double? shippingFee,
-    bool isPaid,
-    int? customerId,
-  ) async {
-    await database.ordersDao.createOrder(
-      orderName: orderName,
-      description: description,
-      remark: remark,
-      customerName: customerName,
-      customerPhone: customerPhone,
-      customerAddress: customerAddress,
-      driverName: driverName,
-      driverPhone: driverPhone,
-      vehiclePlateNumber: vehiclePlateNumber,
-      advancePayment: advancePayment!,
-      totalPrice: totalPrice!,
-      itemCount: itemCount!,
-      shippingFee: shippingFee!,
-      isPaid: isPaid,
-      customerId: customerId,
-    );
+  Future<void> addOrder(Order order) async {
+    await database.ordersDao.createOrder(order);
   }
 
-  Future<void> updateOrder(
-    int id,
-    String customerName,
-    String? orderName,
-    String? description,
-    String? remark,
-    String? customerPhone,
-    String? customerAddress,
-    String? driverName,
-    String? driverPhone,
-    String? vehiclePlateNumber,
-    double? advancePayment,
-    double? totalPrice,
-    double? itemCount,
-    double? shippingFee,
-    bool isPaid,
-    DateTime? createdAt,
-  ) async {
-    await database.ordersDao.updateOrder(
-      id: id,
-      orderName: orderName!,
-      description: description,
-      remark: remark,
-      customerName: customerName,
-      customerPhone: customerPhone,
-      customerAddress: customerAddress,
-      driverName: driverName,
-      driverPhone: driverPhone,
-      vehiclePlateNumber: vehiclePlateNumber,
-      advancePayment: advancePayment!,
-      totalPrice: totalPrice!,
-      itemCount: itemCount!,
-      shippingFee: shippingFee!,
-      isPaid: isPaid,
-      createdAt: createdAt,
-    );
+  Future<void> updateOrder(Order updatedOrder) async {
+    await database.ordersDao.updateOrder(updatedOrder);
   }
 
   Future<void> deleteOrder(Order order) async {

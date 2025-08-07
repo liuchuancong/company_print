@@ -43,9 +43,7 @@ class _CustomerOrderItemsPageState extends State<CustomerOrderItemsPage> {
     return BackButtonListener(
       onBackButtonPressed: onWillPop,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('客户商品管理'),
-        ),
+        appBar: AppBar(title: const Text('客户商品管理')),
         body: Column(
           children: [
             Expanded(
@@ -100,10 +98,7 @@ class _CustomerOrderItemsPageState extends State<CustomerOrderItemsPage> {
                   fixedCornerColor: Theme.of(context).highlightColor,
                   fixedLeftColumns: Get.width > 680 ? 1 : 0,
                   columns: [
-                    const DataColumn2(
-                      label: Text('操作'),
-                      fixedWidth: 220,
-                    ),
+                    const DataColumn2(label: Text('操作'), fixedWidth: 220),
                     DataColumn2(
                       label: const Text('商品名称'),
                       fixedWidth: 150,
@@ -191,15 +186,19 @@ class EditOrderItemPageState extends State<EditOrderItemPage> {
     _itemNameController = TextEditingController(text: isNew ? '' : widget.orderItem!.itemName);
     _itemShortNameController = TextEditingController(text: isNew ? '' : widget.orderItem?.itemShortName ?? '');
     _purchaseUnitController = TextEditingController(text: isNew ? '' : widget.orderItem?.purchaseUnit ?? '');
-    _purchaseQuantityController =
-        TextEditingController(text: isNew ? '' : widget.orderItem?.purchaseQuantity.toString() ?? '0');
+    _purchaseQuantityController = TextEditingController(
+      text: isNew ? '' : widget.orderItem?.purchaseQuantity.toString() ?? '0',
+    );
     _actualUnitController = TextEditingController(text: isNew ? '' : widget.orderItem?.actualUnit ?? '');
-    _actualQuantityController =
-        TextEditingController(text: isNew ? '' : widget.orderItem?.actualQuantity.toString() ?? '0');
-    _presetPriceController =
-        TextEditingController(text: isNew ? '' : widget.orderItem?.presetPrice.toString() ?? '0.0');
-    _actualPriceController =
-        TextEditingController(text: isNew ? '' : widget.orderItem?.actualPrice.toString() ?? '0.0');
+    _actualQuantityController = TextEditingController(
+      text: isNew ? '' : widget.orderItem?.actualQuantity.toString() ?? '0',
+    );
+    _presetPriceController = TextEditingController(
+      text: isNew ? '' : widget.orderItem?.presetPrice.toString() ?? '0.0',
+    );
+    _actualPriceController = TextEditingController(
+      text: isNew ? '' : widget.orderItem?.actualPrice.toString() ?? '0.0',
+    );
   }
 
   void _submitForm() {
@@ -220,6 +219,8 @@ class EditOrderItemPageState extends State<EditOrderItemPage> {
         presetPrice: double.tryParse(_presetPriceController.text) ?? 0,
         actualPrice: double.tryParse(_actualPriceController.text) ?? 0,
         createdAt: isNew ? DateTime.now() : widget.orderItem!.createdAt,
+        updatedAt: DateTime.now(),
+        uuid: UuidUtil.v4(),
       );
       widget.onConfirm(newOrUpdatedOrderItem);
       Get.back();
@@ -229,9 +230,7 @@ class EditOrderItemPageState extends State<EditOrderItemPage> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      appBar: AppBar(
-        title: Text(isNew ? '新增商品' : '编辑商品'),
-      ),
+      appBar: AppBar(title: Text(isNew ? '新增商品' : '编辑商品')),
       body: ListView(
         children: [
           const SectionTitle(title: '商品信息'),
@@ -244,10 +243,7 @@ class EditOrderItemPageState extends State<EditOrderItemPage> {
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 suffixIcon: IconButton(
-                  icon: const Icon(
-                    Icons.chevron_right_outlined,
-                    size: 30,
-                  ),
+                  icon: const Icon(Icons.chevron_right_outlined, size: 30),
                   onPressed: () async {
                     final result = await Get.toNamed(RoutePath.kDishSelectPage);
                     if (result != null) {
@@ -280,10 +276,7 @@ class EditOrderItemPageState extends State<EditOrderItemPage> {
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 suffixIcon: IconButton(
-                  icon: const Icon(
-                    Icons.chevron_right_outlined,
-                    size: 30,
-                  ),
+                  icon: const Icon(Icons.chevron_right_outlined, size: 30),
                   onPressed: () async {
                     final result = await Get.toNamed(RoutePath.kUnitSelectPage);
                     if (result != null) {
@@ -331,10 +324,7 @@ class EditOrderItemPageState extends State<EditOrderItemPage> {
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 suffixIcon: IconButton(
-                  icon: const Icon(
-                    Icons.chevron_right_outlined,
-                    size: 30,
-                  ),
+                  icon: const Icon(Icons.chevron_right_outlined, size: 30),
                   onPressed: () async {
                     final result = await Get.toNamed(RoutePath.kUnitSelectPage);
                     if (result != null) {
@@ -369,9 +359,7 @@ class EditOrderItemPageState extends State<EditOrderItemPage> {
               maxLength: 100,
             ),
           ),
-          const SizedBox(
-            height: 40,
-          )
+          const SizedBox(height: 40),
         ],
       ),
       actions: [
@@ -426,64 +414,56 @@ class CustomerOrderItemsDataSource extends AsyncDataTableSource {
     await controller.loadTotalData();
     await controller.loadData(startIndex);
     return AsyncRowsResponse(
-        controller.totalCustomerOrderItems.value,
-        controller.customerOrderItems.map((orderItem) {
-          return DataRow(
-            key: ValueKey<int>(orderItem.id),
-            cells: [
-              DataCell(
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.copy_rounded),
-                      tooltip: '复制',
-                      onPressed: () {
-                        var text =
-                            '商品名称：${Utils.getString(orderItem.itemName)}\n单价：${Utils.getString(orderItem.actualPrice)}元/${Utils.getString(orderItem.actualUnit)}\n备注：${Utils.getString(orderItem.itemShortName)}';
-                        Utils.clipboard(text);
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.remove_red_eye,
-                        color: Colors.black,
-                      ),
-                      tooltip: '查看',
-                      onPressed: () {
-                        controller.showPreviewCustomerPage(orderItem);
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.edit,
-                        color: Colors.black,
-                      ),
-                      tooltip: '编辑',
-                      onPressed: () {
-                        controller.showEditCustomerPage(orderItem);
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.delete,
-                        color: Colors.black,
-                      ),
-                      tooltip: '删除',
-                      onPressed: () {
-                        controller.showDeleteCustomerOrderDialog(orderItem.id);
-                      },
-                    ),
-                  ],
-                ),
+      controller.totalCustomerOrderItems.value,
+      controller.customerOrderItems.map((orderItem) {
+        return DataRow(
+          key: ValueKey<int>(orderItem.id),
+          cells: [
+            DataCell(
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.copy_rounded),
+                    tooltip: '复制',
+                    onPressed: () {
+                      var text =
+                          '商品名称：${Utils.getString(orderItem.itemName)}\n单价：${Utils.getString(orderItem.actualPrice)}元/${Utils.getString(orderItem.actualUnit)}\n备注：${Utils.getString(orderItem.itemShortName)}';
+                      Utils.clipboard(text);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.remove_red_eye, color: Colors.black),
+                    tooltip: '查看',
+                    onPressed: () {
+                      controller.showPreviewCustomerPage(orderItem);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.black),
+                    tooltip: '编辑',
+                    onPressed: () {
+                      controller.showEditCustomerPage(orderItem);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.black),
+                    tooltip: '删除',
+                    onPressed: () {
+                      controller.showDeleteCustomerOrderDialog(orderItem.id);
+                    },
+                  ),
+                ],
               ),
-              DataCell(Text(orderItem.itemName)),
-              DataCell(Text(Utils.concatenation(orderItem.purchaseQuantity, orderItem.purchaseUnit))),
-              DataCell(Text('${orderItem.presetPrice}')),
-              DataCell(Text(Utils.concatenation(orderItem.actualQuantity, orderItem.actualUnit))),
-              DataCell(Text('${orderItem.actualPrice}')),
-              DataCell(Text(orderItem.itemShortName ?? '')),
-            ],
-          );
-        }).toList());
+            ),
+            DataCell(Text(orderItem.itemName)),
+            DataCell(Text(Utils.concatenation(orderItem.purchaseQuantity, orderItem.purchaseUnit))),
+            DataCell(Text('${orderItem.presetPrice}')),
+            DataCell(Text(Utils.concatenation(orderItem.actualQuantity, orderItem.actualUnit))),
+            DataCell(Text('${orderItem.actualPrice}')),
+            DataCell(Text(orderItem.itemShortName ?? '')),
+          ],
+        );
+      }).toList(),
+    );
   }
 }

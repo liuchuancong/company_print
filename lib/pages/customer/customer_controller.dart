@@ -88,38 +88,23 @@ class CustomersController extends GetxController {
   }
 
   void showCreateCustomerDialog() {
-    Get.to(
-      () => EditOrCreateCustomerPage(
-        onConfirm: (newCustomer) => addCustomer(
-          newCustomer.name!,
-          newCustomer.phone,
-          newCustomer.address,
-          newCustomer.additionalInfo,
-        ),
-      ),
-    );
+    Get.to(() => EditOrCreateCustomerPage(onConfirm: (newCustomer) => addCustomer(newCustomer)));
   }
 
   void showEditCustomerDialog(Customer customer) {
-    Get.to(() => EditOrCreateCustomerPage(
-          customer: customer,
-          onConfirm: (updatedCustomer) => updateCustomer(
-            updatedCustomer.id,
-            updatedCustomer.name!,
-            updatedCustomer.phone,
-            updatedCustomer.address,
-            updatedCustomer.additionalInfo,
-          ),
-        ));
+    Get.to(
+      () =>
+          EditOrCreateCustomerPage(customer: customer, onConfirm: (updatedCustomer) => updateCustomer(updatedCustomer)),
+    );
   }
 
-  Future<void> addCustomer(String name, String? phone, String? address, String? additionalInfo) async {
-    await database.customerDao.createCustomer(name, phone, address, additionalInfo);
+  Future<void> addCustomer(Customer newCustomer) async {
+    await database.customerDao.createCustomer(newCustomer);
     dataSource?.refreshDatasource();
   }
 
-  Future<void> updateCustomer(int id, String name, String? phone, String? address, String? additionalInfo) async {
-    await database.customerDao.updateCustomer(id, name, phone, address, additionalInfo);
+  Future<void> updateCustomer(Customer updatedCustomer) async {
+    await database.customerDao.updateCustomer(updatedCustomer);
     dataSource?.refreshDatasource();
   }
 

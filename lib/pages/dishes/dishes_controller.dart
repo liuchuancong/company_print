@@ -27,10 +27,7 @@ class DishesController extends GetxController {
 
   List<TreeNode<CategoryTreeNode>> generateTreeNodes(List<CategoryTreeNode> nodes) {
     return nodes.map((node) {
-      final currentNode = TreeNode<CategoryTreeNode>(
-        key: node.data.id.toString(),
-        data: node,
-      );
+      final currentNode = TreeNode<CategoryTreeNode>(key: node.data.id.toString(), data: node);
       if (node.children.isNotEmpty) {
         final filteredChildren = node.children;
 
@@ -63,40 +60,35 @@ class DishesController extends GetxController {
   }
 
   void showCreateCategoryDialog() {
-    Get.to(() => EditOrCreateCategoryPage(
-          controller: this,
-          onConfirm: (newCategory) {
-            addCategory(
-              newCategory.name,
-              newCategory.parentId == 0 ? null : newCategory.parentId,
-              newCategory.description,
-            );
-          },
-        ));
+    Get.to(
+      () => EditOrCreateCategoryPage(
+        controller: this,
+        onConfirm: (newCategory) {
+          addCategory(newCategory);
+        },
+      ),
+    );
   }
 
   void showEditCategoryDialog(DishesCategoryData category) {
-    Get.to(() => EditOrCreateCategoryPage(
-          controller: this,
-          category: category,
-          onConfirm: (updatedCategory) {
-            updateCategory(
-              updatedCategory.id,
-              updatedCategory.name,
-              category.parentId,
-              updatedCategory.description,
-            );
-          },
-        ));
+    Get.to(
+      () => EditOrCreateCategoryPage(
+        controller: this,
+        category: category,
+        onConfirm: (updatedCategory) {
+          updateCategory(updatedCategory);
+        },
+      ),
+    );
   }
 
-  Future<void> addCategory(String name, int? parentId, String? description) async {
-    await database.dishesCategoryDao.createCategory(name, parentId, description);
+  Future<void> addCategory(DishesCategoryData newCategory) async {
+    await database.dishesCategoryDao.createCategory(newCategory);
     fetchCategories();
   }
 
-  Future<void> updateCategory(int id, String name, int? parentId, String? description) async {
-    await database.dishesCategoryDao.updateCategory(name, parentId, description, id);
+  Future<void> updateCategory(DishesCategoryData updatedCategory) async {
+    await database.dishesCategoryDao.updateCategory(updatedCategory);
     fetchCategories();
   }
 

@@ -43,14 +43,10 @@ class CustomerDao extends DatabaseAccessor<AppDatabase> with _$CustomerDaoMixin 
     if (columnMap.containsKey(orderByField)) {
       final column = columnMap[orderByField];
       final orderMode = ascending ? OrderingMode.asc : OrderingMode.desc;
-      query.orderBy([
-        (t) => OrderingTerm(expression: column, mode: orderMode),
-      ]);
+      query.orderBy([(t) => OrderingTerm(expression: column, mode: orderMode)]);
     } else {
       // 如果没有提供有效字段，则默认按照创建时间排序，且默认为倒序
-      query.orderBy([
-        (t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc),
-      ]);
+      query.orderBy([(t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc)]);
     }
 
     return await query.get();
@@ -65,25 +61,30 @@ class CustomerDao extends DatabaseAccessor<AppDatabase> with _$CustomerDaoMixin 
   }
 
   /// 创建新的客户
-  Future<int> createCustomer(String name, String? phone, String? address, String? additionalInfo) async {
+  Future<int> createCustomer(Customer customer) async {
     final entry = CustomersCompanion(
-      name: Value(name),
-      phone: Value(phone),
-      address: Value(address),
-      additionalInfo: Value(additionalInfo ?? '无其他信息'),
+      name: Value(customer.name),
+      phone: Value(customer.phone),
+      address: Value(customer.address),
+      additionalInfo: Value(customer.additionalInfo ?? '无其他信息'),
+      createdAt: Value(customer.createdAt),
+      updatedAt: Value(customer.updatedAt),
+      uuid: Value(customer.uuid),
     );
     return await into(customers).insert(entry);
   }
 
   /// 更新客户信息
-  Future updateCustomer(int id, String name, String? phone, String? address, String? additionalInfo) async {
+  Future updateCustomer(Customer customer) async {
     final entry = CustomersCompanion(
-      name: Value(name),
-      phone: Value(phone),
-      address: Value(address),
-      additionalInfo: Value(additionalInfo ?? '无其他信息'),
+      name: Value(customer.name),
+      phone: Value(customer.phone),
+      address: Value(customer.address),
+      additionalInfo: Value(customer.additionalInfo ?? '无其他信息'),
+      updatedAt: Value(customer.updatedAt),
+      uuid: Value(customer.uuid),
     );
-    return await (update(customers)..where((tbl) => tbl.id.equals(id))).write(entry);
+    return await (update(customers)..where((tbl) => tbl.id.equals(customer.id))).write(entry);
   }
 
   /// 删除客户
@@ -99,5 +100,27 @@ class CustomerDao extends DatabaseAccessor<AppDatabase> with _$CustomerDaoMixin 
   /// 根据姓名查找客户
   Future<List<Customer>> getCustomersByName(String name) async {
     return await (select(customers)..where((tbl) => tbl.name.equals(name))).get();
+  }
+
+  Future<void> insertAllCustomers(List<Customer> customers) async {
+    await batch((batch) {
+      batch.insertAll(
+        db.customers,
+        customers
+            .map(
+              (customer) => CustomersCompanion.insert(
+                name: Value(customer.name),
+                phone: Value(customer.phone),
+                address: Value(customer.address),
+                additionalInfo: Value(customer.additionalInfo),
+                createdAt: Value(customer.createdAt),
+                uuid: customer.uuid,
+                updatedAt: Value(customer.updatedAt),
+              ),
+            )
+            .toList(),
+        mode: InsertMode.insert,
+      );
+    });
   }
 }

@@ -31,10 +31,7 @@ class _UnitsPageState extends State<UnitsPage> {
   Widget build(BuildContext context) {
     final controller = Get.find<UnitsController>();
     return Scaffold(
-      appBar: AppBar(
-        leading: Get.width > 680 ? null : MenuButton(),
-        title: const Text('商品单位'),
-      ),
+      appBar: AppBar(leading: Get.width > 680 ? null : MenuButton(), title: const Text('商品单位')),
       body: Column(
         children: [
           Expanded(
@@ -69,10 +66,7 @@ class _UnitsPageState extends State<UnitsPage> {
                 sortAscending: controller.sortAscending.value,
                 minWidth: 800,
                 columns: [
-                  const DataColumn2(
-                    label: Text('操作'),
-                    fixedWidth: 160,
-                  ),
+                  const DataColumn2(label: Text('操作'), fixedWidth: 160),
                   DataColumn2(
                     label: const Text('单位'),
                     fixedWidth: 140,
@@ -124,44 +118,45 @@ class DishUnitsDataSource extends AsyncDataTableSource {
     await controller.loadTotalData();
     await controller.loadData(startIndex);
     return AsyncRowsResponse(
-        controller.totalDishUnits.value,
-        controller.dishUnits.map((unit) {
-          return DataRow(
-            key: ValueKey<int>(unit.id),
-            cells: [
-              DataCell(
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.remove_red_eye),
-                      tooltip: '查看',
-                      onPressed: () {
-                        controller.showPreviewDishUnitPage(unit);
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.edit),
-                      tooltip: '编辑',
-                      onPressed: () {
-                        controller.showEditDishUnitPage(unit);
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      tooltip: '删除',
-                      onPressed: () {
-                        controller.showDeleteDishUnitPage(unit);
-                      },
-                    ),
-                  ],
-                ),
+      controller.totalDishUnits.value,
+      controller.dishUnits.map((unit) {
+        return DataRow(
+          key: ValueKey<int>(unit.id),
+          cells: [
+            DataCell(
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.remove_red_eye),
+                    tooltip: '查看',
+                    onPressed: () {
+                      controller.showPreviewDishUnitPage(unit);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    tooltip: '编辑',
+                    onPressed: () {
+                      controller.showEditDishUnitPage(unit);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    tooltip: '删除',
+                    onPressed: () {
+                      controller.showDeleteDishUnitPage(unit);
+                    },
+                  ),
+                ],
               ),
-              DataCell(Text(unit.name)),
-              DataCell(Text(unit.description ?? '')),
-              DataCell(Text(formatDate(unit.createdAt, [yyyy, '-', mm, '-', dd, ' ', HH, ':', nn, ':', ss]))),
-            ],
-          );
-        }).toList());
+            ),
+            DataCell(Text(unit.name)),
+            DataCell(Text(unit.description ?? '')),
+            DataCell(Text(formatDate(unit.createdAt, [yyyy, '-', mm, '-', dd, ' ', HH, ':', nn, ':', ss]))),
+          ],
+        );
+      }).toList(),
+    );
   }
 }
 
@@ -205,6 +200,8 @@ class EditOrCreateDishUnitPageState extends State<EditOrCreateDishUnitPage> {
       abbreviation: _abbreviationController.text,
       description: _descriptionController.text.isNotEmpty ? _descriptionController.text : null,
       createdAt: isNew ? DateTime.now() : widget.dishUnit!.createdAt,
+      updatedAt: DateTime.now(),
+      uuid: UuidUtil.v4(),
     );
     widget.onConfirm(newOrUpdatedDishUnit);
     Get.back();
@@ -213,9 +210,7 @@ class EditOrCreateDishUnitPageState extends State<EditOrCreateDishUnitPage> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      appBar: AppBar(
-        title: Text(isNew ? '新增单位' : '编辑单位'),
-      ),
+      appBar: AppBar(title: Text(isNew ? '新增单位' : '编辑单位')),
       body: ListView(
         children: [
           const SectionTitle(title: '商品单位'),
@@ -229,11 +224,7 @@ class EditOrCreateDishUnitPageState extends State<EditOrCreateDishUnitPage> {
               maxLength: 100,
               maxLines: null,
               decoration: const InputDecoration(
-                suffixIcon: Icon(
-                  Icons.info_outline,
-                  size: 30,
-                  color: Colors.redAccent,
-                ),
+                suffixIcon: Icon(Icons.info_outline, size: 30, color: Colors.redAccent),
               ),
             ),
           ),
