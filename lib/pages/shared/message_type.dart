@@ -40,10 +40,10 @@ class BaseMessage {
   }
 
   // 序列化（转JSON）
-  Future<Map<String, dynamic>> toJson() async {
+  Map<String, dynamic> toJson() {
     return {
       'type': type.index,
-      'data': await dataToJson(type, data), // 根据类型序列化数据
+      'data': data, // 根据类型序列化数据
       'ip': ip,
       'name': name,
       'time': time.millisecondsSinceEpoch,
@@ -53,12 +53,11 @@ class BaseMessage {
   @override
   toString() => '设备: [$name]，IP: [$ip]， 消息：$type，数据：$data，时间：${DateFormatUtils.formatFullChinese(time)}';
 
-  static Future<BaseMessage> fromJson(Map<String, dynamic> json) async {
+  static BaseMessage fromJson(Map<String, dynamic> json) {
     final type = MessageType.values[json['type']];
-    final data = await dataFromJson(type, json['data']);
     return BaseMessage(
       type: type,
-      data: data,
+      data: json['data'],
       ip: json['ip'],
       name: json['name'],
       time: DateTime.fromMillisecondsSinceEpoch(json['time']),

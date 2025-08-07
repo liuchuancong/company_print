@@ -321,9 +321,41 @@ class SharedController extends GetxService {
     _webSocketUtils = null;
   }
 
-  void syncAllData() {
+  void syncTypeData(MessageType type) {
     if (isConnected.value) {
-      // sendMessage(BaseMessage(type: MessageType.allData));
+      switch (type) {
+        case MessageType.allData:
+          sendMessage(BaseMessage(type: MessageType.allData, data: 'syncAllData'));
+        case MessageType.customers:
+          sendMessage(BaseMessage(type: MessageType.customers, data: 'syncCustomers'));
+          break;
+        case MessageType.customerOrderItems:
+          sendMessage(BaseMessage(type: MessageType.customerOrderItems, data: 'syncCustomerOrderItems'));
+          break;
+        case MessageType.dishUnits:
+          sendMessage(BaseMessage(type: MessageType.dishUnits, data: 'syncDishUnits'));
+          break;
+        case MessageType.categories:
+          sendMessage(BaseMessage(type: MessageType.categories, data: 'syncCategories'));
+          break;
+        case MessageType.orders:
+          sendMessage(BaseMessage(type: MessageType.orders, data: 'syncOrders'));
+          break;
+        case MessageType.orderItems:
+          sendMessage(BaseMessage(type: MessageType.orderItems, data: 'syncOrderItems'));
+          break;
+        case MessageType.vehicles:
+          sendMessage(BaseMessage(type: MessageType.vehicles, data: 'syncVehicles'));
+          break;
+        case MessageType.join:
+          sendMessage(BaseMessage(type: MessageType.join, data: 'join'));
+        case MessageType.leave:
+          sendMessage(BaseMessage(type: MessageType.leave, data: 'leave'));
+        case MessageType.system:
+          sendMessage(BaseMessage(type: MessageType.system, data: 'system'));
+        case MessageType.heartbeat:
+          sendMessage(BaseMessage(type: MessageType.heartbeat, data: 'heartbeat'));
+      }
     }
   }
 }

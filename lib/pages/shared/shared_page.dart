@@ -346,10 +346,36 @@ class SharedPage extends GetView<SharedController> {
           mainAxisSpacing: 8,
           childAspectRatio: 3, // 保持按钮宽高比
           children: [
-            _buildSyncButton(icon: Icons.sync, text: '同步全部数据', onPressed: () => controller.syncAllData()),
-            _buildSyncButton(icon: Icons.receipt_long, text: '同步订单数据', onPressed: () => {}),
-            _buildSyncButton(icon: Icons.directions_car, text: '同步车辆数据', onPressed: () => {}),
-            _buildSyncButton(icon: Icons.shopping_cart, text: '同步商品信息', onPressed: () => {}),
+            _buildSyncButton(
+              icon: Icons.sync,
+              text: '同步全部数据',
+              onPressed: () => controller.syncTypeData(MessageType.allData),
+            ),
+            _buildSyncButton(
+              icon: Icons.receipt_long,
+              text: '同步销售清单',
+              onPressed: () => controller.syncTypeData(MessageType.orders),
+            ),
+            _buildSyncButton(
+              icon: HugeIcons.strokeRoundedDashboardSquare02,
+              text: '同步商品分类',
+              onPressed: () => controller.syncTypeData(MessageType.categories),
+            ),
+            _buildSyncButton(
+              icon: HugeIcons.strokeRoundedGitbook,
+              text: '同步单位信息',
+              onPressed: () => controller.syncTypeData(MessageType.dishUnits),
+            ),
+            _buildSyncButton(
+              icon: HugeIcons.strokeRoundedUserMultiple,
+              text: '同步客户信息',
+              onPressed: () => controller.syncTypeData(MessageType.customers),
+            ),
+            _buildSyncButton(
+              icon: Icons.directions_car,
+              text: '同步车辆数据',
+              onPressed: () => controller.syncTypeData(MessageType.vehicles),
+            ),
           ],
         ),
       ],
