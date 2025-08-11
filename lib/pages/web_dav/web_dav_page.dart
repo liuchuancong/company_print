@@ -23,48 +23,57 @@ class WebDavPage extends GetView<WebDavController> {
 
     Get.dialog(
       AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        // 内容内边距
+        contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
         title: Text(isEditing ? '编辑配置: ${existingConfig.name}' : '添加新配置'),
-        content: Form(
-          key: formKey,
-          child: SingleChildScrollView(
-            child: ListBody(
-              children: [
-                TextFormField(
-                  controller: nameController,
-                  decoration: const InputDecoration(labelText: '配置名称'),
-                  enabled: !isEditing,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) return '配置名称不能为空';
-                    if (!isEditing && controller.configs.any((c) => c.name == value)) {
-                      return '配置名称已存在';
-                    }
-                    return null;
-                  },
-                ),
-                Row(
+        content: Container(
+          constraints: const BoxConstraints(maxWidth: 500, minWidth: 300),
+          child: Theme(
+            data: ThemeData(useMaterial3: true),
+            child: Form(
+              key: formKey,
+              child: SingleChildScrollView(
+                child: ListBody(
                   children: [
-                    Expanded(
-                      flex: 2,
-                      child: TextFormField(
-                        controller: addressController,
-                        decoration: const InputDecoration(labelText: '地址'),
-                        validator: (value) => value == null || value.isEmpty ? '地址不能为空' : null,
-                      ),
+                    TextFormField(
+                      controller: nameController,
+                      decoration: const InputDecoration(labelText: '配置名称'),
+                      enabled: !isEditing,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return '配置名称不能为空';
+                        if (!isEditing && controller.configs.any((c) => c.name == value)) {
+                          return '配置名称已存在';
+                        }
+                        return null;
+                      },
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: TextFormField(
+                            controller: addressController,
+                            decoration: const InputDecoration(labelText: '地址'),
+                            validator: (value) => value == null || value.isEmpty ? '地址不能为空' : null,
+                          ),
+                        ),
+                      ],
+                    ),
+                    TextFormField(
+                      controller: userController,
+                      decoration: const InputDecoration(labelText: '用户名'),
+                      validator: (value) => value == null || value.isEmpty ? '用户名不能为空' : null,
+                    ),
+                    TextFormField(
+                      controller: pwdController,
+                      decoration: const InputDecoration(labelText: '密码'),
+                      obscureText: true,
+                      validator: (value) => value == null || value.isEmpty ? '密码不能为空' : null,
                     ),
                   ],
                 ),
-                TextFormField(
-                  controller: userController,
-                  decoration: const InputDecoration(labelText: '用户名'),
-                  validator: (value) => value == null || value.isEmpty ? '用户名不能为空' : null,
-                ),
-                TextFormField(
-                  controller: pwdController,
-                  decoration: const InputDecoration(labelText: '密码'),
-                  obscureText: true,
-                  validator: (value) => value == null || value.isEmpty ? '密码不能为空' : null,
-                ),
-              ],
+              ),
             ),
           ),
         ),
