@@ -644,17 +644,7 @@ class SharedPage extends GetView<SharedController> {
       return;
     }
 
-    controller.hostIp.value = ip;
-    await controller.initClientWebSocket();
-    final joinMsg = BaseMessage(
-      type: MessageType.join,
-      data: '加入连接',
-      name: controller.deviceNameController.text,
-      ip: controller.hostIp.value,
-      from: deviceName,
-      to: '主机',
-    );
-    controller.sendMessage(joinMsg);
+    controller.connectToHost(ip);
   }
 
   // 复制IP到剪贴板

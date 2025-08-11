@@ -8,6 +8,7 @@ import 'package:company_print/pages/units/units_page.dart';
 import 'package:company_print/pages/dishes/dishes_page.dart';
 import 'package:company_print/pages/customer/customer_page.dart';
 import 'package:company_print/pages/vehicles/vehicles_page.dart';
+import 'package:company_print/pages/shared/shared_controller.dart';
 import 'package:company_print/pages/statistics/statistics_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -28,6 +29,12 @@ class _HomePageState extends State<HomePage> {
     VehiclesPage(),
     StatisticsPage(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    Get.put(SharedController());
+  }
 
   void onDestinationSelected(int index) {
     setState(() => selectedTab = index);
@@ -56,5 +63,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-// #enddocregion Example
+
+  // #enddocregion Example
 }

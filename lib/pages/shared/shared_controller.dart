@@ -6,6 +6,7 @@ import 'package:shelf/shelf.dart';
 import 'package:flutter/material.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:company_print/common/index.dart';
+import 'package:company_print/utils/event_bus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:company_print/utils/web_socket_util.dart';
@@ -61,8 +62,7 @@ class SharedController extends GetxService {
 
   // 设备自身标识（设备ID：设备名-IP）
   late String selfDeviceId;
-  // 局域网连接状态
-  final RxBool isLanConnected = true.obs;
+
   // 网络连接订阅
   StreamSubscription<ConnectivityResult>? connectivitySubscription;
 
@@ -77,38 +77,9 @@ class SharedController extends GetxService {
   // 初始化
   Future<void> init() async {
     await _requestPermissions();
-    await initConnectivity(); // 初始化局域网监听
     final SettingsService service = Get.find<SettingsService>();
     deviceNameController.text = service.deviceName.value;
     hostIpController.text = service.deviceIp.value;
-  }
-
-  Future<void> initConnectivity() async {
-    final connectivity = Connectivity();
-    // 初始检查
-    final results = await connectivity.checkConnectivity();
-    updateLanStatus(results.isNotEmpty ? results.first : ConnectivityResult.none);
-
-    // 监听变化 - 转换流的类型
-    connectivitySubscription = connectivity.onConnectivityChanged
-        .map((results) => results.isNotEmpty ? results.first : ConnectivityResult.none)
-        .listen(updateLanStatus);
-  }
-
-  // 更新局域网状态（仅WiFi视为局域网环境）
-  void updateLanStatus(ConnectivityResult result) {
-    // 保持原有实现不变
-    final wasConnected = isLanConnected.value;
-    isLanConnected.value = result == ConnectivityResult.wifi;
-
-    if (!isLanConnected.value && wasConnected) {
-      SmartDialog.showToast('局域网连接已断开，请检查网络');
-      if (isConnected.value) {
-        isHost.value ? clearHostResources() : clearDeviceResources();
-      }
-    } else if (isLanConnected.value && !wasConnected) {
-      SmartDialog.showToast('已连接到局域网，可以重新建立连接');
-    }
   }
 
   // 初始化自身设备ID（设备名-IP）
@@ -133,16 +104,14 @@ class SharedController extends GetxService {
 
   // 连接主机（设备角色专用）
   Future<void> connectToHost(String ip) async {
-    if (ip.isEmpty || !isLanConnected.value) {
-      SmartDialog.showToast(isLanConnected.value ? 'IP不能为空' : '请先连接局域网');
-      return;
-    }
     hostIp.value = ip;
     await initClientWebSocket();
   }
 
   void sendMessage(BaseMessage message) async {
-    if (!isConnected.value || !isLanConnected.value) return;
+    if (!isConnected.value) {
+      return;
+    }
 
     // 补充消息的发送方信息
     final sendMsg = message.copyWith(from: selfDeviceId, name: selfDeviceId, ip: await getLocalIp());
@@ -160,9 +129,7 @@ class SharedController extends GetxService {
         SmartDialog.showToast('目标设备不在线');
         return;
       }
-    }
-    // 设备发送：只能发送给主机
-    else {
+    } else {
       final jsonMsg = jsonEncode(sendMsg.copyWith(to: 'host').toJson());
       _webSocketUtils?.sendMessage(jsonMsg);
     }
@@ -467,10 +434,6 @@ class SharedController extends GetxService {
 
   // 初始化客户端WebSocket（设备角色）
   Future<void> initClientWebSocket() async {
-    if (!isLanConnected.value) {
-      SmartDialog.showToast('请先连接局域网');
-      return;
-    }
     SmartDialog.showToast('尝试连接主机...');
     _webSocketUtils?.close();
     await initSelfDeviceId();
@@ -572,9 +535,9 @@ class SharedController extends GetxService {
     _webSocketUtils = null;
   }
 
-  void syncTypeData(MessageType type, {String? targetDeviceId}) {
+  void syncTypeData(MessageType type, {String? targetDeviceId}) async {
     // 仅在连接状态且处于局域网时执行
-    if (!isConnected.value || !isLanConnected.value) {
+    if (!isConnected.value) {
       SmartDialog.showToast('请先确保网络连接正常');
       return;
     }
@@ -585,8 +548,10 @@ class SharedController extends GetxService {
       data: _getSyncDataText(type), // 获取同步操作描述文本
       from: selfDeviceId,
       to: _getTargetRecipient(type, targetDeviceId), // 确定接收方
+      ip: await getLocalIp(),
+      name: deviceNameController.text,
     );
-
+    log(baseMessage.toJson().toString());
     sendMessage(baseMessage);
   }
 
@@ -727,6 +692,7 @@ class SharedController extends GetxService {
       await database.ordersDao.insertAllOrders(orders);
       await database.orderItemsDao.insertAllOrderItems(orderItems);
       await database.vehicleDao.insertAllVehicles(vehicles);
+      EventBus.instance.emit('refreshOrderPage', true);
       SmartDialog.showToast('数据同步成功');
     } catch (e) {
       SmartDialog.showToast('数据同步失败：$e');
@@ -743,6 +709,7 @@ class SharedController extends GetxService {
           .toList();
       await database.customerDao.insertAllCustomers(customers);
       await database.customerOrderItemsDao.insertAllOrderItems(customerOrderItems);
+      EventBus.instance.emit('refreshOrderPage', true);
       SmartDialog.showToast('客户数据同步成功');
     } catch (e) {
       SmartDialog.showToast('客户数据同步失败：$e');
@@ -851,7 +818,7 @@ class SharedController extends GetxService {
   void syncOrder(Order order) async {
     final AppDatabase database = DatabaseManager.instance.appDatabase;
     // 检查连接状态
-    if (!isConnected.value || !isLanConnected.value) {
+    if (!isConnected.value) {
       SmartDialog.showToast('请先确保与主机连接正常');
       return;
     }

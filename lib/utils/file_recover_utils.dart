@@ -4,15 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/utils/snackbar_util.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class FileRecoverUtils {
-  ///获取后缀
+  /// 获取Android API级别
+  Future<int> _getAndroidSdkVersion() async {
+    if (!Platform.isAndroid) return 0;
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
+    return androidInfo.version.sdkInt;
+  }
+
+  /// 获取文件名（不含路径）
   static String getName(String fullName) {
     return fullName.split(Platform.pathSeparator).last;
   }
 
-  ///获取uuid
+  /// 生成UUID
   static String getUUid() {
     var currentTime = DateTime.now().millisecondsSinceEpoch;
     var randomValue = Random().nextInt(4294967295);
@@ -20,45 +28,50 @@ class FileRecoverUtils {
     return result.toString();
   }
 
-  ///验证URL
+  /// 验证URL
   static bool isUrl(String value) {
     final urlRegExp = RegExp(
       r'((https?:www\.)|(https?:\/\/)|(www\.))[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9]{1,6}(\/[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)?',
     );
-    List<String?> urlMatches = urlRegExp.allMatches(value).map((m) => m.group(0)).toList();
-    return urlMatches.isNotEmpty;
+    return urlRegExp.hasMatch(value);
   }
 
-  ///验证URL
+  /// 验证主机URL
   static bool isHostUrl(String value) {
     final urlRegExp = RegExp(
       r'((https?:www\.)|(https?:\/\/))[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9]{1,6}(\/[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)?',
     );
-    List<String?> urlMatches = urlRegExp.allMatches(value).map((m) => m.group(0)).toList();
-    return urlMatches.isNotEmpty;
+    return urlRegExp.hasMatch(value);
   }
 
-  ///验证URL
+  /// 验证端口
   static bool isPort(String value) {
     final portRegExp = RegExp(r'\d+');
-    List<String?> portMatches = portRegExp.allMatches(value).map((m) => m.group(0)).toList();
-    return portMatches.isNotEmpty;
+    return portRegExp.hasMatch(value);
   }
 
-  Future<bool> requestStorageExternalPermission() async {
-    if (await Permission.manageExternalStorage.isDenied) {
-      final status = Permission.manageExternalStorage.request();
-      return status.isGranted;
-    }
-    return true;
-  }
+  /// 根据API级别请求适当的存储权限
+  Future<bool> requestStoragePermissions() async {
+    try {
+      final sdkVersion = await _getAndroidSdkVersion();
 
-  Future<bool> requestStoragePermission() async {
-    if (await Permission.storage.isDenied) {
-      final status = Permission.storage.request();
-      return status.isGranted;
+      if (sdkVersion >= 30) {
+        // Android 11 (API 30) 及以上需要管理外部存储权限
+        return await Permission.manageExternalStorage.request().isGranted;
+      } else if (sdkVersion >= 29) {
+        // Android 10 (API 29) 需要存储权限 + 清单文件添加requestLegacyExternalStorage
+        return await Permission.storage.request().isGranted;
+      } else {
+        // Android 9 (API 28) 及以下需要读写存储权限
+        Map<Permission, PermissionStatus> statuses = await [
+          Permission.storage,
+          Permission.accessMediaLocation,
+        ].request();
+        return statuses[Permission.storage]?.isGranted ?? false;
+      }
+    } catch (e) {
+      rethrow;
     }
-    return true;
   }
 
   Future<bool?> onFileExistsPop() async {
@@ -68,9 +81,8 @@ class FileRecoverUtils {
   Future<String?> createBackup() async {
     final settings = Get.find<SettingsService>();
     if (Platform.isAndroid || Platform.isIOS) {
-      final granted = await requestStoragePermission();
-      final grantedExternal = await requestStorageExternalPermission();
-      if (!granted || !grantedExternal) {
+      final allGranted = await requestStoragePermissions();
+      if (!allGranted) {
         SnackBarUtil.error('请先授予读写文件权限');
         return null;
       }
@@ -84,24 +96,22 @@ class FileRecoverUtils {
 
     final dbFolderFile = Directory(selectedDirectory + dbFolder);
     if (!dbFolderFile.existsSync()) {
-      dbFolderFile.createSync();
+      dbFolderFile.createSync(recursive: true);
     }
     final file = File(selectedDirectory + dbPath);
     if (file.existsSync()) {
       final result = await onFileExistsPop();
       if (result == true) {
-        file.deleteSync();
-        file.createSync();
+        await file.delete();
+        await file.create();
         SnackBarUtil.success('设置成功');
-        // 首次同步备份目录
         settings.dbPath.value = file.path;
       } else if (result == false) {
         SnackBarUtil.success('设置成功');
-        // 首次同步备份目录
         settings.dbPath.value = file.path;
       }
     } else {
-      file.createSync();
+      await file.create(recursive: true);
       SnackBarUtil.success('设置成功');
       settings.dbPath.value = file.path;
     }
