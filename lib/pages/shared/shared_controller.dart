@@ -439,7 +439,7 @@ class SharedController extends GetxService {
     await initSelfDeviceId();
     final service = Get.find<SettingsService>();
     service.deviceName.value = deviceNameController.text;
-    hostIp.value = hostIpController.text;
+    service.deviceIp.value = hostIpController.text;
     final wsUrl = 'ws://${hostIp.value}:$_wsPort';
     _webSocketUtils = WebSocketUtils(
       url: wsUrl,
