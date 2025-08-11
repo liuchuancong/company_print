@@ -20,10 +20,7 @@ import 'package:company_print/pages/dishes/dishes_controller.dart';
 import 'package:company_print/pages/sale_details/sale_details_page.dart';
 import 'package:company_print/pages/sale_details/mutiple_order_items.dart';
 
-enum DishesSelectType {
-  dishes,
-  customer,
-}
+enum DishesSelectType { dishes, customer }
 
 class SaleDetailsController extends GetxController {
   SaleDetailsController(this.orderId);
@@ -80,7 +77,7 @@ class SaleDetailsController extends GetxController {
     final controller = Get.find<SettingsService>();
     if (controller.printTitle.isEmpty) {
       log('打印标题为空，请到设置中设置打印标题', name: 'checkPrint');
-      SmartDialog.showToast('如需打印，请到设置中设置打印标题', displayTime: const Duration(seconds: 3));
+      SmartDialog.showToast('如需打印，请到设置中设置打印标题', displayTime: const Duration(seconds: 2));
     }
   }
 
@@ -148,31 +145,39 @@ class SaleDetailsController extends GetxController {
   }
 
   void showCreateOrderDialog() {
-    Get.to(() => EditOrderItemsPage(
-          controller: this,
-          onConfirm: (orderItem) async {
-            await addOrderOrderItem(orderItem);
-            setOrderCalculationType(salesOrderCalculationType.value.index);
-          },
-        ));
+    Get.to(
+      () => EditOrderItemsPage(
+        controller: this,
+        onConfirm: (orderItem) async {
+          await addOrderOrderItem(orderItem);
+          setOrderCalculationType(salesOrderCalculationType.value.index);
+        },
+      ),
+    );
   }
 
   void showMutipleOrderItemPage() {
     dishesSelectType = DishesSelectType.dishes;
-    Get.to(() => MutipleOrderItemPage(
+    Get.to(
+      () => MutipleOrderItemPage(
         controller: this,
         onConfirm: (List<OrderItem> newOrderItems) {
           handleMutipleOrderItem(newOrderItems);
-        }));
+        },
+      ),
+    );
   }
 
   void showMutipleCustomerOrderItemPage() {
     dishesSelectType = DishesSelectType.customer;
-    Get.to(() => MutipleOrderItemPage(
+    Get.to(
+      () => MutipleOrderItemPage(
         controller: this,
         onConfirm: (List<OrderItem> newOrderItems) {
           handleMutipleOrderItem(newOrderItems);
-        }));
+        },
+      ),
+    );
   }
 
   void handleMutipleOrderItem(List<OrderItem> newOrderItems) async {
@@ -184,13 +189,15 @@ class SaleDetailsController extends GetxController {
   }
 
   void showEditOrderDialog(OrderItem customerOrderItem) {
-    Get.to(() => EditOrderItemsPage(
-          controller: this,
-          orderItem: customerOrderItem,
-          onConfirm: (orderItem) async {
-            await updateOrderOrderItem(orderItem);
-          },
-        ));
+    Get.to(
+      () => EditOrderItemsPage(
+        controller: this,
+        orderItem: customerOrderItem,
+        onConfirm: (orderItem) async {
+          await updateOrderOrderItem(orderItem);
+        },
+      ),
+    );
   }
 
   Future<void> addOrderOrderItem(OrderItem order) async {
@@ -265,9 +272,7 @@ class SaleDetailsController extends GetxController {
         folderName: folderName,
         fileName: fileName,
         onSuccess: (String uri, String filePath) {
-          Get.to(() => PdfView(
-                path: filePath,
-              ));
+          Get.to(() => PdfView(path: filePath));
 
           SnackBarUtil.success('文件已保存到$filePath');
         },
@@ -304,203 +309,201 @@ class SaleDetailsController extends GetxController {
 
         // 分页商品列表
         for (var i = 0; i < products.length; i += itemsPerPage) {
-          final pageProducts =
-              products.sublist(i, i + itemsPerPage > products.length ? products.length : i + itemsPerPage);
-          pdf.addPage(pw.MultiPage(
-            pageTheme: pw.PageTheme(
-              pageFormat: PdfPageFormat.a4.copyWith(
-                marginBottom: 12,
-                marginLeft: 20,
-                marginRight: 20,
-                marginTop: 20,
+          final pageProducts = products.sublist(
+            i,
+            i + itemsPerPage > products.length ? products.length : i + itemsPerPage,
+          );
+          pdf.addPage(
+            pw.MultiPage(
+              pageTheme: pw.PageTheme(
+                pageFormat: PdfPageFormat.a4.copyWith(marginBottom: 12, marginLeft: 20, marginRight: 20, marginTop: 20),
+                orientation: pw.PageOrientation.portrait,
+                theme: pw.ThemeData.withFont(base: ttf, bold: ttf),
               ),
-              orientation: pw.PageOrientation.portrait,
-              theme: pw.ThemeData.withFont(
-                base: ttf,
-                bold: ttf,
-              ),
-            ),
-            build: (pw.Context context) => <pw.Widget>[
-              pw.Center(
-                child: pw.Text(
-                  settings.printTitle.value,
-                  style: pw.TextStyle(
-                    fontSize: 15,
-                    font: ttf,
-                    fontWeight: pw.FontWeight.bold,
-                    decoration: pw.TextDecoration.none,
-                  ),
-                ),
-              ),
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.end,
-                children: [
-                  pw.Text(
-                    "录单日期：${formatDate(DateTime.now(), [yyyy, '-', mm, '-', dd])}",
+              build: (pw.Context context) => <pw.Widget>[
+                pw.Center(
+                  child: pw.Text(
+                    settings.printTitle.value,
                     style: pw.TextStyle(
-                      fontSize: 13,
+                      fontSize: 15,
                       font: ttf,
                       fontWeight: pw.FontWeight.bold,
                       decoration: pw.TextDecoration.none,
                     ),
                   ),
-                ],
-              ),
-              if (settings.printIsShowCustomerInfo.value)
+                ),
                 pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.start,
+                  mainAxisAlignment: pw.MainAxisAlignment.end,
                   children: [
-                    pw.Expanded(
-                      flex: 1, // 设置 flex 为 1 表示占据一半宽度
-                      child: pw.Container(
-                        child: pw.Text('购买单位：${order.customerName}', style: const pw.TextStyle(fontSize: 12)),
-                      ),
-                    ),
-                    pw.Expanded(
-                      flex: 1, // 设置 flex 为 1 表示占据一半宽度
-                      child: pw.Container(
-                        child: pw.Text('电话：${order.customerPhone}', style: const pw.TextStyle(fontSize: 12)),
+                    pw.Text(
+                      "录单日期：${formatDate(DateTime.now(), [yyyy, '-', mm, '-', dd])}",
+                      style: pw.TextStyle(
+                        fontSize: 13,
+                        font: ttf,
+                        fontWeight: pw.FontWeight.bold,
+                        decoration: pw.TextDecoration.none,
                       ),
                     ),
                   ],
                 ),
-              if (settings.printIsShowCustomerInfo.value) pw.Padding(padding: const pw.EdgeInsets.all(2)),
-              if (settings.printIsShowCustomerInfo.value)
-                pw.Text(
-                  '地址：${order.customerAddress}',
-                  style: pw.TextStyle(
-                    fontSize: 12,
-                    font: ttf,
-                  ),
-                ),
-              if (settings.printIsShowDriverInfo.value) pw.Padding(padding: const pw.EdgeInsets.all(2)),
-              if (settings.printIsShowDriverInfo.value)
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.start,
-                  children: [
-                    pw.Expanded(
-                      flex: 2, // 设置 flex 为 1 表示占据一半宽度
-                      child: pw.Container(
-                        child: pw.Text('司机：${order.driverName}', style: const pw.TextStyle(fontSize: 12)),
-                      ),
-                    ),
-                    pw.Expanded(
-                      flex: 2, // 设置 flex 为 1 表示占据一半宽度
-                      child: pw.Container(
-                        child: pw.Text('电话：${order.driverPhone}', style: const pw.TextStyle(fontSize: 12)),
-                      ),
-                    ),
-                    pw.Expanded(
-                      flex: 2, // 设置 flex 为 1 表示占据一半宽度
-                      child: pw.Container(
-                        child: pw.Text('车牌号：${order.vehiclePlateNumber}', style: const pw.TextStyle(fontSize: 12)),
-                      ),
-                    ),
-                  ],
-                ),
-              if (settings.printIsShowPriceInfo.value) pw.Padding(padding: const pw.EdgeInsets.all(2)),
-              if (settings.printIsShowPriceInfo.value)
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.start,
-                  children: [
-                    pw.Expanded(
-                      flex: 1, // 设置 flex 为 1 表示占据一半宽度
-                      child: pw.Container(
-                        child: pw.Text('合计: ${getTotalOrderPrice.value} 元', style: const pw.TextStyle(fontSize: 12)),
-                      ),
-                    ),
-                    pw.Expanded(
-                      flex: 2, // 设置 flex 为 1 表示占据一半宽度
-                      child: pw.Container(
-                        child: pw.Text('大写：${double.parse(getTotalOrderPrice.value).toSimplifiedChineseNumber()}元',
-                            style: const pw.TextStyle(fontSize: 12)),
-                      ),
-                    ),
-                  ],
-                ),
-              pw.Padding(padding: const pw.EdgeInsets.all(2)),
-              pw.TableHelper.fromTextArray(
-                headers: ['序号', '商品名称', '数量', '单价/元', '总价/元', '备注'],
-                data: List.generate(pageProducts.length, (index) {
-                  final product = pageProducts[index];
-                  // 计算全局序号（基于整个列表）
-                  final globalIndex = i + index + 1;
-                  return [
-                    globalIndex.toString(),
-                    product.itemName,
-                    Utils.concatenation(product.actualQuantity, product.actualUnit),
-                    product.actualPrice,
-                    getOrderCalculationType(product.totalPrice),
-                    product.itemShortName,
-                  ];
-                }),
-                headerStyle: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, font: ttf),
-                cellStyle: pw.TextStyle(fontSize: 10, font: ttf),
-                cellPadding: const pw.EdgeInsets.only(left: 4, right: 0, top: 1, bottom: 1),
-                columnWidths: {
-                  0: const pw.FlexColumnWidth(1),
-                  1: const pw.FlexColumnWidth(2),
-                  2: const pw.FlexColumnWidth(2),
-                  3: const pw.FlexColumnWidth(2),
-                  4: const pw.FlexColumnWidth(2),
-                  5: const pw.FlexColumnWidth(3),
-                },
-                cellAlignments: {
-                  0: pw.Alignment.center,
-                  1: pw.Alignment.centerLeft,
-                  2: pw.Alignment.center,
-                  3: pw.Alignment.center,
-                  4: pw.Alignment.center,
-                  5: pw.Alignment.center,
-                },
-              ),
-            ],
-            footer: (pw.Context context) {
-              if (!settings.printIsShowOwnerInfo.value) {
-                return pw.Container(
-                  alignment: pw.Alignment.centerRight,
-                  child: pw.Text('第${context.pageNumber}页，共${context.pagesCount}页',
-                      style: const pw.TextStyle(fontSize: 12)),
-                );
-              }
-              return pw.Container(
-                margin: const pw.EdgeInsets.only(top: 10),
-                child: pw.Column(children: [
+                if (settings.printIsShowCustomerInfo.value)
                   pw.Row(
-                    children: [
-                      pw.Container(
-                        child: pw.Text('店面地址：${settings.myAddress}', style: const pw.TextStyle(fontSize: 12)),
-                      )
-                    ],
-                  ),
-                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.start,
                     children: [
                       pw.Expanded(
-                        flex: 3, // 设置 flex 为 1 表示占据一半宽度
+                        flex: 1, // 设置 flex 为 1 表示占据一半宽度
                         child: pw.Container(
-                          child: pw.Text('电话：${settings.myPhone}', style: const pw.TextStyle(fontSize: 12)),
+                          child: pw.Text('购买单位：${order.customerName}', style: const pw.TextStyle(fontSize: 12)),
                         ),
                       ),
                       pw.Expanded(
-                        flex: 3, // 设置 flex 为 1 表示占据一半宽度
+                        flex: 1, // 设置 flex 为 1 表示占据一半宽度
                         child: pw.Container(
-                          child: pw.Text('联系人：${settings.myName}', style: const pw.TextStyle(fontSize: 12)),
+                          child: pw.Text('电话：${order.customerPhone}', style: const pw.TextStyle(fontSize: 12)),
+                        ),
+                      ),
+                    ],
+                  ),
+                if (settings.printIsShowCustomerInfo.value) pw.Padding(padding: const pw.EdgeInsets.all(2)),
+                if (settings.printIsShowCustomerInfo.value)
+                  pw.Text('地址：${order.customerAddress}', style: pw.TextStyle(fontSize: 12, font: ttf)),
+                if (settings.printIsShowDriverInfo.value) pw.Padding(padding: const pw.EdgeInsets.all(2)),
+                if (settings.printIsShowDriverInfo.value)
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.start,
+                    children: [
+                      pw.Expanded(
+                        flex: 2, // 设置 flex 为 1 表示占据一半宽度
+                        child: pw.Container(
+                          child: pw.Text('司机：${order.driverName}', style: const pw.TextStyle(fontSize: 12)),
                         ),
                       ),
                       pw.Expanded(
                         flex: 2, // 设置 flex 为 1 表示占据一半宽度
                         child: pw.Container(
-                          alignment: pw.Alignment.centerRight,
-                          child: pw.Text('第${context.pageNumber}页，共${context.pagesCount}页',
-                              style: const pw.TextStyle(fontSize: 12)),
+                          child: pw.Text('电话：${order.driverPhone}', style: const pw.TextStyle(fontSize: 12)),
+                        ),
+                      ),
+                      pw.Expanded(
+                        flex: 2, // 设置 flex 为 1 表示占据一半宽度
+                        child: pw.Container(
+                          child: pw.Text('车牌号：${order.vehiclePlateNumber}', style: const pw.TextStyle(fontSize: 12)),
                         ),
                       ),
                     ],
-                  )
-                ]),
-              );
-            },
-          ));
+                  ),
+                if (settings.printIsShowPriceInfo.value) pw.Padding(padding: const pw.EdgeInsets.all(2)),
+                if (settings.printIsShowPriceInfo.value)
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.start,
+                    children: [
+                      pw.Expanded(
+                        flex: 1, // 设置 flex 为 1 表示占据一半宽度
+                        child: pw.Container(
+                          child: pw.Text('合计: ${getTotalOrderPrice.value} 元', style: const pw.TextStyle(fontSize: 12)),
+                        ),
+                      ),
+                      pw.Expanded(
+                        flex: 2, // 设置 flex 为 1 表示占据一半宽度
+                        child: pw.Container(
+                          child: pw.Text(
+                            '大写：${double.parse(getTotalOrderPrice.value).toSimplifiedChineseNumber()}元',
+                            style: const pw.TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                pw.Padding(padding: const pw.EdgeInsets.all(2)),
+                pw.TableHelper.fromTextArray(
+                  headers: ['序号', '商品名称', '数量', '单价/元', '总价/元', '备注'],
+                  data: List.generate(pageProducts.length, (index) {
+                    final product = pageProducts[index];
+                    // 计算全局序号（基于整个列表）
+                    final globalIndex = i + index + 1;
+                    return [
+                      globalIndex.toString(),
+                      product.itemName,
+                      Utils.concatenation(product.actualQuantity, product.actualUnit),
+                      product.actualPrice,
+                      getOrderCalculationType(product.totalPrice),
+                      product.itemShortName,
+                    ];
+                  }),
+                  headerStyle: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, font: ttf),
+                  cellStyle: pw.TextStyle(fontSize: 10, font: ttf),
+                  cellPadding: const pw.EdgeInsets.only(left: 4, right: 0, top: 1, bottom: 1),
+                  columnWidths: {
+                    0: const pw.FlexColumnWidth(1),
+                    1: const pw.FlexColumnWidth(2),
+                    2: const pw.FlexColumnWidth(2),
+                    3: const pw.FlexColumnWidth(2),
+                    4: const pw.FlexColumnWidth(2),
+                    5: const pw.FlexColumnWidth(3),
+                  },
+                  cellAlignments: {
+                    0: pw.Alignment.center,
+                    1: pw.Alignment.centerLeft,
+                    2: pw.Alignment.center,
+                    3: pw.Alignment.center,
+                    4: pw.Alignment.center,
+                    5: pw.Alignment.center,
+                  },
+                ),
+              ],
+              footer: (pw.Context context) {
+                if (!settings.printIsShowOwnerInfo.value) {
+                  return pw.Container(
+                    alignment: pw.Alignment.centerRight,
+                    child: pw.Text(
+                      '第${context.pageNumber}页，共${context.pagesCount}页',
+                      style: const pw.TextStyle(fontSize: 12),
+                    ),
+                  );
+                }
+                return pw.Container(
+                  margin: const pw.EdgeInsets.only(top: 10),
+                  child: pw.Column(
+                    children: [
+                      pw.Row(
+                        children: [
+                          pw.Container(
+                            child: pw.Text('店面地址：${settings.myAddress}', style: const pw.TextStyle(fontSize: 12)),
+                          ),
+                        ],
+                      ),
+                      pw.Row(
+                        children: [
+                          pw.Expanded(
+                            flex: 3, // 设置 flex 为 1 表示占据一半宽度
+                            child: pw.Container(
+                              child: pw.Text('电话：${settings.myPhone}', style: const pw.TextStyle(fontSize: 12)),
+                            ),
+                          ),
+                          pw.Expanded(
+                            flex: 3, // 设置 flex 为 1 表示占据一半宽度
+                            child: pw.Container(
+                              child: pw.Text('联系人：${settings.myName}', style: const pw.TextStyle(fontSize: 12)),
+                            ),
+                          ),
+                          pw.Expanded(
+                            flex: 2, // 设置 flex 为 1 表示占据一半宽度
+                            child: pw.Container(
+                              alignment: pw.Alignment.centerRight,
+                              child: pw.Text(
+                                '第${context.pageNumber}页，共${context.pagesCount}页',
+                                style: const pw.TextStyle(fontSize: 12),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          );
         }
 
         final DateFormat formatter = DateFormat("yyyy'年'MM'月'dd'日'HH'点'");
@@ -520,7 +523,8 @@ class SaleDetailsController extends GetxController {
               downloadsDir = await getDownloadsDirectory();
             }
             final file = File(
-                '${downloadsDir?.path}${Platform.pathSeparator}xiao_liu_da_yin${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}${Platform.pathSeparator}${order.customerName}.pdf');
+              '${downloadsDir?.path}${Platform.pathSeparator}xiao_liu_da_yin${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}${Platform.pathSeparator}${order.customerName}.pdf',
+            );
 
             if (Platform.isAndroid) {
               saveFile(
@@ -530,12 +534,15 @@ class SaleDetailsController extends GetxController {
                 fileName: '${order.customerName}_$dateStr.pdf',
               );
             } else {
-              log('${downloadsDir?.path}${Platform.pathSeparator}xiao_liu_da_yin${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}',
-                  name: 'generateAndPrintPdf');
+              log(
+                '${downloadsDir?.path}${Platform.pathSeparator}xiao_liu_da_yin${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}',
+                name: 'generateAndPrintPdf',
+              );
               file.createSync(recursive: true);
               await file.writeAsBytes(bytes);
               SnackBarUtil.success(
-                  '文件已保存到${downloadsDir?.path}${Platform.pathSeparator}xiao_liu_da_yin${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}');
+                '文件已保存到${downloadsDir?.path}${Platform.pathSeparator}xiao_liu_da_yin${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}',
+              );
               settings.backupDirectory.value = '${downloadsDir?.path}${Platform.pathSeparator}xiao_liu_da_yin';
             }
           } catch (e) {
@@ -566,30 +573,33 @@ class SaleDetailsController extends GetxController {
     showDialog(
       context: Get.context!,
       builder: (BuildContext context) {
-        return SimpleDialog(title: const Text('打印'), children: [
-          RadioListTile<dynamic>(
-            activeColor: Theme.of(context).colorScheme.primary,
-            groupValue: printSelected,
-            value: 0,
-            title: const Text('保存并预览'),
-            onChanged: (value) {
-              printSelected = 0;
-              generateAndPrintPdf();
-              Navigator.pop(context);
-            },
-          ),
-          RadioListTile<dynamic>(
-            activeColor: Theme.of(context).colorScheme.primary,
-            groupValue: printSelected,
-            value: 1,
-            title: const Text('打印'),
-            onChanged: (value) {
-              printSelected = 1;
-              generateAndPrintPdf();
-              Navigator.pop(context);
-            },
-          ),
-        ]);
+        return SimpleDialog(
+          title: const Text('打印'),
+          children: [
+            RadioListTile<dynamic>(
+              activeColor: Theme.of(context).colorScheme.primary,
+              groupValue: printSelected,
+              value: 0,
+              title: const Text('保存并预览'),
+              onChanged: (value) {
+                printSelected = 0;
+                generateAndPrintPdf();
+                Navigator.pop(context);
+              },
+            ),
+            RadioListTile<dynamic>(
+              activeColor: Theme.of(context).colorScheme.primary,
+              groupValue: printSelected,
+              value: 1,
+              title: const Text('打印'),
+              onChanged: (value) {
+                printSelected = 1;
+                generateAndPrintPdf();
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
       },
     );
   }

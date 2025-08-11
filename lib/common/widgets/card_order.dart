@@ -12,13 +12,17 @@ class CardOrder extends StatelessWidget {
     required this.onDelete,
     required this.onTap,
     required this.complete,
+    required this.syncOrder,
+    required this.showSync,
   });
   final Order order;
   final int index;
+  final bool showSync;
   final Function(Order) onEdit;
   final Function(Order) onDelete;
   final Function(Order) onTap;
   final Function(Order) complete;
+  final Function(Order) syncOrder;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -62,7 +66,7 @@ class CardOrder extends StatelessWidget {
                               '${Utils.getDoubleStringRound(order.itemCount)}件商品',
                               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.white),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -70,13 +74,22 @@ class CardOrder extends StatelessWidget {
                   Positioned(
                     right: 10,
                     top: 10,
-                    child: GestureDetector(
-                      onTap: () => complete(order),
-                      child: CountChip(
-                        icon: Icons.monetization_on_outlined,
-                        count: order.isPaid ? '已结算' : '未结算',
-                        isPaid: order.isPaid,
-                      ),
+                    child: Row(
+                      children: [
+                        if (showSync)
+                          GestureDetector(
+                            onTap: () => syncOrder(order),
+                            child: const CountChip(icon: Icons.sync_outlined, count: '同步', isPaid: true),
+                          ),
+                        GestureDetector(
+                          onTap: () => complete(order),
+                          child: CountChip(
+                            icon: Icons.monetization_on_outlined,
+                            count: order.isPaid ? '已结算' : '未结算',
+                            isPaid: order.isPaid,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   Container(
@@ -84,9 +97,7 @@ class CardOrder extends StatelessWidget {
                     height: 260,
                     child: Column(
                       children: [
-                        Divider(
-                          color: Theme.of(context).primaryColor.withAlpha(50),
-                        ),
+                        Divider(color: Theme.of(context).primaryColor.withAlpha(50)),
                         Expanded(
                           child: ListTile(
                             dense: true,
@@ -95,10 +106,7 @@ class CardOrder extends StatelessWidget {
                               '客户名称: ${order.customerName!}',
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                              ),
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
                             ),
                             subtitle: Column(
                               mainAxisSize: MainAxisSize.min,
@@ -109,38 +117,17 @@ class CardOrder extends StatelessWidget {
                                   '备注: ${order.remark}',
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 14,
-                                  ),
+                                  style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 14),
                                 ),
                                 Text(
                                   '司机: ${order.driverName}',
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 14,
-                                  ),
+                                  style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 14),
                                 ),
                                 Text(
-                                  '创建时间: ${formatDate(order.createdAt, [
-                                        yyyy,
-                                        '-',
-                                        mm,
-                                        '-',
-                                        dd,
-                                        ' ',
-                                        HH,
-                                        ':',
-                                        nn,
-                                        ':',
-                                        ss
-                                      ])}',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                  ),
+                                  '创建时间: ${formatDate(order.createdAt, [yyyy, '-', mm, '-', dd, ' ', HH, ':', nn, ':', ss])}',
+                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
                                 ),
                               ],
                             ),
@@ -153,54 +140,50 @@ class CardOrder extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              // '合计: ${order.totalPrice} 元',
-                              //   style: const TextStyle(
-                              //     fontSize: 14,
-                              //     fontWeight: FontWeight.w400,
-                              //   ),
                               Text.rich(
-                                TextSpan(children: [
-                                  TextSpan(text: '合计：', style: Theme.of(context).textTheme.titleSmall),
-                                  TextSpan(
-                                    text: '${order.totalPrice}',
-                                    style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.red),
-                                  ),
-                                  TextSpan(text: ' 元', style: Theme.of(context).textTheme.titleSmall),
-                                ]),
+                                TextSpan(
+                                  children: [
+                                    TextSpan(text: '合计：', style: Theme.of(context).textTheme.titleSmall),
+                                    TextSpan(
+                                      text: '${order.totalPrice}',
+                                      style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.red),
+                                    ),
+                                    TextSpan(text: ' 元', style: Theme.of(context).textTheme.titleSmall),
+                                  ],
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                               Expanded(
-                                  child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  FilledButton(
-                                    onPressed: () {
-                                      onDelete(order);
-                                    },
-                                    style: ButtonStyle(
-                                      backgroundColor: WidgetStateProperty.all(Colors.red),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    FilledButton(
+                                      onPressed: () {
+                                        onDelete(order);
+                                      },
+                                      style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.red)),
+                                      child: const Text('删除'),
                                     ),
-                                    child: const Text('删除'),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  FilledButton(
-                                    onPressed: () {
-                                      onEdit(order);
-                                    },
-                                    child: const Text('编辑'),
-                                  ),
-                                ],
-                              )),
+                                    const SizedBox(width: 10),
+                                    FilledButton(
+                                      onPressed: () {
+                                        onEdit(order);
+                                      },
+                                      child: const Text('编辑'),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),
@@ -210,13 +193,7 @@ class CardOrder extends StatelessWidget {
 }
 
 class CountChip extends StatelessWidget {
-  const CountChip({
-    super.key,
-    required this.icon,
-    required this.count,
-    this.isPaid = false,
-    this.color = Colors.black,
-  });
+  const CountChip({super.key, required this.icon, required this.count, this.isPaid = false, this.color = Colors.black});
 
   final IconData icon;
   final String count;
@@ -236,18 +213,8 @@ class CountChip extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              color: Colors.white,
-              size: 16,
-            ),
-            Text(
-              count,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.white,
-                    fontSize: 15,
-                  ),
-            ),
+            Icon(icon, color: Colors.white, size: 16),
+            Text(count, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.white, fontSize: 15)),
           ],
         ),
       ),
@@ -256,12 +223,7 @@ class CountChip extends StatelessWidget {
 }
 
 class OrderChip extends StatelessWidget {
-  const OrderChip({
-    super.key,
-    required this.icon,
-    required this.count,
-    this.color = Colors.black,
-  });
+  const OrderChip({super.key, required this.icon, required this.count, this.color = Colors.black});
 
   final IconData icon;
   final String count;
@@ -271,13 +233,7 @@ class OrderChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return CircleAvatar(
       backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-      child: Text(
-        count,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Colors.white,
-              fontSize: 15,
-            ),
-      ),
+      child: Text(count, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.white, fontSize: 15)),
     );
   }
 }

@@ -6,7 +6,7 @@ import 'package:company_print/pages/view_detail/view_detail.dart';
 class Utils {
   static Future<bool?> showAlertDialog(
     String content, {
-    String title = '',
+    String title = '提示',
     String confirm = '',
     String cancel = '',
     bool selectable = false,
@@ -262,6 +262,10 @@ class Utils {
       return;
     }
     Clipboard.setData(ClipboardData(text: text)).then((value) => {SmartDialog.showToast('已复制')});
+  }
+
+  static void showToast(String s) {
+    SmartDialog.showToast(s);
   }
 }
 

@@ -7,10 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:company_print/common/index.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:company_print/utils/web_socket_util.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:company_print/pages/shared/device_info.dart';
 import 'package:company_print/services/overlay_service.dart';
 import 'package:company_print/pages/shared/message_type.dart';
 import 'package:shelf_web_socket/shelf_web_socket.dart' as shelf_ws;
@@ -32,9 +34,12 @@ class SharedController extends GetxService {
   final RxList<BaseMessage> messages = <BaseMessage>[].obs;
   final TextEditingController msgController = TextEditingController();
 
-  // WebSocket相关资源（私有）
-  final Map<String, WebSocketChannel> connectedClients = {};
-  final RxMap<String, Map<String, dynamic>> deviceHeartbeats = <String, Map<String, dynamic>>{}.obs;
+  // 在线设备列表（主机专用，供页面展示）
+  final RxList<DeviceInfo> onlineDevices = <DeviceInfo>[].obs;
+  FocusNode focusNode = FocusNode();
+  // WebSocket相关资源
+  final Map<String, WebSocketChannel> connectedClients = {}; // key: deviceId
+  final RxMap<String, DeviceInfo> deviceHeartbeats = <String, DeviceInfo>{}.obs; // key: deviceId
   final int heartbeatTimeout = 15;
   // 心跳检查定时器
   Timer? heartbeatTimer;
@@ -54,10 +59,65 @@ class SharedController extends GetxService {
   /// 服务端WebSocketChannel 实例
   WebSocketChannel? serverWebSocket;
 
+  // 设备自身标识（设备ID：设备名-IP）
+  late String selfDeviceId;
+  // 局域网连接状态
+  final RxBool isLanConnected = true.obs;
+  // 网络连接订阅
+  StreamSubscription<ConnectivityResult>? connectivitySubscription;
+
+  @override
+  void onInit() {
+    super.onInit();
+    Future.delayed(const Duration(seconds: 2), () {
+      init();
+    });
+  }
+
   // 初始化
-  Future<SharedController> init() async {
+  Future<void> init() async {
     await _requestPermissions();
-    return this;
+    await initConnectivity(); // 初始化局域网监听
+    final SettingsService service = Get.find<SettingsService>();
+    deviceNameController.text = service.deviceName.value;
+    hostIpController.text = service.deviceIp.value;
+  }
+
+  Future<void> initConnectivity() async {
+    final connectivity = Connectivity();
+    // 初始检查
+    final results = await connectivity.checkConnectivity();
+    updateLanStatus(results.isNotEmpty ? results.first : ConnectivityResult.none);
+
+    // 监听变化 - 转换流的类型
+    connectivitySubscription = connectivity.onConnectivityChanged
+        .map((results) => results.isNotEmpty ? results.first : ConnectivityResult.none)
+        .listen(updateLanStatus);
+  }
+
+  // 更新局域网状态（仅WiFi视为局域网环境）
+  void updateLanStatus(ConnectivityResult result) {
+    // 保持原有实现不变
+    final wasConnected = isLanConnected.value;
+    isLanConnected.value = result == ConnectivityResult.wifi;
+
+    if (!isLanConnected.value && wasConnected) {
+      SmartDialog.showToast('局域网连接已断开，请检查网络');
+      if (isConnected.value) {
+        isHost.value ? clearHostResources() : clearDeviceResources();
+      }
+    } else if (isLanConnected.value && !wasConnected) {
+      SmartDialog.showToast('已连接到局域网，可以重新建立连接');
+    }
+  }
+
+  // 初始化自身设备ID（设备名-IP）
+  Future<void> initSelfDeviceId() async {
+    final ip = await getLocalIp() ?? 'unknown';
+    final deviceName = deviceNameController.text.isNotEmpty
+        ? deviceNameController.text
+        : '设备-${ip.split('.').last}'; // 默认设备名+IP尾段
+    selfDeviceId = '$deviceName-$ip';
   }
 
   Future<void> switchRole(bool value) async {
@@ -73,79 +133,148 @@ class SharedController extends GetxService {
 
   // 连接主机（设备角色专用）
   Future<void> connectToHost(String ip) async {
-    if (ip.isEmpty) return;
+    if (ip.isEmpty || !isLanConnected.value) {
+      SmartDialog.showToast(isLanConnected.value ? 'IP不能为空' : '请先连接局域网');
+      return;
+    }
     hostIp.value = ip;
     await initClientWebSocket();
   }
 
-  // 发送消息（支持所有消息类型）
   void sendMessage(BaseMessage message) async {
-    if (!isConnected.value) return;
+    if (!isConnected.value || !isLanConnected.value) return;
+
+    // 补充消息的发送方信息
+    final sendMsg = message.copyWith(from: selfDeviceId, name: selfDeviceId, ip: await getLocalIp());
+
+    // 主机发送：定向到目标设备或广播
     if (isHost.value) {
-      final jsonMsg = jsonEncode(message.toJson());
-      serverWebSocket?.sink.add(jsonMsg);
-    } else {
-      message = message.copyWith(ip: hostIp.value, name: isHost.value ? '主机' : deviceNameController.text);
-      final jsonMsg = jsonEncode(message.toJson());
+      final jsonMsg = jsonEncode(sendMsg.toJson());
+      if (sendMsg.to == 'all') {
+        // 广播给所有设备
+        connectedClients.forEach((deviceId, channel) => channel.sink.add(jsonMsg));
+      } else if (connectedClients.containsKey(sendMsg.to)) {
+        // 定向发送给指定设备
+        connectedClients[sendMsg.to]?.sink.add(jsonMsg);
+      } else {
+        SmartDialog.showToast('目标设备不在线');
+        return;
+      }
+    }
+    // 设备发送：只能发送给主机
+    else {
+      final jsonMsg = jsonEncode(sendMsg.copyWith(to: 'host').toJson());
       _webSocketUtils?.sendMessage(jsonMsg);
     }
-    addMessage(message);
+
+    addMessage(sendMsg);
   }
 
+  // 修复消息添加逻辑
   void addMessage(BaseMessage message) {
-    String msg = '';
     String content = '';
+    // 区分发送方和接收方角色
+    final isSelfSend = message.from == selfDeviceId;
+    final isHostSend = message.from == 'host';
+
     switch (message.type) {
       case MessageType.allData:
-        content = message.from == '主机' ? '向设备${message.from}发送全部数据' : '向主机请求全部数据';
+        if (isHostSend) {
+          content = message.to == 'all' ? '向所有设备发送全部数据' : '向设备${message.to.split('-').first}发送全部数据';
+        } else if (isSelfSend) {
+          content = '向主机请求全部数据';
+        } else {
+          content = '收到主机的全部数据';
+        }
         break;
       case MessageType.customers:
-        content = message.from == '主机' ? '向设备${message.from}发送客户数据' : '向主机请求客户数据';
-        break;
-      case MessageType.customerOrderItems:
+        if (isHostSend) {
+          content = message.to == 'all' ? '向所有设备发送客户数据' : '向设备${message.to.split('-').first}发送客户数据';
+        } else if (isSelfSend) {
+          content = '向主机请求客户数据';
+        } else {
+          content = '收到主机的客户数据';
+        }
         break;
       case MessageType.dishUnits:
-        content = message.from == '主机' ? '向设备${message.from}发送商品单位数据' : '向主机请求商品单位数据';
+        if (isHostSend) {
+          content = message.to == 'all' ? '向所有设备发送商品单位数据' : '向设备${message.to.split('-').first}发送商品单位数据';
+        } else if (isSelfSend) {
+          content = '向主机请求商品单位数据';
+        } else {
+          content = '收到主机的商品单位数据';
+        }
         break;
       case MessageType.categories:
-        content = message.from == '主机' ? '向设备${message.from}发送商品分类数据' : '向主机请求商品分类数据';
+        if (isHostSend) {
+          content = message.to == 'all' ? '向所有设备发送商品分类数据' : '向设备${message.to.split('-').first}发送商品分类数据';
+        } else if (isSelfSend) {
+          content = '向主机请求商品分类数据';
+        } else {
+          content = '收到主机的商品分类数据';
+        }
         break;
       case MessageType.orders:
-        content = message.from == '主机' ? '向设备${message.from}发送销售清单数据' : '向主机请求销售清单数据';
-        break;
-      case MessageType.orderItems:
+        if (isHostSend) {
+          content = message.to == 'all' ? '向所有设备发送销售清单数据' : '向设备${message.to.split('-').first}发送销售清单数据';
+        } else if (isSelfSend) {
+          content = '向主机请求销售清单数据';
+        } else {
+          content = '收到主机的销售清单数据';
+        }
         break;
       case MessageType.vehicles:
-        content = message.from == '主机' ? '向设备${message.from}发送车辆数据' : '向主机请求车辆数据';
+        if (isHostSend) {
+          content = message.to == 'all' ? '向所有设备发送车辆数据' : '向设备${message.to.split('-').first}发送车辆数据';
+        } else if (isSelfSend) {
+          content = '向主机请求车辆数据';
+        } else {
+          content = '收到主机的车辆数据';
+        }
         break;
       case MessageType.leave:
-        content = message.from == '主机' ? '设备${message.from}离开' : '已断开连接';
-        break;
-      case MessageType.heartbeat:
-        content = '心跳';
+        if (isHostSend) {
+          content = '设备${message.to.split('-').first}已断开连接';
+        } else if (isSelfSend) {
+          content = '已断开与主机的连接';
+        } else {
+          content = '设备${message.from.split('-').first}已离开';
+        }
         break;
       case MessageType.join:
-        content = message.from == '主机' ? '设备${message.from}加入' : '已连接到主机';
+        if (isHostSend) {
+          content = '设备${message.to.split('-').first}已加入';
+        } else if (isSelfSend) {
+          content = '已连接到主机';
+        } else {
+          content = '设备${message.from.split('-').first}已加入';
+        }
         break;
       case MessageType.system:
         content = message.data.toString();
         break;
+      default:
+        content = '未知消息';
     }
-    msg = '${message.from == '主机' ? '[主机]' : '[我]'} ：$content';
-    // 排除指定的三种消息类型，只添加其他类型的消息
-    if (message.type != MessageType.heartbeat &&
-        message.type != MessageType.customerOrderItems &&
-        message.type != MessageType.orderItems) {
-      messages.add(BaseMessage(type: message.type, data: msg, from: message.from, to: message.to));
 
-      // 滚动到最新消息
-      if (messageScrollController.hasClients) {
-        messageScrollController.animateTo(
-          messageScrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
+    // 生成消息展示文本
+    final senderTag = isHostSend ? '[主机]' : '[$selfDeviceId]';
+    final showMsg = '$senderTag ：$content';
+
+    // 过滤不需要显示的消息类型
+    if ([MessageType.heartbeat, MessageType.customerOrderItems, MessageType.orderItems].contains(message.type)) {
+      return;
+    }
+
+    messages.add(message.copyWith(data: showMsg));
+
+    // 滚动到最新消息
+    if (messageScrollController.hasClients) {
+      messageScrollController.animateTo(
+        messageScrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
     }
   }
 
@@ -156,9 +285,11 @@ class SharedController extends GetxService {
     String info;
 
     if (isHost.value) {
-      info = 'IP: ${hostIp.value}\n连接设备: ${connectedClients.length}';
+      info =
+          'IP: ${hostIp.value}\n在线设备: ${onlineDevices.length}\n'
+          '${onlineDevices.map((d) => '- ${d.name}(${d.ip})').join('\n')}';
     } else {
-      info = '连接主机: ${hostIp.value}\n状态: $status';
+      info = '设备ID: $selfDeviceId\n连接主机: ${hostIp.value}\n状态: $status';
     }
 
     _overlayService.showStatusDialog(title: role, message: info);
@@ -168,14 +299,14 @@ class SharedController extends GetxService {
   Future<void> clearHostResources() async {
     await stopServer();
     _clearClientResources();
-    msgController.clear();
+    onlineDevices.clear();
+    deviceHeartbeats.clear();
     hostIp.value = '';
     isConnected.value = false;
   }
 
   Future<void> clearDeviceResources() async {
-    // 关闭客户端WebSocket连接
-    sendMessage(BaseMessage(type: MessageType.leave, data: 'leave', from: deviceNameController.text, to: '主机'));
+    sendMessage(BaseMessage(type: MessageType.leave, data: 'leave', from: selfDeviceId, to: 'host'));
     Future.delayed(const Duration(seconds: 1), () {
       isConnected.value = false;
       _webSocketUtils?.close();
@@ -192,11 +323,10 @@ class SharedController extends GetxService {
       }
     }
     final statuses = await permissions.request();
-    if (statuses.values.any((s) => !s.isGranted)) {
-      isHasPermission.value = false;
-      SmartDialog.showToast('警告：部分权限未授予，可能影响功能');
+    isHasPermission.value = !statuses.values.any((s) => !s.isGranted);
+    if (!isHasPermission.value) {
+      SmartDialog.showToast('警告：部分权限未授予，可能影响局域网功能');
     }
-    isHasPermission.value = true;
   }
 
   // 获取本地IP
@@ -204,8 +334,6 @@ class SharedController extends GetxService {
     try {
       final info = NetworkInfo();
       String? ip = await info.getWifiIP();
-      log(ip.toString(), name: 'AutoRoleController');
-
       if (ip == null || ip.isEmpty) {
         final interfaces = await NetworkInterface.list(includeLoopback: false, type: InternetAddressType.IPv4);
         for (var interface in interfaces) {
@@ -213,8 +341,7 @@ class SharedController extends GetxService {
               interface.name.contains('wlan') ||
               interface.name.contains('ap') ||
               interface.name.contains('hotspot') ||
-              interface.name.contains('本地连接') ||
-              interface.name.contains('tether');
+              interface.name.contains('本地连接');
           if (isHotspotInterface) {
             for (var addr in interface.addresses) {
               if (addr.type == InternetAddressType.IPv4) {
@@ -232,41 +359,24 @@ class SharedController extends GetxService {
     }
   }
 
-  Middleware addClientIpMiddleware() {
-    return (Handler handler) {
-      return (Request request) {
-        final headers = request.headers;
-        final remoteAddr = request.context['remoteAddress'] as InternetAddress?;
-        String clientIp =
-            headers['x-forwarded-for']?.split(',').first.trim() ??
-            headers['x-real-ip'] ??
-            headers['remote-addr'] ??
-            (remoteAddr?.address ?? 'unknown');
-        final context = Map<String, dynamic>.from(request.context)..['clientIp'] = clientIp;
-        return handler(request.change(context: context));
-      };
-    };
-  }
-
+  // 心跳检查（主机）
   void checkHeartbeatTimeout() {
     final now = DateTime.now();
-    final offlineIps = <String>[];
+    final offlineDevices = <String>[];
 
-    deviceHeartbeats.forEach((ip, info) {
-      final lastBeat = info['lastBeat'] as DateTime;
-      final duration = now.difference(lastBeat).inSeconds;
-
-      // 如果超时，标记为离线
+    deviceHeartbeats.forEach((deviceId, info) {
+      final duration = now.difference(info.lastActive).inSeconds;
       if (duration > heartbeatTimeout) {
-        offlineIps.add(ip);
+        offlineDevices.add(deviceId);
       }
     });
 
     // 处理离线设备
-    for (final ip in offlineIps) {
-      final deviceName = deviceHeartbeats[ip]?['name'] ?? '未知设备';
-      deviceHeartbeats.remove(ip); // 从心跳列表移除
-      addMessage(BaseMessage(type: MessageType.leave, data: '设备 [$deviceName] 已断开', from: '主机', to: 'all'));
+    for (final deviceId in offlineDevices) {
+      deviceHeartbeats.remove(deviceId);
+      connectedClients.remove(deviceId);
+      onlineDevices.removeWhere((d) => d.deviceId == deviceId);
+      addMessage(BaseMessage(type: MessageType.leave, data: '超时离线', from: 'host', to: deviceId));
     }
   }
 
@@ -276,54 +386,78 @@ class SharedController extends GetxService {
       SmartDialog.showToast('服务器已运行');
       return;
     }
-    heartbeatTimer?.cancel();
-    heartbeatTimer = Timer.periodic(const Duration(seconds: 10), (_) {
-      checkHeartbeatTimeout();
-    });
-    final ip = await getLocalIp();
-    if (ip != null) {
-      hostIp.value = ip;
-    } else {
-      SmartDialog.showToast('获取IP失败，请手动输入');
-      var ip = await Utils.showEditTextDialog('', hintText: '请输入IP地址');
-      if (ip != null) {
-        hostIp.value = ip;
-      }
-    }
-    if (ip == null) {
-      SmartDialog.showToast('获取IP失败，请手动输入');
+    if (!isLanConnected.value) {
+      SmartDialog.showToast('请先连接局域网');
       return;
     }
 
+    heartbeatTimer?.cancel();
+    heartbeatTimer = Timer.periodic(const Duration(seconds: 10), (_) => checkHeartbeatTimeout());
+
+    final ip = await getLocalIp();
+    if (ip == null) {
+      SmartDialog.showToast('获取IP失败，请手动输入');
+      final manualIp = await Utils.showEditTextDialog('', hintText: '请输入IP地址');
+      if (manualIp == null) return;
+      hostIp.value = manualIp;
+    } else {
+      hostIp.value = ip;
+    }
+    await initSelfDeviceId();
     try {
-      // 完善WebSocket处理器逻辑
-      final handler = shelf_ws.webSocketHandler((webSocket, _) {
-        // 监听客户端消息
+      final handler = shelf_ws.webSocketHandler((webSocket, request) {
+        // 客户端连接时，先等待客户端发送设备ID（首次消息必须是join类型）
+        late String clientDeviceId;
         webSocket.stream.listen(
-          (data) => handleClientMessage(data),
-          onError: (error) {
-            SmartDialog.showToast('客户端消息处理失败：$error');
+          (data) {
+            try {
+              final msg = BaseMessage.fromJson(jsonDecode(data));
+              if (msg.type == MessageType.join) {
+                // 初始化客户端信息
+                clientDeviceId = msg.from;
+                connectedClients[clientDeviceId] = webSocket;
+                final deviceInfo = DeviceInfo(
+                  deviceId: clientDeviceId,
+                  name: msg.name ?? '未知设备',
+                  ip: msg.ip ?? '未知IP',
+                  lastActive: DateTime.now(),
+                );
+                deviceHeartbeats[clientDeviceId] = deviceInfo;
+                onlineDevices.add(deviceInfo);
+                addMessage(msg.copyWith(from: 'host', to: clientDeviceId)); // 主机视角：设备加入
+              } else if (msg.type == MessageType.heartbeat) {
+                // 更新心跳
+                if (deviceHeartbeats.containsKey(clientDeviceId)) {
+                  deviceHeartbeats[clientDeviceId] = deviceHeartbeats[clientDeviceId]!.copyWith(
+                    lastActive: DateTime.now(),
+                  );
+                }
+              } else {
+                // 处理设备发送的业务消息（仅转发给目标设备或处理）
+                handleClientMessage(msg);
+              }
+            } catch (e) {
+              SmartDialog.showToast('客户端消息处理失败：$e');
+            }
           },
+          onError: (error) => SmartDialog.showToast('客户端错误：$error'),
           onDone: () {
-            SmartDialog.showToast('客户端已断开连接');
+            // 客户端断开
+            if (clientDeviceId.isNotEmpty) {
+              connectedClients.remove(clientDeviceId);
+              deviceHeartbeats.remove(clientDeviceId);
+              onlineDevices.removeWhere((d) => d.deviceId == clientDeviceId);
+              addMessage(BaseMessage(type: MessageType.leave, data: '主动断开', from: 'host', to: clientDeviceId));
+            }
           },
         );
-        serverWebSocket = webSocket;
       });
 
-      var pipeline = const Pipeline()
-          .addMiddleware(logRequests())
-          .addMiddleware(addClientIpMiddleware())
-          .addHandler(handler);
+      final pipeline = const Pipeline().addHandler(handler);
 
       shelf_io
           .serve(pipeline, hostIp.value, _wsPort)
-          .timeout(
-            _serverBindTimeout,
-            onTimeout: () {
-              throw TimeoutException('绑定端口超时');
-            },
-          )
+          .timeout(_serverBindTimeout, onTimeout: () => throw TimeoutException('绑定端口超时'))
           .then((server) {
             _server = server;
             isConnected.value = true;
@@ -331,83 +465,81 @@ class SharedController extends GetxService {
           });
     } catch (e) {
       SmartDialog.showToast('主机启动失败：$e');
-      _overlayService.showStatusDialog(title: '启动失败', message: e.toString());
       await clearHostResources();
     }
   }
 
+  // 初始化客户端WebSocket（设备角色）
   Future<void> initClientWebSocket() async {
+    if (!isLanConnected.value) {
+      SmartDialog.showToast('请先连接局域网');
+      return;
+    }
     SmartDialog.showToast('尝试连接主机...');
-    sendMessage(BaseMessage(type: MessageType.system, data: '正在连接...', from: deviceNameController.text, to: '主机'));
     _webSocketUtils?.close();
+    await initSelfDeviceId();
+    final service = Get.find<SettingsService>();
+    service.deviceName.value = deviceNameController.text;
+    hostIp.value = hostIpController.text;
     final wsUrl = 'ws://${hostIp.value}:$_wsPort';
     _webSocketUtils = WebSocketUtils(
       url: wsUrl,
       heartBeatTime: _heartbeatIntervalMs,
-      headers: {}, // 可根据需要添加请求头
-      // 接收主机消息
-      onMessage: (data) => _handleHostMessage(data),
-      // 连接关闭回调
+      onMessage: (data) => _handleHostMessage(data), // 只处理发给自己的消息
       onClose: (msg) => handleDisconnect(msg),
-      // 重连回调
       onReconnect: () {
-        Future.delayed(const Duration(seconds: 1), () {
-          sendMessage(BaseMessage(type: MessageType.join, data: 'join', from: deviceNameController.text, to: '主机'));
+        Future.delayed(const Duration(seconds: 1), () async {
+          sendMessage(
+            BaseMessage(
+              type: MessageType.join,
+              data: 'reconnect',
+              from: selfDeviceId,
+              to: 'host',
+              name: deviceNameController.text,
+              ip: await getLocalIp(),
+            ),
+          );
         });
       },
-      // 连接就绪回调
-      onReady: () {
+      onReady: () async {
         isConnected.value = true;
         SmartDialog.showToast('连接主机成功');
-        Future.delayed(const Duration(seconds: 1), () {
-          sendMessage(BaseMessage(type: MessageType.join, data: 'join', from: deviceNameController.text, to: '主机'));
-        });
+        // 发送加入消息（包含设备ID和名称）
+        sendMessage(
+          BaseMessage(
+            type: MessageType.join,
+            data: 'join',
+            from: selfDeviceId,
+            to: 'host',
+            name: deviceNameController.text,
+            ip: await getLocalIp(),
+          ),
+        );
       },
-      // 心跳回调
       onHeartBeat: () {
-        // 发送心跳消息
         if (isConnected.value) {
-          sendMessage(
-            BaseMessage(type: MessageType.heartbeat, data: 'heartbeat', from: deviceNameController.text, to: '主机'),
-          );
+          sendMessage(BaseMessage(type: MessageType.heartbeat, data: 'heartbeat', from: selfDeviceId, to: 'host'));
         }
       },
     );
-
-    // 发起连接
     _webSocketUtils?.connect();
   }
 
-  // 处理客户端消息（主机角色）
-  void handleClientMessage(dynamic data) {
-    try {
-      final msg = BaseMessage.fromJson(jsonDecode(data));
-      sendDataToClient(msg);
-      // 处理设备加入（首次连接）
-      if (msg.type == MessageType.join) {
-        final deviceName = msg.name ?? '未知设备';
-        // 记录设备并更新心跳时间
-        deviceHeartbeats[msg.ip!] = {
-          'name': deviceName,
-          'lastBeat': DateTime.now(), // 初始心跳时间
-        };
-        addMessage(BaseMessage(type: MessageType.join, data: '设备 [$deviceName] 已加入', from: '主机', to: 'all'));
-      } else if (msg.type == MessageType.heartbeat) {
-        if (deviceHeartbeats.containsKey([msg.ip!])) {
-          // 更新最后心跳时间
-          deviceHeartbeats[msg.ip!]!['lastBeat'] = DateTime.now();
-        }
-      }
-    } catch (e) {
-      SmartDialog.showToast('客户端消息解析错误：$e');
+  void handleClientMessage(BaseMessage message) async {
+    // 设备向主机请求数据时，主机处理并返回给该设备
+    if (message.to == 'host') {
+      sendDataToClient(message);
     }
   }
 
   void _handleHostMessage(dynamic data) {
     try {
       final msg = BaseMessage.fromJson(jsonDecode(data));
-      log(msg.data.runtimeType.toString(), name: 'SharedController');
-      syncLocalData(msg);
+      // 过滤：只处理发给自己或广播的消息
+      if (msg.to == selfDeviceId) {
+        syncLocalData(msg); // 处理业务数据
+        addMessage(msg); // 添加到消息列表
+      }
     } catch (e) {
       SmartDialog.showToast('消息解析错误：$e');
     }
@@ -444,85 +576,75 @@ class SharedController extends GetxService {
     _webSocketUtils = null;
   }
 
-  void syncTypeData(MessageType type) {
-    if (isConnected.value) {
-      switch (type) {
-        case MessageType.allData:
-          sendMessage(
-            BaseMessage(type: MessageType.allData, data: 'syncAllData', from: deviceNameController.text, to: '主机'),
-          );
-        case MessageType.customers:
-          sendMessage(
-            BaseMessage(type: MessageType.customers, data: 'syncCustomers', from: deviceNameController.text, to: '主机'),
-          );
-          break;
-        case MessageType.customerOrderItems:
-          sendMessage(
-            BaseMessage(
-              type: MessageType.customerOrderItems,
-              data: 'syncCustomerOrderItems',
-              from: deviceNameController.text,
-              to: '主机',
-            ),
-          );
-          break;
-        case MessageType.dishUnits:
-          sendMessage(
-            BaseMessage(type: MessageType.dishUnits, data: 'syncDishUnits', from: deviceNameController.text, to: '主机'),
-          );
-          break;
-        case MessageType.categories:
-          sendMessage(
-            BaseMessage(
-              type: MessageType.categories,
-              data: 'syncCategories',
-              from: deviceNameController.text,
-              to: '主机',
-            ),
-          );
-          break;
-        case MessageType.orders:
-          sendMessage(
-            BaseMessage(type: MessageType.orders, data: 'syncOrders', from: deviceNameController.text, to: '主机'),
-          );
-          break;
-        case MessageType.orderItems:
-          sendMessage(
-            BaseMessage(
-              type: MessageType.orderItems,
-              data: 'syncOrderItems',
-              from: deviceNameController.text,
-              to: '主机',
-            ),
-          );
-          break;
-        case MessageType.vehicles:
-          sendMessage(
-            BaseMessage(type: MessageType.vehicles, data: 'syncVehicles', from: deviceNameController.text, to: '主机'),
-          );
-          break;
-        case MessageType.join:
-          sendMessage(BaseMessage(type: MessageType.join, data: 'join', from: deviceNameController.text, to: '主机'));
-        case MessageType.leave:
-          sendMessage(BaseMessage(type: MessageType.leave, data: 'leave', from: deviceNameController.text, to: '主机'));
-        case MessageType.system:
-          sendMessage(BaseMessage(type: MessageType.system, data: 'system', from: deviceNameController.text, to: '主机'));
-        case MessageType.heartbeat:
-          sendMessage(
-            BaseMessage(type: MessageType.heartbeat, data: 'heartbeat', from: deviceNameController.text, to: '主机'),
-          );
-      }
+  void syncTypeData(MessageType type, {String? targetDeviceId}) {
+    // 仅在连接状态且处于局域网时执行
+    if (!isConnected.value || !isLanConnected.value) {
+      SmartDialog.showToast('请先确保网络连接正常');
+      return;
+    }
+
+    // 构建基础消息
+    final baseMessage = BaseMessage(
+      type: type,
+      data: _getSyncDataText(type), // 获取同步操作描述文本
+      from: selfDeviceId,
+      to: _getTargetRecipient(type, targetDeviceId), // 确定接收方
+    );
+
+    sendMessage(baseMessage);
+  }
+
+  // 获取同步操作的描述文本
+  String _getSyncDataText(MessageType type) {
+    switch (type) {
+      case MessageType.allData:
+        return '请求全部数据同步';
+      case MessageType.customers:
+        return '请求客户数据同步';
+      case MessageType.dishUnits:
+        return '请求商品单位数据同步';
+      case MessageType.categories:
+        return '请求商品分类数据同步';
+      case MessageType.orders:
+        return '请求销售清单数据同步';
+      case MessageType.vehicles:
+        return '请求车辆数据同步';
+      default:
+        return '请求数据同步';
     }
   }
 
-  void sendDataToClient(BaseMessage message) async {
-    if (isConnected.value) {
-      if (message.type != MessageType.heartbeat &&
-          message.type != MessageType.customerOrderItems &&
-          message.type != MessageType.orderItems) {
-        var data = await dataToJson(message.type, message.data);
-        sendMessage(message.copyWith(data: data, from: message.to, to: message.from));
+  // 确定消息接收方（支持定向发送）
+  String _getTargetRecipient(MessageType type, String? targetDeviceId) {
+    // 主机模式：可以指定目标设备或广播
+    if (isHost.value) {
+      // 如果指定了目标设备且设备在线，则定向发送
+      if (targetDeviceId != null && connectedClients.containsKey(targetDeviceId)) {
+        return targetDeviceId;
       }
+      // 否则广播给所有设备
+      return 'all';
+    }
+
+    // 设备模式：只能发送给主机
+    return 'host';
+  }
+
+  Future<void> sendDataToClient(BaseMessage message) async {
+    if (!isConnected.value) return;
+    if (message.type == MessageType.order) {
+      final result = await Utils.showAlertDialog('是否同步来自于${message.name}的订单数据？, 注意：同步后本地数据将被覆盖');
+      if (result == true) {
+        _syncOrder(jsonDecode(message.data));
+      }
+    } else {
+      var data = await dataToJson(message.type, message.data);
+      final responseMsg = message.copyWith(
+        from: 'host',
+        data: data,
+        to: message.from, // 发给请求的设备
+      );
+      sendMessage(responseMsg);
     }
   }
 
@@ -564,6 +686,8 @@ class SharedController extends GetxService {
           if (result == true) {
             _syncVehicles(jsonDecode(message.data));
           }
+          break;
+        case MessageType.order:
           break;
         case MessageType.join:
           break;
@@ -680,6 +804,78 @@ class SharedController extends GetxService {
     } catch (e) {
       log(e.toString(), name: 'SharedController');
       SmartDialog.showToast('车辆数据同步失败：$e');
+    }
+  }
+
+  void _syncOrder(Map<String, dynamic> data) async {
+    final AppDatabase database = DatabaseManager.instance.appDatabase;
+    try {
+      final order = Order.fromJson(data['order']);
+      List<OrderItem> orderItems = (data['orderItems'] as List).map((e) => OrderItem.fromJson(e)).toList();
+      final localOrder = await database.ordersDao.getOrderByUUid(order.uuid);
+      // 如果订单不存在，则新增订单
+      if (localOrder == null) {
+        // 本地无此订单：直接插入订单和订单项
+        final newOrderId = await database.ordersDao.createOrder(order.copyWith(id: null));
+        for (var item in orderItems) {
+          await database.orderItemsDao.insertOrderItem(item.copyWith(orderId: newOrderId, id: null));
+        }
+        SmartDialog.showToast('新增订单同步成功：${order.customerName}');
+      } else {
+        final localUpdatedAt = localOrder.updatedAt;
+        final remoteUpdatedAt = order.updatedAt;
+        // 本地有此订单：更新订单和订单项
+        if (remoteUpdatedAt.isAfter(localUpdatedAt) || remoteUpdatedAt.isAtSameMomentAs(localUpdatedAt)) {
+          // 远程订单更新更早：更新本地订单和订单项
+          await database.ordersDao.updateOrder(order.copyWith(id: localOrder.id, createdAt: localOrder.createdAt));
+          await database.orderItemsDao.deleteAllOrderItemsByOrderId(localOrder.id);
+          for (var item in orderItems) {
+            await database.orderItemsDao.insertOrderItem(item.copyWith(orderId: localOrder.id));
+          }
+          SmartDialog.showToast('订单已更新：${order.customerName}');
+        } else {
+          final result = await Utils.showAlertDialog('本地订单已更新，是否覆盖？');
+          if (result == true) {
+            // 本地订单更新更早：更新本地订单和订单项
+            await database.ordersDao.updateOrder(order.copyWith(id: localOrder.id, createdAt: localOrder.createdAt));
+            await database.orderItemsDao.deleteAllOrderItemsByOrderId(localOrder.id);
+            for (var item in orderItems) {
+              await database.orderItemsDao.insertOrderItem(item.copyWith(orderId: localOrder.id));
+            }
+            SmartDialog.showToast('订单已更新：${order.customerName}');
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('订单同步到本地失败：$e');
+      SmartDialog.showToast('订单同步失败：${e.toString()}');
+    }
+  }
+
+  void syncOrder(Order order) async {
+    final AppDatabase database = DatabaseManager.instance.appDatabase;
+    // 检查连接状态
+    if (!isConnected.value || !isLanConnected.value) {
+      SmartDialog.showToast('请先确保与主机连接正常');
+      return;
+    }
+
+    try {
+      // 同步订单数据
+      List<OrderItem> orderItems = await database.orderItemsDao.getAllOrderItemsByOrderId(order.id);
+      final orderData = {'order': order.toJson(), 'orderItems': orderItems.map((item) => item.toJson()).toList()};
+      final syncMsg = BaseMessage(
+        type: MessageType.order, // 使用订单相关的消息类型
+        data: jsonEncode(orderData), // 将完整订单数据转为JSON
+        from: selfDeviceId,
+        to: 'host', // 发送给主机
+        name: deviceNameController.text,
+        ip: await getLocalIp(),
+      );
+      sendMessage(syncMsg);
+      SmartDialog.showToast('订单数据同步成功');
+    } catch (e) {
+      SmartDialog.showToast('订单数据同步失败：$e');
     }
   }
 }

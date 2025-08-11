@@ -28,6 +28,10 @@ class OrdersDao extends DatabaseAccessor<AppDatabase> with _$OrdersDaoMixin {
     return await (select(orders)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
   }
 
+  Future<Order?> getOrderByUUid(String uuid) async {
+    return await (select(orders)..where((tbl) => tbl.uuid.equals(uuid))).getSingleOrNull();
+  }
+
   Future<List<Order>> getOrdersForTimeRangeQuery(DateTime startTime, DateTime endTime) async {
     var query = select(orders)
       ..where((tbl) => tbl.createdAt.isBiggerOrEqualValue(startTime) & tbl.createdAt.isSmallerThanValue(endTime));

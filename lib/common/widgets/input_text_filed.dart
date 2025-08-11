@@ -6,9 +6,27 @@ class InputTextField extends StatelessWidget {
   final Widget child;
   final double gap;
   final int? maxLength;
+
+  // 定义小屏幕标签固定宽度
+  static const double _smallScreenLabelWidth = 120;
+
   const InputTextField({super.key, required this.labelText, required this.child, this.gap = 10, this.maxLength});
+
   @override
   Widget build(BuildContext context) {
+    final screenWidth = Get.width;
+    final isSmallScreen = screenWidth <= 680;
+
+    // 根据屏幕尺寸定义不同的padding
+    final labelPadding = isSmallScreen
+        ? const EdgeInsets.only(left: 8, right: 5, top: 12) // 小屏幕内边距
+        : const EdgeInsets.only(left: 20, right: 20, top: 10); // 大屏幕内边距
+
+    // 输入区域的padding也做响应式调整
+    final inputContainerPadding = isSmallScreen
+        ? const EdgeInsets.only(top: 1, right: 1, bottom: 1, left: 1)
+        : const EdgeInsets.only(top: 2, right: 2, bottom: 2, left: 2);
+
     return Column(
       children: [
         IntrinsicHeight(
@@ -17,58 +35,81 @@ class InputTextField extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Flexible(
-                flex: Get.width > 680 ? 1 : 2,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: 50),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      borderRadius:
-                          const BorderRadius.only(topLeft: Radius.circular(5), bottomLeft: Radius.circular(5)),
-                    ),
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 20, right: 20, top: Get.width > 680 ? 10 : 15),
-                        child: Row(
-                          children: [
-                            Text(
-                              '$labelText：',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: Get.width > 680 ? 18 : 15, letterSpacing: 2),
+              // 小屏幕使用固定宽度，大屏幕使用弹性布局
+              isSmallScreen
+                  ? SizedBox(
+                      width: _smallScreenLabelWidth,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(minHeight: 50),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(5),
+                              bottomLeft: Radius.circular(5),
                             ),
-                          ],
+                          ),
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Padding(
+                              padding: labelPadding, // 使用响应式padding
+                              child: Text(
+                                '$labelText：',
+                                style: const TextStyle(color: Colors.white, fontSize: 15, letterSpacing: 2),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  : Flexible(
+                      flex: 1,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(minHeight: 50),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(5),
+                              bottomLeft: Radius.circular(5),
+                            ),
+                          ),
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Padding(
+                              padding: labelPadding, // 使用响应式padding
+                              child: Text(
+                                '$labelText：',
+                                style: const TextStyle(color: Colors.white, fontSize: 18, letterSpacing: 2),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-              ),
               Flexible(
                 flex: 3,
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(minHeight: 50, maxHeight: 120),
                   child: Container(
-                    padding: const EdgeInsets.only(top: 2, right: 2, bottom: 2, left: 2),
+                    padding: inputContainerPadding, // 输入区域响应式padding
                     decoration: BoxDecoration(
                       color: Theme.of(context).primaryColor,
-                      borderRadius:
-                          const BorderRadius.only(topRight: Radius.circular(5), bottomRight: Radius.circular(5)),
+                      borderRadius: const BorderRadius.only(
+                        topRight: Radius.circular(5),
+                        bottomRight: Radius.circular(5),
+                      ),
                     ),
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
+                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5)),
                         child: child,
                       ),
                     ),
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -77,7 +118,8 @@ class InputTextField extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Padding(
-                padding: const EdgeInsets.only(right: 10, top: 10),
+                // 最大长度提示的padding也做响应式调整
+                padding: EdgeInsets.only(right: isSmallScreen ? 8 : 10, top: isSmallScreen ? 8 : 10),
                 child: Text.rich(
                   TextSpan(
                     text: '最多可输入',

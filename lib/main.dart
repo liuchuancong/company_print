@@ -9,6 +9,7 @@ import 'package:company_print/utils/event_bus.dart';
 import 'package:company_print/services/overlay_service.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:company_print/pages/shared/shared_controller.dart';
 
 Future<void> initSystem() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,7 +17,7 @@ Future<void> initSystem() async {
   PrefUtil.prefs = await SharedPreferences.getInstance();
   await ScreenUtil.ensureScreenSize(); // 确保屏幕大小被正确设置
   initService();
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       systemNavigationBarColor: Colors.transparent,
@@ -28,6 +29,7 @@ Future<void> initSystem() async {
 
 void initService() {
   Get.put(SettingsService());
+  Get.put(SharedController());
 }
 
 void main() async {

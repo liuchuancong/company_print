@@ -4,6 +4,7 @@ import 'package:date_format/date_format.dart';
 import 'package:company_print/common/index.dart';
 import 'package:company_print/utils/snackbar_util.dart';
 import 'package:webdav_client/webdav_client.dart' as webdav;
+import 'package:company_print/pages/shared/message_type.dart';
 import 'package:company_print/pages/web_dav/webdav_config.dart';
 import 'package:company_print/pages/web_dav/webdav_service.dart';
 
@@ -157,9 +158,12 @@ class WebDavController extends GetxController {
       final dateStr = formatDate(DateTime.now(), [yyyy, '-', mm, '-', dd, 'T', HH, '_', nn, '_', ss]);
       final fileName = 'purelive_$dateStr.txt';
       // 2. 准备要上传的文件内容（这里假设是配置数据，根据实际需求替换）
-      // 示例：将某个配置对象转换为 JSON 字符串
+      // 系统配置
       final settingConfigs = _settingsService.toJson();
-      final fileContent = jsonEncode(settingConfigs); // 转换为 JSON 字符串
+      final orderConfigs = jsonDecode(await dataToJson(MessageType.allData, ''));
+      Map<String, dynamic> combinedMap = {...settingConfigs, ...orderConfigs};
+
+      final fileContent = jsonEncode(combinedMap); // 转换为 JSON 字符串
       final dataBytes = utf8.encode(fileContent); // 转换为字节数据（WebDAV 通常需要字节流）
 
       // 3. 定义 WebDAV 服务器上的完整路径（例如上传到根目录下）

@@ -16,6 +16,7 @@ enum MessageType {
   orders,
   orderItems,
   vehicles,
+  order, // 订单消息
   heartbeat,
 }
 

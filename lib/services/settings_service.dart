@@ -63,6 +63,14 @@ class SettingsService extends GetxController {
     currentWebDavConfig.listen((config) {
       PrefUtil.setString('currentWebDavConfig', config);
     });
+
+    deviceName.listen((value) {
+      PrefUtil.setString('deviceName', value);
+    });
+
+    deviceIp.listen((value) {
+      PrefUtil.setString('deviceIp', value);
+    });
   }
 
   // Theme settings
@@ -84,6 +92,10 @@ class SettingsService extends GetxController {
   final printIsShowOwnerInfo = (PrefUtil.getBool('printIsShowOwnerInfo') ?? true).obs;
 
   final printIsShowPriceInfo = (PrefUtil.getBool('printIsShowPriceInfo') ?? true).obs;
+
+  final deviceName = (PrefUtil.getString('deviceName') ?? '我的设备').obs;
+
+  final deviceIp = (PrefUtil.getString('deviceIp') ?? '').obs;
 
   final webDavConfigs =
       ((PrefUtil.getStringList('webDavConfigs') ?? []).map((e) => WebDAVConfig.fromJson(jsonDecode(e))).toList()).obs;
@@ -210,6 +222,8 @@ class SettingsService extends GetxController {
         ? (json['webDavConfigs'] as List).map<WebDAVConfig>((e) => WebDAVConfig.fromJson(jsonDecode(e))).toList()
         : [];
     json['currentWebDavConfig'] = currentWebDavConfig.value;
+    deviceIp.value = json['deviceIp'];
+    deviceName.value = json['deviceName'];
     EventBus.instance.emit('enableScreenKeepOn', enableScreenKeepOn.value);
   }
 
@@ -230,6 +244,8 @@ class SettingsService extends GetxController {
     json['backupDirectory'] = backupDirectory.value;
     json['enableScreenKeepOn'] = enableScreenKeepOn.value;
     json['dbPath'] = dbPath.value;
+    json['deviceIp'] = deviceIp.value;
+    json['deviceName'] = deviceName.value;
     return json;
   }
 
@@ -250,6 +266,8 @@ class SettingsService extends GetxController {
       'dbPath': '',
       'webDavConfigs': [],
       'currentWebDavConfig': '',
+      'deviceIp': '',
+      'deviceName': '我的设备',
     };
     return json;
   }

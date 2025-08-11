@@ -6,6 +6,7 @@ import 'package:company_print/utils/event_bus.dart';
 import 'package:company_print/common/base/base_controller.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:company_print/pages/sales/add_or_edit_order.dart';
+import 'package:company_print/pages/shared/shared_controller.dart';
 
 class SalesController extends BasePageController {
   final AppDatabase database = DatabaseManager.instance.appDatabase;
@@ -23,13 +24,13 @@ class SalesController extends BasePageController {
   FocusNode searchFocusNode = FocusNode();
   StreamSubscription<dynamic>? orderRefreshSubscription;
   final refreshController = EasyRefreshController(controlFinishRefresh: true, controlFinishLoad: true);
+  final SharedController sharedController = Get.find<SharedController>();
 
   @override
   void onInit() {
     super.onInit();
     initCurrentDate();
     loadData();
-
     orderRefreshSubscription = EventBus.instance.listen('refreshOrderList', (data) {
       refreshData();
     });
@@ -190,5 +191,13 @@ class SalesController extends BasePageController {
 
   Future<void> deleteOrder(Order order) async {
     await database.ordersDao.deleteOrder(order.id);
+  }
+
+  Future<void> syncOrder(Order order) async {
+    var result = await Utils.showAlertDialog('是否同步该订单？', title: '提示');
+    if (result == true) {
+      SharedController sharedController = Get.find<SharedController>();
+      sharedController.syncOrder(order);
+    }
   }
 }
