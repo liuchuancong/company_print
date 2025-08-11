@@ -386,10 +386,6 @@ class SharedController extends GetxService {
       SmartDialog.showToast('服务器已运行');
       return;
     }
-    if (!isLanConnected.value) {
-      SmartDialog.showToast('请先连接局域网');
-      return;
-    }
 
     heartbeatTimer?.cancel();
     heartbeatTimer = Timer.periodic(const Duration(seconds: 10), (_) => checkHeartbeatTimeout());
