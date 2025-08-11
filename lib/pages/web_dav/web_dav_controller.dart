@@ -156,7 +156,7 @@ class WebDavController extends GetxController {
       // 1. 生成文件名（包含当前时间戳，避免重复）
 
       final dateStr = formatDate(DateTime.now(), [yyyy, '-', mm, '-', dd, 'T', HH, '_', nn, '_', ss]);
-      final fileName = 'purelive_$dateStr.txt';
+      final fileName = 'xiao_liu_da_yin_$dateStr.txt';
       // 2. 准备要上传的文件内容（这里假设是配置数据，根据实际需求替换）
       // 系统配置
       final settingConfigs = _settingsService.toJson();
