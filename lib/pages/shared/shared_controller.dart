@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
+import 'dart:collection';
 import 'dart:developer' show log;
 import 'package:shelf/shelf.dart';
 import 'package:flutter/material.dart';
@@ -65,6 +66,9 @@ class SharedController extends GetxService {
 
   // 网络连接订阅
   StreamSubscription<ConnectivityResult>? connectivitySubscription;
+
+  final Queue<OrderDialogRequest> orderDialogQueue = Queue<OrderDialogRequest>();
+  final RxBool isOrderDialogShowing = false.obs;
 
   @override
   void onInit() {
@@ -591,13 +595,44 @@ class SharedController extends GetxService {
     return 'host';
   }
 
-  Future<void> sendDataToClient(BaseMessage message) async {
-    if (!isConnected.value) return;
-    if (message.type == MessageType.order) {
+  Future<void> processOrderDialogQueue() async {
+    // 如果已有弹窗显示或队列为空，直接返回
+    if (isOrderDialogShowing.value || orderDialogQueue.isEmpty) return;
+
+    isOrderDialogShowing.value = true;
+
+    try {
+      // 获取队列中的第一个请求
+      final request = orderDialogQueue.first;
+      final message = request.message;
+
+      // 显示弹窗
       final result = await Utils.showAlertDialog('是否同步来自于${message.name}的订单数据？, 注意：同步后本地数据将被覆盖');
+
       if (result == true) {
         _syncOrder(jsonDecode(message.data));
       }
+
+      // 移除已处理的请求
+      orderDialogQueue.removeFirst();
+    } finally {
+      isOrderDialogShowing.value = false;
+      // 处理下一个请求
+      if (orderDialogQueue.isNotEmpty) {
+        // 延迟一小段时间，避免弹窗切换过快
+        Future.delayed(const Duration(milliseconds: 800), () {
+          processOrderDialogQueue();
+        });
+      }
+    }
+  }
+
+  Future<void> sendDataToClient(BaseMessage message) async {
+    if (!isConnected.value) return;
+
+    if (message.type == MessageType.order) {
+      orderDialogQueue.add(OrderDialogRequest(message));
+      processOrderDialogQueue();
     } else {
       var data = await dataToJson(message.type, message.data);
       final responseMsg = message.copyWith(
@@ -841,4 +876,9 @@ class SharedController extends GetxService {
       SmartDialog.showToast('订单数据同步失败：$e');
     }
   }
+}
+
+class OrderDialogRequest {
+  final BaseMessage message;
+  OrderDialogRequest(this.message);
 }
