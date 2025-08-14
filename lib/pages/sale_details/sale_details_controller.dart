@@ -256,6 +256,7 @@ class SaleDetailsController extends GetxController {
     required String rootFolderName,
     required String folderName,
     required String fileName,
+    required pw.Document doc,
   }) async {
     final flutterMediaStorePlugin = FlutterMediaStore();
     try {
@@ -267,8 +268,7 @@ class SaleDetailsController extends GetxController {
         folderName: folderName,
         fileName: fileName,
         onSuccess: (String uri, String filePath) {
-          Get.to(() => PdfView(path: filePath));
-
+          Get.to(() => PdfView(path: filePath, doc: doc));
           SnackBarUtil.success('文件已保存到$filePath');
         },
         onError: (String error) {
@@ -527,6 +527,7 @@ class SaleDetailsController extends GetxController {
                 rootFolderName: 'xiao_liu_da_yin',
                 folderName: dirFormatter.format(DateTime.now()),
                 fileName: '${order.customerName}_$dateStr.pdf',
+                doc: pdf,
               );
             } else {
               log(
@@ -539,6 +540,28 @@ class SaleDetailsController extends GetxController {
                 '文件已保存到${downloadsDir?.path}${Platform.pathSeparator}xiao_liu_da_yin${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}',
               );
               settings.backupDirectory.value = '${downloadsDir?.path}${Platform.pathSeparator}xiao_liu_da_yin';
+            }
+          } catch (e) {
+            log(e.toString(), name: 'generateAndPrintPdf');
+            SnackBarUtil.error('error: $e');
+          }
+        } else if (printSelected == 2) {
+          try {
+            final directory = await getTemporaryDirectory();
+            final file = File(
+              '${directory.path}${Platform.pathSeparator}xiao_liu_da_yin${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}${Platform.pathSeparator}${order.customerName}.pdf',
+            );
+            if (Platform.isAndroid) {
+              await file.writeAsBytes(bytes);
+              Get.to(() => PdfView(path: file.path, doc: pdf));
+            } else {
+              log(
+                '${directory.path}${Platform.pathSeparator}xiao_liu_da_yin${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}',
+                name: 'generateAndPrintPdf',
+              );
+              file.createSync(recursive: true);
+              await file.writeAsBytes(bytes);
+              Get.to(() => PdfView(path: file.path, doc: pdf));
             }
           } catch (e) {
             log(e.toString(), name: 'generateAndPrintPdf');
@@ -571,6 +594,17 @@ class SaleDetailsController extends GetxController {
         return SimpleDialog(
           title: const Text('打印'),
           children: [
+            RadioListTile<dynamic>(
+              activeColor: Theme.of(context).colorScheme.primary,
+              groupValue: printSelected,
+              value: 2,
+              title: const Text('预览'),
+              onChanged: (value) {
+                printSelected = 2;
+                generateAndPrintPdf();
+                Navigator.pop(context);
+              },
+            ),
             RadioListTile<dynamic>(
               activeColor: Theme.of(context).colorScheme.primary,
               groupValue: printSelected,
