@@ -552,6 +552,7 @@ class SaleDetailsController extends GetxController {
               '${directory.path}${Platform.pathSeparator}xiao_liu_da_yin${Platform.pathSeparator}${dirFormatter.format(DateTime.now())}${Platform.pathSeparator}${order.customerName}.pdf',
             );
             if (Platform.isAndroid) {
+              file.createSync(recursive: true);
               await file.writeAsBytes(bytes);
               Get.to(() => PdfView(path: file.path, doc: pdf));
             } else {
