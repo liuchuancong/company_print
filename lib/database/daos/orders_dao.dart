@@ -94,6 +94,7 @@ class OrdersDao extends DatabaseAccessor<AppDatabase> with _$OrdersDaoMixin {
       isPaid: Value(order.isPaid),
       customerId: Value(order.customerId),
       uuid: order.uuid,
+      createdAt: Value(order.createdAt),
     );
     return await into(orders).insert(entry);
   }

@@ -60,15 +60,10 @@ class SaleDetailsController extends GetxController {
       '',
       'itemName',
       'totalPrice',
-      'advancePayment',
       'purchaseQuantity',
-      'presetPrice',
-      'purchaseUnit',
       'actualQuantity',
-      'actualPrice',
-      'actualUnit',
+      'advancePayment',
       'itemShortName',
-      // 如果有其他需要排序的字段，可以继续添加
     ];
     return sortNames[sortColumnIndex.value];
   }

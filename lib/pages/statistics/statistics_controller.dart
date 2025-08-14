@@ -53,15 +53,12 @@ class StatisticsController extends GetxController {
         title: const Text('选择日期'),
         content: Container(
           width: Get.width < 600 ? Get.width * 0.9 : Get.width * 0.6,
-          constraints: const BoxConstraints(
-            maxHeight: 500,
-          ),
+          constraints: const BoxConstraints(maxHeight: 500),
           child: SingleChildScrollView(
             child: CalendarDatePicker2(
               config: CalendarDatePicker2Config(
                 calendarType: CalendarDatePicker2Type.range,
                 firstDate: DateTime(1990, 1, 1),
-                lastDate: DateTime.now(),
                 controlsTextStyle: const TextStyle(color: Colors.black, fontSize: 18),
                 dayTextStyle: const TextStyle(color: Colors.black, fontSize: 18),
                 monthTextStyle: const TextStyle(fontSize: 18, color: Colors.black),
@@ -92,10 +89,7 @@ class StatisticsController extends GetxController {
             }),
             child: const Text('取消'),
           ),
-          TextButton(
-            onPressed: (() => Navigator.of(Get.context!).pop(currentDates)),
-            child: const Text('确定'),
-          ),
+          TextButton(onPressed: (() => Navigator.of(Get.context!).pop(currentDates)), child: const Text('确定')),
         ],
       ),
     );

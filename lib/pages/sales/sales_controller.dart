@@ -97,7 +97,6 @@ class SalesController extends BasePageController {
               config: CalendarDatePicker2Config(
                 calendarType: CalendarDatePicker2Type.range,
                 firstDate: DateTime(1990, 1, 1),
-                lastDate: DateTime.now(),
                 controlsTextStyle: const TextStyle(color: Colors.black, fontSize: 18),
                 dayTextStyle: const TextStyle(color: Colors.black, fontSize: 18),
                 monthTextStyle: const TextStyle(fontSize: 18, color: Colors.black),

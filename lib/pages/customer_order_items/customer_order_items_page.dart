@@ -91,7 +91,7 @@ class _CustomerOrderItemsPageState extends State<CustomerOrderItemsPage> {
                   onRowsPerPageChanged: controller.handleRowsPerPageChanged,
                   sortColumnIndex: controller.sortColumnIndex.value,
                   sortAscending: controller.sortAscending.value,
-                  minWidth: 1500,
+                  minWidth: 1200,
                   isHorizontalScrollBarVisible: true,
                   columnSpacing: 20,
                   fixedColumnsColor: Theme.of(context).highlightColor,
@@ -101,27 +101,17 @@ class _CustomerOrderItemsPageState extends State<CustomerOrderItemsPage> {
                     const DataColumn2(label: Text('操作'), fixedWidth: 220),
                     DataColumn2(
                       label: const Text('商品名称'),
-                      fixedWidth: 150,
+                      fixedWidth: 160,
                       onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                     ),
                     DataColumn2(
                       label: const Text('购买数量'),
-                      fixedWidth: 160,
-                      onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
-                    ),
-                    DataColumn2(
-                      label: const Text('购买单价'),
-                      fixedWidth: 160,
+                      fixedWidth: 200,
                       onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                     ),
                     DataColumn2(
                       label: const Text('实际数量'),
-                      fixedWidth: 160,
-                      onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
-                    ),
-                    DataColumn2(
-                      label: const Text('实际单价'),
-                      fixedWidth: 160,
+                      fixedWidth: 200,
                       onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                     ),
                     DataColumn2(
@@ -199,6 +189,21 @@ class EditOrderItemPageState extends State<EditOrderItemPage> {
     _actualPriceController = TextEditingController(
       text: isNew ? '' : widget.orderItem?.actualPrice.toString() ?? '0.0',
     );
+    setDefaultUnitValue();
+  }
+
+  Future<void> setDefaultUnitValue() async {
+    final AppDatabase database = DatabaseManager.instance.appDatabase;
+    final result = await database.dishUnitsDao.getAllDishUnits();
+    if (result.isNotEmpty) {
+      for (var element in result) {
+        if (element.name == '斤' && isNew) {
+          _purchaseUnitController.text = element.name;
+          _actualUnitController.text = element.name;
+          break;
+        }
+      }
+    }
   }
 
   void _submitForm() {
@@ -456,10 +461,16 @@ class CustomerOrderItemsDataSource extends AsyncDataTableSource {
               ),
             ),
             DataCell(Text(orderItem.itemName)),
-            DataCell(Text(Utils.concatenation(orderItem.purchaseQuantity, orderItem.purchaseUnit))),
-            DataCell(Text('${orderItem.presetPrice}')),
-            DataCell(Text(Utils.concatenation(orderItem.actualQuantity, orderItem.actualUnit))),
-            DataCell(Text('${orderItem.actualPrice}')),
+            DataCell(
+              Text(
+                '${Utils.concatenation(orderItem.purchaseQuantity, orderItem.purchaseUnit)} x ${orderItem.presetPrice.toString()}元',
+              ),
+            ),
+            DataCell(
+              Text(
+                '${Utils.concatenation(orderItem.actualQuantity, orderItem.actualUnit)} x ${orderItem.actualPrice.toString()}元',
+              ),
+            ),
             DataCell(Text(orderItem.itemShortName ?? '')),
           ],
         );

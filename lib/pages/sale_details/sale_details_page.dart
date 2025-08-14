@@ -218,7 +218,7 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                 onRowsPerPageChanged: controller.handleRowsPerPageChanged,
                 sortColumnIndex: controller.sortColumnIndex.value,
                 sortAscending: controller.sortAscending.value,
-                minWidth: 1600,
+                minWidth: 1200,
                 isHorizontalScrollBarVisible: true,
                 columnSpacing: 20,
                 fixedColumnsColor: Theme.of(context).highlightColor,
@@ -228,7 +228,7 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                   const DataColumn2(label: Text('操作'), fixedWidth: 160),
                   DataColumn2(
                     label: const Text('商品名称'),
-                    fixedWidth: 200,
+                    fixedWidth: 150,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
@@ -237,28 +237,19 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
-                    label: const Text('垫付'),
-                    fixedWidth: 150,
-                    onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
-                  ),
-                  DataColumn2(
                     label: const Text('购买数量'),
-                    fixedWidth: 160,
-                    onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
-                  ),
-                  DataColumn2(
-                    label: const Text('购买单价'),
-                    fixedWidth: 160,
+                    fixedWidth: 180,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
                     label: const Text('实际数量'),
-                    fixedWidth: 160,
+                    fixedWidth: 180,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
+
                   DataColumn2(
-                    label: const Text('实际单价'),
-                    fixedWidth: 160,
+                    label: const Text('垫付'),
+                    fixedWidth: 150,
                     onSort: (columnIndex, ascending) => controller.sort(columnIndex, ascending),
                   ),
                   DataColumn2(
@@ -342,6 +333,21 @@ class EditOrderItemsPageState extends State<EditOrderItemsPage> {
     _actualPriceController = TextEditingController(
       text: isNew ? '' : widget.orderItem?.actualPrice.toString() ?? '0.0',
     );
+    setDefaultUnitValue();
+  }
+
+  Future<void> setDefaultUnitValue() async {
+    final AppDatabase database = DatabaseManager.instance.appDatabase;
+    final result = await database.dishUnitsDao.getAllDishUnits();
+    if (result.isNotEmpty) {
+      for (var element in result) {
+        if (element.name == '斤' && isNew) {
+          _purchaseUnitController.text = element.name;
+          _actualUnitController.text = element.name;
+          break;
+        }
+      }
+    }
   }
 
   void _submitForm() {
@@ -648,15 +654,21 @@ class SaleDetailsDataSource extends AsyncDataTableSource {
             ),
             DataCell(
               Text(
+                '${Utils.concatenation(orderItem.purchaseQuantity, orderItem.purchaseUnit)} x ${orderItem.presetPrice.toString()}元',
+              ),
+            ),
+            DataCell(
+              Text(
+                '${Utils.concatenation(orderItem.actualQuantity, orderItem.actualUnit)} x ${orderItem.actualPrice.toString()}元',
+              ),
+            ),
+            DataCell(
+              Text(
                 controller.salesOrderCalculationType.value == SalesOrderCalculationType.decimal
                     ? Utils.getDoubleStringDecimal(orderItem.advancePayment)
                     : Utils.getDoubleStringRound(orderItem.advancePayment),
               ),
             ),
-            DataCell(Text(Utils.concatenation(orderItem.purchaseQuantity, orderItem.purchaseUnit))),
-            DataCell(Text(orderItem.presetPrice.toString())),
-            DataCell(Text(Utils.concatenation(orderItem.actualQuantity, orderItem.actualUnit))),
-            DataCell(Text(orderItem.actualPrice.toString())),
             DataCell(Text(orderItem.itemShortName ?? '')),
           ],
         );

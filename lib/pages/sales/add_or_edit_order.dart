@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:date_format/date_format.dart';
@@ -63,6 +64,9 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
         selectedDate = [widget.order!.createdAt];
         _dateController.text = formatDate(widget.order!.createdAt, [yyyy, '-', mm, '-', dd, ' ', HH, ':', nn, ':', ss]);
       });
+    } else {
+      selectedDate = [DateTime.now()];
+      _dateController.text = formatDate(DateTime.now(), [yyyy, '-', mm, '-', dd, ' ', HH, ':', nn, ':', ss]);
     }
     super.initState();
   }
@@ -79,7 +83,6 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
               config: CalendarDatePicker2Config(
                 calendarType: CalendarDatePicker2Type.single,
                 firstDate: DateTime(1990, 1, 1),
-                lastDate: DateTime.now(),
                 controlsTextStyle: const TextStyle(color: Colors.black, fontSize: 18),
                 dayTextStyle: const TextStyle(color: Colors.black, fontSize: 18),
                 monthTextStyle: const TextStyle(fontSize: 18),
@@ -104,7 +107,12 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
           TextButton(
             onPressed: (() {
               setState(() {
-                selectedDate = [widget.order!.createdAt];
+                if (isNew) {
+                  selectedDate = [DateTime.now()];
+                } else {
+                  selectedDate = [widget.order!.createdAt];
+                }
+                _dateController.text = formatDate(selectedDate[0], [yyyy, '-', mm, '-', dd, ' ', HH, ':', nn, ':', ss]);
               });
               Navigator.of(Get.context!).pop();
             }),
@@ -149,11 +157,11 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
       shippingFee: double.tryParse(_shippingFeeController.text) ?? 0,
       isPaid: _isPaid,
       customerId: customerId,
-      createdAt: isNew ? DateTime.now() : selectedDate[0],
+      createdAt: selectedDate[0],
       updatedAt: DateTime.now(),
       uuid: UuidUtil.v4(),
     );
-
+    log(updatedOrder.toString());
     widget.onConfirm(updatedOrder);
     Get.back();
   }
@@ -249,24 +257,23 @@ class AddOrEditOrderPageState extends State<AddOrEditOrderPage> {
                         textInputAction: TextInputAction.next,
                       ),
                     ),
-                  if (!isNew)
-                    InputTextField(
-                      labelText: '创建日期',
-                      gap: 10,
-                      child: TextField(
-                        readOnly: true,
-                        controller: _dateController,
-                        textInputAction: TextInputAction.next,
-                        decoration: InputDecoration(
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.calendar_month_outlined, size: 30),
-                            onPressed: () {
-                              showDateTimerPicker();
-                            },
-                          ),
+                  InputTextField(
+                    labelText: '创建日期',
+                    gap: 10,
+                    child: TextField(
+                      readOnly: true,
+                      controller: _dateController,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.calendar_month_outlined, size: 30),
+                          onPressed: () {
+                            showDateTimerPicker();
+                          },
                         ),
                       ),
                     ),
+                  ),
                   InputTextField(
                     labelText: '备注',
                     gap: 10,

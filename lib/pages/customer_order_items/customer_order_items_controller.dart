@@ -29,15 +29,7 @@ class CustomerOrderItemsController extends GetxController {
   }
 
   String getSortName() {
-    var sortNames = [
-      '',
-      'itemName',
-      'purchaseQuantity',
-      'presetPrice',
-      'actualQuantity',
-      'actualPrice',
-      'itemShortName',
-    ];
+    var sortNames = ['', 'itemName', 'purchaseQuantity', 'actualQuantity', 'itemShortName'];
     return sortNames[sortColumnIndex.value];
   }
 
@@ -105,10 +97,12 @@ class CustomerOrderItemsController extends GetxController {
   }
 
   void showCreateCustomerPage() {
-    Get.to(() => EditOrderItemPage(
-          controller: this,
-          onConfirm: (newCustomerOrderItem) => addCustomerOrderItem(newCustomerOrderItem),
-        ));
+    Get.to(
+      () => EditOrderItemPage(
+        controller: this,
+        onConfirm: (newCustomerOrderItem) => addCustomerOrderItem(newCustomerOrderItem),
+      ),
+    );
   }
 
   void copyTextToClipboard() async {
@@ -124,11 +118,14 @@ class CustomerOrderItemsController extends GetxController {
   }
 
   void showMutipleOrderItemPage() {
-    Get.to(() => MutipleOrderItemPage(
+    Get.to(
+      () => MutipleOrderItemPage(
         controller: this,
         onConfirm: (List<CustomerOrderItem> newCustomerOrderItems) {
           handleMutipleOrderItem(newCustomerOrderItems);
-        }));
+        },
+      ),
+    );
   }
 
   void handleMutipleOrderItem(List<CustomerOrderItem> newCustomerOrderItems) async {
@@ -138,11 +135,13 @@ class CustomerOrderItemsController extends GetxController {
   }
 
   void showEditCustomerPage(CustomerOrderItem customerOrderItem) {
-    Get.to(() => EditOrderItemPage(
-          controller: this,
-          orderItem: customerOrderItem,
-          onConfirm: (updatedCustomerOrderItem) => updateCustomerOrderItem(updatedCustomerOrderItem),
-        ));
+    Get.to(
+      () => EditOrderItemPage(
+        controller: this,
+        orderItem: customerOrderItem,
+        onConfirm: (updatedCustomerOrderItem) => updateCustomerOrderItem(updatedCustomerOrderItem),
+      ),
+    );
   }
 
   Future<void> addCustomerOrderItem(CustomerOrderItem addCustomerOrderItem) async {

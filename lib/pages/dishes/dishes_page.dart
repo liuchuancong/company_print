@@ -88,14 +88,18 @@ class _DishesPageState extends State<DishesPage> with TickerProviderStateMixin {
                             title: Container(
                               margin: const EdgeInsets.only(left: 15.0),
                               child: Text(
-                                '商品名称: ${node.data!.data.name}',
+                                node.children.isNotEmpty
+                                    ? '商品类别: ${node.data!.data.name}'
+                                    : '商品名称: ${node.data!.data.name}',
                                 style: const TextStyle(fontSize: 18.0, color: Colors.black),
                               ),
                             ),
                             subtitle: Container(
                               margin: const EdgeInsets.only(left: 15.0),
                               child: Text(
-                                '商品描述: ${node.data!.data.description}',
+                                node.children.isNotEmpty
+                                    ? '类别描述: ${node.data!.data.description}'
+                                    : '商品描述: ${node.data!.data.description}',
                                 style: const TextStyle(fontSize: 16.0, color: Colors.black),
                               ),
                             ),
